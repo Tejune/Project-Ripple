@@ -71,7 +71,7 @@ def play_song(song):
 
     # Load thumbnail image
     if song["Image"] == "None":
-        song["Image"] = "C:\\Users\\osknil30\\Downloads\\20211026_071741.jpg"
+        song["Image"] = "default_thumb.jpg"
 
     imp = pygame.image.load(song["Image"]).convert()
     imp = pygame.transform.scale(imp, (1200, 675))
@@ -210,6 +210,7 @@ for root in os.scandir(songs_directory):
     # Create directory for song info
     song_info = {}
     song_info["Image"] = "None"
+    song_info["Title"] = "None"
     found_qua_file = False
 
     # Check files for .QUA info file & .mp3 audio file & .png thumbnail and add to dict
