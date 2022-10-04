@@ -66,6 +66,7 @@ def play_song(song):
     pygame.display.update()
 
     # Load and play song
+    print("\n AUDIO FILE PATHWAY: " + song["AudioPath"])
     pygame.mixer.music.load(song["Audio"])
     pygame.mixer.music.play()
 
@@ -229,8 +230,10 @@ for root in os.scandir(songs_directory):
                 print(song_info["Title"] + "\n" + song_info["Description"]+ "\n" )
             
         # .mp3 File
-        elif file.name.endswith('.mp3'):
+        elif file.name.endswith('.mp3') or file.name.endswith('.wav'):
             song_info["Audio"] = file
+            song_info["AudioPath"] = file.path
+            print("FOUND SONG FILE")
 
          # .png / .jpg File
         elif file.name.endswith('.jpg') or file.name.endswith('.png'):
