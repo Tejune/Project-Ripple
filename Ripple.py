@@ -64,6 +64,8 @@ def lerp(a: float, b: float, t: float) -> float:
 ## PLAY SONG FUNCTION
 def play_song(song):
 
+    ### SETUP ###
+
     #Clear screen
     pygame.display.update()
 
@@ -81,8 +83,26 @@ def play_song(song):
 
     rip = []
     lp = 0
-
     is_playing = True
+
+    # Setup note data using .QUA file
+    f = song_info["Data"]
+    notes = []
+    with open(f, "r", encoding="utf8") as info:
+        Lines = f.readlines()
+        iteration = 0
+        for Line in Lines:
+            if Line.find("StartTime: "):
+                start_time = Line[Line.find("StartTime: ") + 11 : Line.find("\n", Line.find("StartTime"))]
+                next_line = Lines[iteration + 1]
+                lane = next_line[next_line.find("Lane: ") + 6 : next_line.find("\n", next_line.find("Lane: "))]
+                notes.append([int(start_time), int(lane)])
+            iteration += 1
+
+    song_info["Title"] =  inf[inf.find("Title: ") + 7:inf.find("\n", inf.find("Title: "))]
+
+    ### MAIN LOOP ###
+
     while is_playing:
 
         #Set constant framerate
@@ -101,25 +121,24 @@ def play_song(song):
         # Fill screen with black
         WIN.fill(BLACK)
 
-        # Draw image
+        # Draw background image
         sur = pygame.Surface((1200, 675))
         sur.set_alpha(40)
         sur.blit(imp, (0, 0))
         WIN.blit(sur, (0, 0))
 
-        # Draw labels
+        # Draw topbar surfaces
         pygame.draw.rect(WIN, BLACK, pygame.Rect(0, 0, 1500, 64))
         corner = pygame.Surface((210, 64))
         pygame.draw.rect(corner, YELLOW, pygame.Rect(0, 0, 210, 64))
         pygame.draw.rect(WIN, YELLOW, pygame.Rect(0, 0, 210, 64))
 
-        #Surface ripple effect
+        #Topbar ripple effect
         lp+= 1
         if lp >= 40:
             # Create ripple
             rip.append(0)
             lp = 0
-
         for lifetime in rip:
 
             rip[rip.index(lifetime)] += 1
@@ -133,6 +152,8 @@ def play_song(song):
             if lifetime >= 120:
                 rip.remove(lifetime + 1)
 
+
+        # Draw topbar labels
         display_t = song["Title"]
         if len(display_t) > 100:
             display_t = display_t[0:97] + "..."
@@ -140,10 +161,14 @@ def play_song(song):
         WIN.blit(subtitle, (227, 23))
         tooltip = FONT.render("NOW PLAYING:", False, BLACK)
         WIN.blit(tooltip, (23, 23 ))
-        #final = FONT_SMALL.render("RETURN [SPACE]", False, (150,150,150))
-        #WIN.blit(final, (WIDTH - final.get_width() - 26, 28 ))
+        
+
+        #### PLAYING THE SONG ###
 
 
+
+
+        # Update screen
         pygame.display.update()
     pygame.mixer.music.stop()
 
@@ -211,6 +236,15 @@ class Button:
 
 
 ############ Setup Songs ############
+
+# Show loading screen
+text_surface = FONT_TITLE.render('PROJECT RIPPLE', False, YELLOW)
+WIN.blit(text_surface, (WIDTH/2 - text_surface.get_width()/2, 200 ))
+subtitle = FONT.render('LOADING SONG LIBRARY...', False, WHITE)
+WIN.blit(subtitle, (WIDTH/2 - subtitle.get_width()/2, 275 ))
+pygame.display.update()
+
+# Main setup loop
 for root in os.scandir(songs_directory):
 
     # Create directory for song info
