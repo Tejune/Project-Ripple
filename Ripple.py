@@ -5,6 +5,7 @@
 
 #### Imports
 from array import array
+from asyncio.windows_events import NULL
 import math
 from platform import python_revision
 from tkinter import Frame
@@ -22,6 +23,7 @@ Framerate = 60
 
 #### Directory & Dictionary
 songs_directory = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Quaver\\Songs"
+default_thumbnail = pygame.image.load("default_thumb.jpg")
 songs = []
 
 #### Set pygame variables
@@ -42,7 +44,7 @@ BLACK = (0, 0, 0)
 
 ##Scrolling song selection
 scroll_offset = 0
-selected_song = ""
+selected_song = None
 gradient = pygame.image.load("thumbnail_bg.png").convert_alpha()
 topbar = pygame.image.load("topbar.png").convert()
 
@@ -74,7 +76,7 @@ def play_song(song):
     if song["Image"] == "None":
         song["Image"] = "default_thumb.jpg"
 
-    imp = pygame.image.load(song["Image"]).convert()
+    imp = song["LoadedImage"]
     imp = pygame.transform.scale(imp, (1200, 675))
 
     rip = []
@@ -132,14 +134,14 @@ def play_song(song):
                 rip.remove(lifetime + 1)
 
         display_t = song["Title"]
-        if len(display_t) > 40:
-            display_t = display_t[0:37] + "..."
+        if len(display_t) > 100:
+            display_t = display_t[0:97] + "..."
         subtitle = FONT.render("" + display_t, False, WHITE)
         WIN.blit(subtitle, (227, 23))
         tooltip = FONT.render("NOW PLAYING:", False, BLACK)
         WIN.blit(tooltip, (23, 23 ))
-        final = FONT_SMALL.render("RETURN [SPACE]", False, (150,150,150))
-        WIN.blit(final, (WIDTH - final.get_width() - 26, 28 ))
+        #final = FONT_SMALL.render("RETURN [SPACE]", False, (150,150,150))
+        #WIN.blit(final, (WIDTH - final.get_width() - 26, 28 ))
 
 
         pygame.display.update()
@@ -170,8 +172,9 @@ class Button:
         self.bound_x, self.bound_y = FONT.size(text)
         self.bound_x = 500
         self.size = (self.bound_x, self.bound_y + 18)
-        self.surface = pygame.Surface(self.size)
-        self.surface.fill(bg)
+        self.surface = pygame.Surface(self.size, pygame.SRCALPHA)
+        self.surface.convert_alpha()
+        #self.surface.fill(bg)
         self.surface.blit(self.text, (0, 9))
         self.rect = pygame.Rect(self.x, self.y, self.size[0], self.size[1])
  
@@ -181,18 +184,20 @@ class Button:
         if self.rect.collidepoint(m_x, m_y):
             self.text = self.font.render(self.input, 1, (255, 255, 200))
             self.size = (self.bound_x, self.bound_y + 18)
-            self.surface = pygame.Surface(self.size)
+            self.surface = pygame.Surface(self.size, pygame.SRCALPHA)
+            self.surface.convert_alpha()
             self.surface.fill((10,10,10))
             self.surface.blit(self.text, (0, 9))
         else:
             self.text = self.font.render(self.input, 1, YELLOW)
             self.size = (self.bound_x, self.bound_y + 18)
-            self.surface = pygame.Surface(self.size)
-            self.surface.fill(BLACK)
+            self.surface = pygame.Surface(self.size, pygame.SRCALPHA)
+            self.surface.convert_alpha()
+            #self.surface.fill(BLACK)
             self.surface.blit(self.text, (0, 9))
         WIN.blit(self.surface, (self.x, self.y + scroll_offset))
         if self.rect.collidepoint(m_x, m_y):
-            return self.song["Image"]
+            return self.song
  
     def click(self, event):
         x, y = pygame.mouse.get_pos()
@@ -212,6 +217,7 @@ for root in os.scandir(songs_directory):
     song_info = {}
     song_info["Image"] = "None"
     song_info["Title"] = "None"
+    song_info["LoadedImage"] = "None"
     found_qua_file = False
 
     # Check files for .QUA info file & .mp3 audio file & .png thumbnail and add to dict
@@ -238,7 +244,13 @@ for root in os.scandir(songs_directory):
          # .png / .jpg File
         elif file.name.endswith('.jpg') or file.name.endswith('.png'):
             song_info["Image"] = file
+            song_info["LoadedImage"] = pygame.image.load(file)
     
+    # Check if a thumbnail image couldn't be found, if true load the default
+    if song_info["Image"] == "None":
+        song_info["Image"] = "default_thumb.jpg"
+        song_info["LoadedImage"] = default_thumbnail
+
     # Add new song information to the primary dictionary
     songs.append(song_info)
 
@@ -334,17 +346,19 @@ while is_on_select_screen:
     WIN.fill(BLACK)
 
     # Draw selected song thumbnail preview
-    #if selected_song != "":
-     #   if selected_song == "None":
-      #      selected_song = "C:\\Users\\osknil30\\Downloads\\20211026_071741.jpg"
-
-       # sur = pygame.Surface((1200, 675))
-        #sur.set_alpha(40)
-        #imp = pygame.image.load(selected_song).convert()
-        #imp = pygame.transform.scale(imp, (1200, 675))
-        #sur.blit(imp, (0, 0))
-        #WIN.blit(sur, (WIDTH - imp.get_width()/1.325, 0))
-    #pygame.draw.rect(WIN, BLACK, pygame.Rect(0, 0, 580, 1400))
+    if selected_song:
+        sur = pygame.Surface((1200, 675))
+        sur.set_alpha(40)
+        imp = selected_song["LoadedImage"]
+        imp = pygame.transform.scale(imp, (1200, 675))
+        sur.blit(imp, (0, 0))
+        WIN.blit(sur, (0, 0))
+    
+    # Add transparent background under song list
+    _bg = pygame.Surface((580, 675))
+    _bg.set_alpha(100)
+    pygame.draw.rect(_bg, BLACK, pygame.Rect(0, 0, 580, 675))
+    WIN.blit(_bg,(0, 130))
 
     for button in buttons:
         sel = button.show()
@@ -363,11 +377,17 @@ while is_on_select_screen:
     scroll_offset = max(-2000, min(scroll_offset + scroll, 0))
 
 
+    # Add transparent background under title
+    _title = pygame.Surface((1125, 130))
+    _title.set_alpha(230)
+    pygame.draw.rect(_title, (5,5,5), pygame.Rect(0, 0, 1125, 130))
+    WIN.blit(_title,(0, 0))
+
     # Draw title
-    pygame.draw.rect(WIN, (5,5,5), pygame.Rect(0, 0, 1125, 130))
+    #pygame.draw.rect(WIN, (5,5,5), pygame.Rect(0, 0, 1125, 130))
     subtitle = FONT_HEADER.render('SONG SELECT', False, WHITE)
     WIN.blit(subtitle, (25, 50 ))
-    tooltip = FONT_SMALL.render('View more songs by hovering with your mouse!', False, WHITE)
+    tooltip = FONT_SMALL.render( "[" + str(len(songs)) + ' Loaded] View more songs by hovering with your mouse!', False, WHITE)
     WIN.blit(tooltip, (25, 92 ))
 
 
