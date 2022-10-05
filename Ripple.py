@@ -41,6 +41,7 @@ clock = pygame.time.Clock()
 WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
 BLACK = (0, 0, 0)
+NOTE_WINDOW = 1000 #ms
 
 ##Scrolling song selection
 scroll_offset = 0
@@ -84,29 +85,48 @@ def play_song(song):
     rip = []
     lp = 0
     is_playing = True
+    song_time = 0
+    playing_notes = []
 
     # Setup note data using .QUA file
-    f = song_info["Data"]
+    f = song["Data"]
     notes = []
     with open(f, "r", encoding="utf8") as info:
-        Lines = f.readlines()
+
+        # Create variables
+        Lines = info.readlines()
         iteration = 0
+
+        # Iterate through each line in the .QUA file
         for Line in Lines:
-            if Line.find("StartTime: "):
+
+            #If the text signaling the start of a note is found:
+            if Line.find("StartTime: ") != -1 and iteration >= 17:
+
+                # Set variables for start time + the next lane
                 start_time = Line[Line.find("StartTime: ") + 11 : Line.find("\n", Line.find("StartTime"))]
                 next_line = Lines[iteration + 1]
-                lane = next_line[next_line.find("Lane: ") + 6 : next_line.find("\n", next_line.find("Lane: "))]
-                notes.append([int(start_time), int(lane)])
+
+                # Make sure a line is also specified on the line below
+                if next_line.find("Lane: ") != -1:
+
+                    # Find lane for note
+                    lane = next_line[next_line.find("Lane: ") + 6 : next_line.find("\n", next_line.find("Lane: "))]
+
+                    # Append to notes array (File is structured so start_times are ordered by default, neat!)
+                    notes.append([int(start_time), int(lane)])
+
             iteration += 1
 
-    song_info["Title"] =  inf[inf.find("Title: ") + 7:inf.find("\n", inf.find("Title: "))]
-
     ### MAIN LOOP ###
+    clock.tick()
 
     while is_playing:
 
         #Set constant framerate
-        clock.tick(Framerate)
+        delta_time = clock.tick(Framerate)
+
+        #print(len(notes))
 
         # Check for events
         for event in pygame.event.get():
@@ -163,9 +183,59 @@ def play_song(song):
         WIN.blit(tooltip, (23, 23 ))
         
 
+
         #### PLAYING THE SONG ###
 
+        # Draw background
+        _bg = pygame.Surface((450, 675))
+        _bg.set_alpha(140)
+        pygame.draw.rect(_bg, BLACK, pygame.Rect(0, 0, 450, 675))
+        pygame.draw.rect(_bg, (140,140,140), pygame.Rect(0, 500, 450, 2))
+        WIN.blit(_bg,(WIDTH/2 - _bg.get_width() / 2, 64))
 
+        # Find and add notes within time window
+        #print(song_time)
+        current_time = song_time + delta_time
+        song_time = current_time
+        for note in notes:
+            if note[0] - current_time <= NOTE_WINDOW:
+                playing_notes.append(note)
+                notes.remove(note)
+                #ADD NOTES
+                print("NEW NOTE ADDED")
+                #print(note[0] - current_time)
+            if note[0] - current_time > NOTE_WINDOW:
+                break
+
+        # Draw and calculate notes
+        _note_bg = pygame.Surface((450, 675), pygame.SRCALPHA)
+        _note_bg = _note_bg.convert_alpha()
+        for note in playing_notes:
+            print("NEW NOTE ROLL")
+            position_x = 100 * (note[1] - 1) + ((note[1] - 1) * 8) + 12
+
+            # FINAL Y = 500
+            #p = p1 + (p2 - p1) * t
+            a = ( note[0] - current_time ) / 1000
+            position_y = -30 + (500 + 30 ) * (1 - a)
+
+            #print("\n\nNOTE INFO: \nhit_time = " + str(note[0]) + "\ncurrent_time = " + str(current_time) + "\na = " + str(a) + "\n pos_y = " + str(position_y))
+
+            # Draw actual note
+            c = YELLOW
+            if position_y >= 500:
+                c = WHITE
+
+            #print(str(position_x) + " | " + str(position_y))
+
+            
+            pygame.draw.rect(_note_bg, c, pygame.Rect(position_x, position_y, 100, 30))
+
+            # Delete note if passed threshold
+            if position_y > 675:
+                playing_notes.remove(note)
+
+        WIN.blit(_note_bg,(WIDTH/2 - _bg.get_width() / 2, 64))
 
 
         # Update screen
