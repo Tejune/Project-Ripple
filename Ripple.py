@@ -42,7 +42,7 @@ clock = pygame.time.Clock()
 WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
 BLACK = (0, 0, 0)
-NOTE_WINDOW = 1000 #ms
+NOTE_WINDOW = 750 #ms
 
 ##Scrolling song selection
 scroll_offset = 0
@@ -83,6 +83,8 @@ def play_song(song):
     imp = pygame.transform.scale(imp, (1200, 675))
 
     rip = []
+    combo_rip = []
+    frames_since_last_hit = 50
     lp = 0
     is_playing = True
     song_playing = False
@@ -128,7 +130,7 @@ def play_song(song):
         for note in playing_notes:
             if note[1] == lane:
                 offset = note[0] - song_time
-                if  offset < 128 and offset > -128:
+                if  offset < 60 and offset > -60:
                     playing_notes.remove(note)
                     return True
 
@@ -139,6 +141,7 @@ def play_song(song):
 
         #Set constant framerate
         delta_time = clock.tick(Framerate)
+        frames_since_last_hit += 1
 
         #print(len(notes))
 
@@ -156,18 +159,22 @@ def play_song(song):
             hit = hit_detect(1)
             if hit:
                 combo += 1
+                frames_since_last_hit = 0
         if keys[pygame.K_s]:
             hit = hit_detect(2)
             if hit:
                 combo += 1
+                frames_since_last_hit = 0
         if keys[pygame.K_d]:
             hit = hit_detect(3)
             if hit:
                 combo += 1
+                frames_since_last_hit = 0
         if keys[pygame.K_f]:
             hit = hit_detect(4)
             if hit:
                 combo += 1
+                frames_since_last_hit = 0
 
 
         # Fill screen with black
@@ -205,6 +212,22 @@ def play_song(song):
                 rip.remove(lifetime + 1)
 
 
+
+        #COMBO ripple effect
+        surface = pygame.Surface((1300,675), pygame.SRCALPHA)
+        surface.set_alpha(50)
+
+       # for lifetime in combo_rip:
+
+        #    combo_rip[combo_rip.index(lifetime)] += 1
+
+            #pygame.Rect(210/2 - 3*lifetime/2, 32 - 3*lifetime/2, 3 * lifetime, 3 * lifetime)
+         #   pygame.draw.circle(surface, YELLOW, (980, 230), lifetime*5, width = 2) 
+ 
+          #  if lifetime >= 40:
+           #     combo_rip.remove(lifetime + 1)
+        #WIN.blit(surface, (0,0))
+
         # Draw topbar labels
         display_t = song["Title"]
         if len(display_t) > 100:
@@ -216,9 +239,10 @@ def play_song(song):
 
         # Draw combo
         combo_label = FONT_HEADER.render("COMBO", False, YELLOW)
-        WIN.blit(combo_label, (880, 150))
+        WIN.blit(combo_label, (830, 150))
         comb = FONT_COMBO.render(str(combo), False, YELLOW)
-        WIN.blit(comb, (880, 200 ))
+        y = max(930, min(940 - frames_since_last_hit * 3, 950))
+        WIN.blit(comb, (y, 200 ))
         
 
 
@@ -260,19 +284,11 @@ def play_song(song):
             # FINAL Y = 500
             #p = p1 + (p2 - p1) * t
             a = ( note[0] - current_time ) / NOTE_WINDOW
-            position_y = -30 + (470 + 30 ) * (1 - a)
-
-            #print("\n\nNOTE INFO: \nhit_time = " + str(note[0]) + "\ncurrent_time = " + str(current_time) + "\na = " + str(a) + "\n pos_y = " + str(position_y))
-
-            # Draw actual note
-            c = YELLOW
-            #if position_y >= 470:
-             #   c = WHITE
-
-            #print(str(position_x) + " | " + str(position_y))
-
+            position_y = -30 + (460 + 30 ) * (1 - a)
             
-            pygame.draw.rect(_note_bg, c, pygame.Rect(position_x, position_y, 100, 30))
+            # Add notes to surface
+            pygame.draw.rect(_note_bg, YELLOW, pygame.Rect(position_x, position_y, 100, 40))
+            pygame.draw.rect(_note_bg, (150,150, 0), pygame.Rect(position_x + 1, position_y + 1, 98, 38))
 
             # Delete note if passed threshold
             if position_y > 675:
