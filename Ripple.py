@@ -32,6 +32,7 @@ FONT_SMALL = pygame.font.Font("Pixellari.ttf", 20)
 FONT = pygame.font.Font("Pixellari.ttf", 25)
 FONT_HEADER = pygame.font.Font("Pixellari.ttf", 35)
 FONT_TITLE = pygame.font.Font("Pixellari.ttf", 55)
+FONT_COMBO = pygame.font.Font("Pixellari.ttf", 80)
 WIDTH = 500*2.25
 HEIGHT = 675
 WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
@@ -87,6 +88,7 @@ def play_song(song):
     song_playing = False
     song_time = -2000
     playing_notes = []
+    combo = 0
 
     ripple_spawn_frequency = (60 / song["BPM"]) * 1000
     ripple_time = 0
@@ -121,6 +123,15 @@ def play_song(song):
 
             iteration += 1
 
+    # Note hit detection
+    def hit_detect (lane):
+        for note in playing_notes:
+            if note[1] == lane:
+                offset = note[0] - song_time
+                if  offset < 128 and offset > -128:
+                    playing_notes.remove(note)
+                    return True
+
     ### MAIN LOOP ###
     clock.tick()
 
@@ -136,10 +147,28 @@ def play_song(song):
             if event.type == pygame.QUIT:
                 pygame.quit()
 
+
         # Check for keys pressed
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
             is_playing = False
+        if keys[pygame.K_a]:
+            hit = hit_detect(1)
+            if hit:
+                combo += 1
+        if keys[pygame.K_s]:
+            hit = hit_detect(2)
+            if hit:
+                combo += 1
+        if keys[pygame.K_d]:
+            hit = hit_detect(3)
+            if hit:
+                combo += 1
+        if keys[pygame.K_f]:
+            hit = hit_detect(4)
+            if hit:
+                combo += 1
+
 
         # Fill screen with black
         WIN.fill(BLACK)
@@ -184,6 +213,12 @@ def play_song(song):
         WIN.blit(subtitle, (227, 23))
         tooltip = FONT.render("NOW PLAYING:", False, BLACK)
         WIN.blit(tooltip, (23, 23 ))
+
+        # Draw combo
+        combo_label = FONT_HEADER.render("COMBO", False, YELLOW)
+        WIN.blit(combo_label, (880, 150))
+        comb = FONT_COMBO.render(str(combo), False, YELLOW)
+        WIN.blit(comb, (880, 200 ))
         
 
 
@@ -224,15 +259,15 @@ def play_song(song):
 
             # FINAL Y = 500
             #p = p1 + (p2 - p1) * t
-            a = ( note[0] - current_time ) / 1000
+            a = ( note[0] - current_time ) / NOTE_WINDOW
             position_y = -30 + (470 + 30 ) * (1 - a)
 
             #print("\n\nNOTE INFO: \nhit_time = " + str(note[0]) + "\ncurrent_time = " + str(current_time) + "\na = " + str(a) + "\n pos_y = " + str(position_y))
 
             # Draw actual note
             c = YELLOW
-            if position_y >= 470:
-                c = WHITE
+            #if position_y >= 470:
+             #   c = WHITE
 
             #print(str(position_x) + " | " + str(position_y))
 
@@ -241,6 +276,7 @@ def play_song(song):
 
             # Delete note if passed threshold
             if position_y > 675:
+                combo = 0
                 playing_notes.remove(note)
 
         WIN.blit(_note_bg,(WIDTH/2 - _bg.get_width() / 2, 64))
