@@ -73,7 +73,6 @@ def play_song(song):
     # Load and play song
     print("\n AUDIO FILE PATHWAY: " + song["AudioPath"])
     pygame.mixer.music.load(song["Audio"])
-    pygame.mixer.music.play()
 
     # Load thumbnail image
     if song["Image"] == "None":
@@ -85,7 +84,8 @@ def play_song(song):
     rip = []
     lp = 0
     is_playing = True
-    song_time = 0
+    song_playing = False
+    song_time = -2000
     playing_notes = []
 
     # Setup note data using .QUA file
@@ -207,6 +207,11 @@ def play_song(song):
             if note[0] - current_time > NOTE_WINDOW:
                 break
 
+        # Start song on queue
+        if song_time >= 0 and not song_playing:
+            song_playing = True
+            pygame.mixer.music.play()
+
         # Draw and calculate notes
         _note_bg = pygame.Surface((450, 675), pygame.SRCALPHA)
         _note_bg = _note_bg.convert_alpha()
@@ -217,13 +222,13 @@ def play_song(song):
             # FINAL Y = 500
             #p = p1 + (p2 - p1) * t
             a = ( note[0] - current_time ) / 1000
-            position_y = -30 + (500 + 30 ) * (1 - a)
+            position_y = -30 + (470 + 30 ) * (1 - a)
 
             #print("\n\nNOTE INFO: \nhit_time = " + str(note[0]) + "\ncurrent_time = " + str(current_time) + "\na = " + str(a) + "\n pos_y = " + str(position_y))
 
             # Draw actual note
             c = YELLOW
-            if position_y >= 500:
+            if position_y >= 470:
                 c = WHITE
 
             #print(str(position_x) + " | " + str(position_y))
@@ -336,6 +341,7 @@ for root in os.scandir(songs_directory):
             with open(file, "r", encoding="utf8") as info:
                 inf = info.read()
                 song_info["Title"] =  inf[inf.find("Title: ") + 7:inf.find("\n", inf.find("Title: "))]
+                song_info["BPM"] =  inf[inf.find("BPM: ") + 5:inf.find("\n", inf.find("BPM: "))]
                 song_info["Description"] =  inf[inf.find("Description: ") + 13:inf.find("\n", inf.find("Description: "))]
                 print(song_info["Title"] + "\n" + song_info["Description"]+ "\n" )
             
