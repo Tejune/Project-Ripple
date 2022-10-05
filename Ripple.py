@@ -88,6 +88,9 @@ def play_song(song):
     song_time = -2000
     playing_notes = []
 
+    ripple_spawn_frequency = (60 / song["BPM"]) * 1000
+    ripple_time = 0
+
     # Setup note data using .QUA file
     f = song["Data"]
     notes = []
@@ -154,11 +157,11 @@ def play_song(song):
         pygame.draw.rect(WIN, YELLOW, pygame.Rect(0, 0, 210, 64))
 
         #Topbar ripple effect
-        lp+= 1
-        if lp >= 40:
+        ripple_time += delta_time
+        if ripple_time >= ripple_spawn_frequency:
             # Create ripple
             rip.append(0)
-            lp = 0
+            ripple_time = 0
         for lifetime in rip:
 
             rip[rip.index(lifetime)] += 1
@@ -202,7 +205,7 @@ def play_song(song):
                 playing_notes.append(note)
                 notes.remove(note)
                 #ADD NOTES
-                print("NEW NOTE ADDED")
+                #print("NEW NOTE ADDED")
                 #print(note[0] - current_time)
             if note[0] - current_time > NOTE_WINDOW:
                 break
@@ -216,7 +219,7 @@ def play_song(song):
         _note_bg = pygame.Surface((450, 675), pygame.SRCALPHA)
         _note_bg = _note_bg.convert_alpha()
         for note in playing_notes:
-            print("NEW NOTE ROLL")
+            #print("NEW NOTE ROLL")
             position_x = 100 * (note[1] - 1) + ((note[1] - 1) * 8) + 12
 
             # FINAL Y = 500
@@ -341,15 +344,14 @@ for root in os.scandir(songs_directory):
             with open(file, "r", encoding="utf8") as info:
                 inf = info.read()
                 song_info["Title"] =  inf[inf.find("Title: ") + 7:inf.find("\n", inf.find("Title: "))]
-                song_info["BPM"] =  inf[inf.find("BPM: ") + 5:inf.find("\n", inf.find("BPM: "))]
+                song_info["BPM"] =  int(float(inf[inf.find("Bpm: ") + 5:inf.find("\n", inf.find("Bpm: "))]))
                 song_info["Description"] =  inf[inf.find("Description: ") + 13:inf.find("\n", inf.find("Description: "))]
-                print(song_info["Title"] + "\n" + song_info["Description"]+ "\n" )
+                print(song_info["Title"] + "\n" + song_info["Description"]+ "\nBPM: " + str(song_info["BPM"]) + "\n" )
             
         # .mp3 File
         elif file.name.endswith('.mp3') or file.name.endswith('.wav'):
             song_info["Audio"] = file
             song_info["AudioPath"] = file.path
-            print("FOUND SONG FILE")
 
          # .png / .jpg File
         elif file.name.endswith('.jpg') or file.name.endswith('.png'):
