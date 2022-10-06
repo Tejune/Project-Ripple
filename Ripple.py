@@ -250,14 +250,14 @@ def play_song(song):
         #### PLAYING THE SONG ###
 
         # Draw background
-        _bg = pygame.Surface((500, 675))
+        _bg = pygame.Surface((530, 675))
         _bg.set_alpha(140)
         pygame.draw.rect(_bg, BLACK, pygame.Rect(0, 0, 500, 675))
         #pygame.draw.rect(_bg, (140,140,140), pygame.Rect(0, 500, 500, 2))
-        _bg.blit(arrow_outline, (12, 450))
-        _bg.blit(arrow_outline, (12 + 118, 450))
-        _bg.blit(arrow_outline, (12 + 118 + 118, 450))
-        _bg.blit(arrow_outline, (12 + 118 + 118 + 118, 450))
+        _bg.blit(arrow_outline, (12, 465))
+        _bg.blit(arrow_outline, (12 + 128, 465))
+        _bg.blit(arrow_outline, (12 + 128 + 128, 465))
+        _bg.blit(arrow_outline, (12 + 128 + 128 + 128, 465))
         WIN.blit(_bg,(WIDTH/2 - _bg.get_width() / 2, 64))
 
         # Find and add notes within time window
@@ -284,15 +284,19 @@ def play_song(song):
         _note_bg = _note_bg.convert_alpha()
         for note in playing_notes:
             #print("NEW NOTE ROLL")
-            position_x = 110 * (note[1] - 1) + ((note[1] - 1) * 8) + 12
+            position_x = 120 * (note[1] - 1) + ((note[1] - 1) * 8) + 12
 
             # FINAL Y = 500
             #p = p1 + (p2 - p1) * t
             a = ( note[0] - current_time ) / NOTE_WINDOW
-            position_y = -110 + (450 + 110 ) * (1 - a)
+            position_y = -120 + (465 + 120 ) * (1 - a)
             
             # Add notes to surface
-            _note_bg.blit(arrow, (position_x, position_y))
+            note_surface = pygame.Surface((120, 120), pygame.SRCALPHA)
+            note_surface.convert_alpha()
+            note_surface.blit(arrow, (0, 0))
+            note_surface = pygame.transform.rotate(note_surface, (note[1] - 1) * 90)
+            _note_bg.blit(note_surface, (position_x, position_y))
             #pygame.draw.rect(_note_bg, YELLOW, pygame.Rect(position_x, position_y, 100, 40))
             #pygame.draw.rect(_note_bg, (150,150, 0), pygame.Rect(position_x + 1, position_y + 1, 98, 38))
 
