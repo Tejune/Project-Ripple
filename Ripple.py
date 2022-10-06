@@ -22,35 +22,65 @@ pygame.mixer.init()
 Framerate = 60
 
 #### Directory & Dictionary
-songs_directory = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Quaver\\Songs"
-default_thumbnail = pygame.image.load("default_thumb.jpg")
-songs = []
+songs_directory     = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Quaver\\Songs"
+default_thumbnail   = pygame.image.load("default_thumb.jpg")
+songs               = []
 
-#### Set pygame variables
-pygame.display.set_caption("Project Ripple")
-FONT_SMALL = pygame.font.Font("Pixellari.ttf", 20)
-FONT = pygame.font.Font("Pixellari.ttf", 25)
-FONT_HEADER = pygame.font.Font("Pixellari.ttf", 35)
-FONT_TITLE = pygame.font.Font("Pixellari.ttf", 55)
-FONT_COMBO = pygame.font.Font("Pixellari.ttf", 80)
-WIDTH = 500*2.25
-HEIGHT = 675
-WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
-clock = pygame.time.Clock()
+#### Pygame variables & Constants
+
+pygame.display.set_caption("Project Ripple") # Set Caption
+
+# Font Constants
+FONT_SMALL    = pygame.font.Font("Pixellari.ttf", 20)
+FONT          = pygame.font.Font("Pixellari.ttf", 25)
+FONT_HEADER   = pygame.font.Font("Pixellari.ttf", 35)
+FONT_TITLE    = pygame.font.Font("Pixellari.ttf", 55)
+FONT_COMBO    = pygame.font.Font("Pixellari.ttf", 80)
+
+# Window constants & clock
+WIDTH         = 500*2.25
+HEIGHT        = 675
+WIN           = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
+clock         = pygame.time.Clock()
+
+
 
 #### Other Constants
-WHITE = (255, 255, 255)
-YELLOW = (255, 255, 0)
-BLACK = (0, 0, 0)
-NOTE_WINDOW = 750 #ms
 
-##Scrolling song selection
-scroll_offset = 0
-selected_song = None
-arrow = pygame.image.load("arrow.png").convert_alpha()
-arrow = pygame.transform.scale(arrow, (120, 120))
-arrow_outline = pygame.image.load("arrow_outline.png").convert_alpha()
-arrow_outline = pygame.transform.scale(arrow_outline, (120, 120))
+# Colors
+WHITE         = (255, 255, 255)
+YELLOW        = (255, 255, 0)
+BLACK         = (0, 0, 0)
+
+# Notes & Judement windows (milliseconds)
+NOTE_WINDOW   = 750
+MARVELOUS     = 33
+PERFECT       = 70
+GREAT         = 110
+GOOD          = 142
+BOO           = 175
+
+#### Song selection & Playing songs
+
+scroll_offset     = 0
+selected_song     = None
+arrow             = pygame.image.load("arrow.png").convert_alpha()
+arrow             = pygame.transform.scale(arrow, (120, 120))
+arrow_outline     = pygame.image.load("arrow_outline.png").convert_alpha()
+arrow_outline     = pygame.transform.scale(arrow_outline, (120, 120))
+
+latest_judgement            = "MISS"
+frames_since_last_judgement = 60
+
+judgement_colors = {
+    "MISS": (255, 0, 0),
+    "GOOD": (255, 184, 51),
+    "GREAT": (97, 255, 102),
+    "PERFECT": (112, 253, 255),
+    "MARVELOUS": (255, 255, 255)
+}
+
+
 
 ############# Functions & Classes ##############
 
@@ -69,6 +99,10 @@ def play_song(song):
 
     ### SETUP ###
 
+    global frames_since_last_judgement
+    global judgement_colors
+    global latest_judgement
+
     #Clear screen
     pygame.display.update()
 
@@ -86,6 +120,7 @@ def play_song(song):
     rip = []
     combo_rip = []
     frames_since_last_hit = 50
+    frames_since_last_judgement = 255
     lp = 0
     is_playing = True
     song_playing = False
@@ -128,12 +163,46 @@ def play_song(song):
 
     # Note hit detection
     def hit_detect (lane):
+        # Define global
+        global latest_judgement
+        global frames_since_last_judgement
+        global combo
+
+        # Variable definition
+        closest_note = False
+
+        # Check all notes and choose the latest one within range.
         for note in playing_notes:
             if note[1] == lane:
                 offset = note[0] - song_time
-                if  offset < 60 and offset > -60:
-                    playing_notes.remove(note)
-                    return True
+                if  offset < BOO and offset > -BOO:
+                    if closest_note and offset < closest_note[0] - song_time:
+                        closest_note = note
+                    else:
+                        closest_note = note
+
+        # Decide judgement for note if found
+        judgement = "MISS"
+        if closest_note:
+            offset = abs(closest_note[0] - song_time)
+            if offset <= GOOD:
+                judgement = "GOOD"
+                if offset <= GREAT:
+                    judgement = "GREAT"
+                    if offset <= PERFECT:
+                        judgement = "PERFECT"
+                        if offset <= MARVELOUS:
+                            judgement = "MARVELOUS"
+            
+            latest_judgement = judgement
+            frames_since_last_judgement = 0
+        
+        # If a note was found, delete it and return the result
+        if closest_note:
+            playing_notes.remove(closest_note)
+            return True, judgement
+        else:
+            return False, judgement
 
     ### MAIN LOOP ###
     clock.tick()
@@ -150,33 +219,31 @@ def play_song(song):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+            if event.type == pygame.KEYDOWN:
+                lane = -1
+
+                if event.key == pygame.K_a:
+                    lane = 1
+                if event.key == pygame.K_s:
+                    lane = 2
+                if event.key == pygame.K_d:
+                    lane = 3
+                if event.key == pygame.K_f:
+                    lane = 4
+
+                if lane != -1:
+                    hit, judgement = hit_detect(lane)
+                    if hit and judgement != "MISS":
+                        combo += 1
+                        frames_since_last_hit = 0
+                    elif hit and judgement == "MISS":
+                        combo = 0
 
 
         # Check for keys pressed
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
             is_playing = False
-        if keys[pygame.K_a]:
-            hit = hit_detect(1)
-            if hit:
-                combo += 1
-                frames_since_last_hit = 0
-        if keys[pygame.K_s]:
-            hit = hit_detect(2)
-            if hit:
-                combo += 1
-                frames_since_last_hit = 0
-        if keys[pygame.K_d]:
-            hit = hit_detect(3)
-            if hit:
-                combo += 1
-                frames_since_last_hit = 0
-        if keys[pygame.K_f]:
-            hit = hit_detect(4)
-            if hit:
-                combo += 1
-                frames_since_last_hit = 0
-
 
         # Fill screen with black
         WIN.fill(BLACK)
@@ -238,15 +305,6 @@ def play_song(song):
         tooltip = FONT.render("NOW PLAYING:", False, BLACK)
         WIN.blit(tooltip, (23, 23 ))
 
-        # Draw combo
-        combo_label = FONT_HEADER.render("COMBO", False, YELLOW)
-        WIN.blit(combo_label, (830, 150))
-        comb = FONT_COMBO.render(str(combo), False, YELLOW)
-        y = max(930, min(940 - frames_since_last_hit * 3, 950))
-        WIN.blit(comb, (y, 200 ))
-        
-
-
         #### PLAYING THE SONG ###
 
         # Draw background
@@ -259,6 +317,18 @@ def play_song(song):
         _bg.blit(arrow_outline, (12 + 128 + 128, 465))
         _bg.blit(arrow_outline, (12 + 128 + 128 + 128, 465))
         WIN.blit(_bg,(WIDTH/2 - _bg.get_width() / 2, 64))
+
+        # Draw combo
+        combo_label = FONT_HEADER.render("COMBO", False, YELLOW)
+        WIN.blit(combo_label, (830, 150))
+        comb = FONT_COMBO.render(str(combo), False, YELLOW)
+        y = max(930, min(940 - frames_since_last_hit * 3, 950))
+        WIN.blit(comb, (y, 200 ))
+        judgement_label = FONT.render(latest_judgement, False, judgement_colors[latest_judgement])
+        judgement_label.set_alpha(255 - frames_since_last_judgement)
+        WIN.blit(judgement_label, (WIDTH/2 - judgement_label.get_width() / 2, 280))
+
+        frames_since_last_judgement += 10
 
         # Find and add notes within time window
         #print(song_time)
@@ -304,6 +374,8 @@ def play_song(song):
             if position_y > 675:
                 combo = 0
                 playing_notes.remove(note)
+                latest_judgement = "MISS"
+                frames_since_last_judgement = 0
 
         WIN.blit(_note_bg,(WIDTH/2 - _bg.get_width() / 2, 64))
 
