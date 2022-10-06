@@ -47,10 +47,10 @@ NOTE_WINDOW = 750 #ms
 ##Scrolling song selection
 scroll_offset = 0
 selected_song = None
-gradient = pygame.image.load("thumbnail_bg.png").convert_alpha()
-topbar = pygame.image.load("topbar.png").convert()
-arrow = pygame.image.load("arrow.png").convert()
-
+arrow = pygame.image.load("arrow.png").convert_alpha()
+arrow = pygame.transform.scale(arrow, (120, 120))
+arrow_outline = pygame.image.load("arrow_outline.png").convert_alpha()
+arrow_outline = pygame.transform.scale(arrow_outline, (120, 120))
 
 ############# Functions & Classes ##############
 
@@ -250,10 +250,14 @@ def play_song(song):
         #### PLAYING THE SONG ###
 
         # Draw background
-        _bg = pygame.Surface((450, 675))
+        _bg = pygame.Surface((500, 675))
         _bg.set_alpha(140)
-        pygame.draw.rect(_bg, BLACK, pygame.Rect(0, 0, 450, 675))
-        pygame.draw.rect(_bg, (140,140,140), pygame.Rect(0, 500, 450, 2))
+        pygame.draw.rect(_bg, BLACK, pygame.Rect(0, 0, 500, 675))
+        #pygame.draw.rect(_bg, (140,140,140), pygame.Rect(0, 500, 500, 2))
+        _bg.blit(arrow_outline, (12, 450))
+        _bg.blit(arrow_outline, (12 + 118, 450))
+        _bg.blit(arrow_outline, (12 + 118 + 118, 450))
+        _bg.blit(arrow_outline, (12 + 118 + 118 + 118, 450))
         WIN.blit(_bg,(WIDTH/2 - _bg.get_width() / 2, 64))
 
         # Find and add notes within time window
@@ -276,20 +280,21 @@ def play_song(song):
             pygame.mixer.music.play()
 
         # Draw and calculate notes
-        _note_bg = pygame.Surface((450, 675), pygame.SRCALPHA)
+        _note_bg = pygame.Surface((500, 675), pygame.SRCALPHA)
         _note_bg = _note_bg.convert_alpha()
         for note in playing_notes:
             #print("NEW NOTE ROLL")
-            position_x = 100 * (note[1] - 1) + ((note[1] - 1) * 8) + 12
+            position_x = 110 * (note[1] - 1) + ((note[1] - 1) * 8) + 12
 
             # FINAL Y = 500
             #p = p1 + (p2 - p1) * t
             a = ( note[0] - current_time ) / NOTE_WINDOW
-            position_y = -30 + (460 + 30 ) * (1 - a)
+            position_y = -110 + (450 + 110 ) * (1 - a)
             
             # Add notes to surface
-            pygame.draw.rect(_note_bg, YELLOW, pygame.Rect(position_x, position_y, 100, 40))
-            pygame.draw.rect(_note_bg, (150,150, 0), pygame.Rect(position_x + 1, position_y + 1, 98, 38))
+            _note_bg.blit(arrow, (position_x, position_y))
+            #pygame.draw.rect(_note_bg, YELLOW, pygame.Rect(position_x, position_y, 100, 40))
+            #pygame.draw.rect(_note_bg, (150,150, 0), pygame.Rect(position_x + 1, position_y + 1, 98, 38))
 
             # Delete note if passed threshold
             if position_y > 675:
