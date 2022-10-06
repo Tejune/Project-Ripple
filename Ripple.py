@@ -49,6 +49,7 @@ scroll_offset = 0
 selected_song = None
 gradient = pygame.image.load("thumbnail_bg.png").convert_alpha()
 topbar = pygame.image.load("topbar.png").convert()
+arrow = pygame.image.load("arrow.png").convert()
 
 
 ############# Functions & Classes ##############
