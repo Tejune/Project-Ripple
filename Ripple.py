@@ -182,10 +182,10 @@ def play_song(song):
         for note in playing_notes:
             if note[1] == lane:
                 offset = note[0] - song_time
-                if  offset < BOO and offset > -BOO:
-                    if closest_note and offset < closest_note[0] - song_time:
+                if abs(offset) <= BOO:
+                    if closest_note and offset < (closest_note[0] - song_time):
                         closest_note = note
-                    else:
+                    elif closest_note == False:
                         closest_note = note
 
         # Decide judgement for note if found
