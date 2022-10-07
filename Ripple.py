@@ -68,12 +68,16 @@ def lerp(a: float, b: float, t: float) -> float:
 def play_song(song):
 
     ### SETUP ###
-
+    
     #Clear screen
     pygame.display.update()
 
     # Load and play song
     print("\n AUDIO FILE PATHWAY: " + song["AudioPath"])
+
+    pygame.mixer.music.load("select.mp3")
+    pygame.mixer.music.play()
+
     pygame.mixer.music.load(song["Audio"])
 
     # Load thumbnail image
