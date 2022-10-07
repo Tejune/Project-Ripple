@@ -59,6 +59,7 @@ PERFECT       = 70
 GREAT         = 110
 GOOD          = 142
 BOO           = 175
+os.kill
 
 #### Song selection & Playing songs
 
@@ -70,6 +71,7 @@ arrow_outline     = pygame.image.load("arrow_outline.png").convert_alpha()
 arrow_outline     = pygame.transform.scale(arrow_outline, (120, 120))
 
 latest_judgement            = "MISS"
+latest_judgement_offset     = 0
 frames_since_last_judgement = 60
 
 judgement_colors = {
@@ -101,6 +103,7 @@ def play_song(song):
 
     global frames_since_last_judgement
     global judgement_colors
+    global latest_judgement_offset
     global latest_judgement
 
     #Clear screen
@@ -169,6 +172,7 @@ def play_song(song):
     def hit_detect (lane):
         # Define global
         global latest_judgement
+        global latest_judgement_offset
         global frames_since_last_judgement
         global combo
 
@@ -188,7 +192,8 @@ def play_song(song):
         # Decide judgement for note if found
         judgement = "MISS"
         if closest_note:
-            offset = abs(closest_note[0] - song_time)
+            offset = abs(closest_note[0] - song_time) 
+            latest_judgement_offset = closest_note[0] - song_time
             if offset <= GOOD:
                 judgement = "GOOD"
                 if offset <= GREAT:
@@ -328,7 +333,7 @@ def play_song(song):
         comb = FONT_COMBO.render(str(combo), False, YELLOW)
         y = max(930, min(940 - frames_since_last_hit * 3, 950))
         WIN.blit(comb, (y, 200 ))
-        judgement_label = FONT.render(latest_judgement, False, judgement_colors[latest_judgement])
+        judgement_label = FONT.render(latest_judgement + "  (" + str(latest_judgement_offset) + " ms)", False, judgement_colors[latest_judgement])
         judgement_label.set_alpha(255 - frames_since_last_judgement)
         WIN.blit(judgement_label, (WIDTH/2 - judgement_label.get_width() / 2, 280))
 
