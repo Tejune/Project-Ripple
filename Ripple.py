@@ -327,11 +327,17 @@ def play_song(song):
         WIN.blit(_bg,(WIDTH/2 - _bg.get_width() / 2, 64))
 
         # Draw combo
-        combo_label = FONT_HEADER.render("COMBO", False, YELLOW)
-        WIN.blit(combo_label, (830, 150))
-        comb = FONT_COMBO.render(str(combo), False, YELLOW)
-        y = max(930, min(940 - frames_since_last_hit * 3, 950))
-        WIN.blit(comb, (y, 200 ))
+        #combo_label = FONT_HEADER.render("COMBO", False, YELLOW)
+       # WIN.blit(combo_label, (830, 150))
+
+
+        # Draw Combo
+        if combo > 0:
+            comb = FONT_HEADER.render(str(combo), False, YELLOW)
+            y = 236 #max(233, min(233 + frames_since_last_hit, 236))
+            WIN.blit(comb, (WIDTH/2 - comb.get_width() / 2, y))
+
+        # Draw Latest Judgement
         judgement_label = FONT.render(latest_judgement + "  (" + str(latest_judgement_offset) + " ms)", False, judgement_colors[latest_judgement])
         judgement_label.set_alpha(255 - frames_since_last_judgement)
         WIN.blit(judgement_label, (WIDTH/2 - judgement_label.get_width() / 2, 280))
