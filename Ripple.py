@@ -384,6 +384,7 @@ def play_song(song):
                 playing_notes.remove(note)
                 latest_judgement = "MISS"
                 frames_since_last_judgement = 0
+                latest_judgement_offset = 150
 
         WIN.blit(_note_bg,(WIDTH/2 - _bg.get_width() / 2, 64))
 
