@@ -62,12 +62,21 @@ BOO           = 175
 
 #### Song selection & Playing songs
 
-scroll_offset     = 0
-selected_song     = None
-arrow             = pygame.image.load("arrow.png").convert_alpha()
-arrow             = pygame.transform.scale(arrow, (120, 120))
-arrow_outline     = pygame.image.load("arrow_outline.png").convert_alpha()
-arrow_outline     = pygame.transform.scale(arrow_outline, (120, 120))
+scroll_offset              = 0
+selected_song              = None
+arrow                      = pygame.image.load("arrow.png").convert_alpha()
+arrow                      = pygame.transform.scale(arrow, (120, 120))
+arrow_outline_original     = pygame.image.load("arrow_outline.png").convert_alpha()
+arrow_outline_original     = pygame.transform.scale(arrow_outline_original, (120, 120))
+
+arrow_outline = [
+    arrow_outline_original,
+    pygame.transform.rotate(arrow_outline_original, 90),
+    pygame.transform.rotate(arrow_outline_original, 180),
+    pygame.transform.rotate(arrow_outline_original, 270)
+]
+
+frames_since_last_lane_pressed = [255, 255, 255, 255]
 
 latest_judgement            = "MISS"
 latest_judgement_offset     = 0
@@ -81,6 +90,13 @@ judgement_colors = {
     "MARVELOUS": (255, 255, 255)
 }
 
+judgement_count = {
+    "MISS": 0,
+    "GOOD": 0,
+    "GREAT": 0,
+    "PERFECT": 0,
+    "MARVELOUS": 0
+}
 
 
 ############# Functions & Classes ##############
@@ -100,29 +116,13 @@ def play_song(song):
 
     ### SETUP ###
 
+    # Define globals
     global frames_since_last_judgement
     global judgement_colors
     global latest_judgement_offset
     global latest_judgement
 
-    #Clear screen
-    pygame.display.update()
-
-    # Load and play song
-    print("\n AUDIO FILE PATHWAY: " + song["AudioPath"])
-
-    pygame.mixer.music.load("select.mp3")
-    pygame.mixer.music.play()
-
-    pygame.mixer.music.load(song["Audio"])
-
-    # Load thumbnail image
-    if song["Image"] == "None":
-        song["Image"] = "default_thumb.jpg"
-
-    imp = song["LoadedImage"]
-    imp = pygame.transform.scale(imp, (1200, 675))
-
+    # Define variables
     rip = []
     combo_rip = []
     frames_since_last_hit = 50
@@ -133,9 +133,28 @@ def play_song(song):
     song_time = -2000
     playing_notes = []
     combo = 0
-
     ripple_spawn_frequency = (60 / song["BPM"]) * 1000
     ripple_time = 0
+
+
+    # Reset judgement count
+    for judgement in judgement_count:
+        judgement_count[judgement] = 0
+
+    # Clear screen
+    pygame.display.update()
+
+    # Play select sound, then load song
+    pygame.mixer.Channel(0).play(pygame.mixer.Sound("select_song.wav"))
+    pygame.mixer.Channel(0).set_volume(4)
+    pygame.mixer.music.load(song["Audio"])
+
+    # Load thumbnail image
+    if song["Image"] == "None":
+        song["Image"] = "default_thumb.jpg"
+
+    imp = song["LoadedImage"]
+    imp = pygame.transform.scale(imp, (1200, 675))
 
     # Setup note data using .QUA file
     f = song["Data"]
@@ -178,6 +197,9 @@ def play_song(song):
         # Variable definition
         closest_note = False
 
+        # Add arrow hightlight
+        frames_since_last_lane_pressed[lane - 1] = 255
+
         # Check all notes and choose the latest one within range.
         for note in playing_notes:
             if note[1] == lane:
@@ -208,6 +230,7 @@ def play_song(song):
         # If a note was found, delete it and return the result
         if closest_note:
             playing_notes.remove(closest_note)
+            judgement_count[judgement] += 1
             return True, judgement
         else:
             return False, judgement
@@ -293,17 +316,6 @@ def play_song(song):
         surface = pygame.Surface((1300,675), pygame.SRCALPHA)
         surface.set_alpha(50)
 
-       # for lifetime in combo_rip:
-
-        #    combo_rip[combo_rip.index(lifetime)] += 1
-
-            #pygame.Rect(210/2 - 3*lifetime/2, 32 - 3*lifetime/2, 3 * lifetime, 3 * lifetime)
-         #   pygame.draw.circle(surface, YELLOW, (980, 230), lifetime*5, width = 2) 
- 
-          #  if lifetime >= 40:
-           #     combo_rip.remove(lifetime + 1)
-        #WIN.blit(surface, (0,0))
-
         # Draw topbar labels
         display_t = song["Title"]
         if len(display_t) > 100:
@@ -319,17 +331,44 @@ def play_song(song):
         _bg = pygame.Surface((530, 675))
         _bg.set_alpha(140)
         pygame.draw.rect(_bg, BLACK, pygame.Rect(0, 0, 500, 675))
-        #pygame.draw.rect(_bg, (140,140,140), pygame.Rect(0, 500, 500, 2))
-        _bg.blit(arrow_outline, (12, 465))
-        _bg.blit(arrow_outline, (12 + 128, 465))
-        _bg.blit(arrow_outline, (12 + 128 + 128, 465))
-        _bg.blit(arrow_outline, (12 + 128 + 128 + 128, 465))
-        WIN.blit(_bg,(WIDTH/2 - _bg.get_width() / 2, 64))
+       
+        # Change arrow highlight visibility
+        for i, lane in enumerate(frames_since_last_lane_pressed):
+            frames_since_last_lane_pressed[i] = max(lane - 20, 90)
 
-        # Draw combo
-        #combo_label = FONT_HEADER.render("COMBO", False, YELLOW)
-       # WIN.blit(combo_label, (830, 150))
+        # Add arrow surfaces
+        arrow_surface_1 = pygame.Surface((530, 675), pygame.SRCALPHA)
+        arrow_surface_1.set_alpha(frames_since_last_lane_pressed[0])
+        arrow_surface_2 = pygame.Surface((530, 675), pygame.SRCALPHA)
+        arrow_surface_2.set_alpha(frames_since_last_lane_pressed[1])
+        arrow_surface_3 = pygame.Surface((530, 675), pygame.SRCALPHA)
+        arrow_surface_3.set_alpha(frames_since_last_lane_pressed[2])
+        arrow_surface_4 = pygame.Surface((530, 675), pygame.SRCALPHA)
+        arrow_surface_4.set_alpha(frames_since_last_lane_pressed[3])
 
+        # Draw arrows
+        arrow_surface_1.blit(arrow_outline[0], (12, 465))
+        arrow_surface_2.blit(arrow_outline[1], (12 + 128, 465))
+        arrow_surface_3.blit(arrow_outline[2], (12 + 128 + 128, 465))
+        arrow_surface_4.blit(arrow_outline[3], (12 + 128 + 128 + 128, 465))
+
+        bg_pos = (WIDTH/2 - _bg.get_width() / 2, 64)
+        WIN.blit(_bg, bg_pos)
+        WIN.blit(arrow_surface_1, bg_pos)
+        WIN.blit(arrow_surface_2, bg_pos)
+        WIN.blit(arrow_surface_3, bg_pos)
+        WIN.blit(arrow_surface_4, bg_pos)
+        
+        # Draw judgement amounts
+        already_drawn = 0
+        for judgement in judgement_count:
+            _x = 225
+            _y = 200 + 54 * already_drawn
+            pygame.draw.rect(WIN, judgement_colors[judgement], pygame.Rect(_x , _y, 60, 40))
+            pygame.draw.rect(WIN, BLACK, pygame.Rect(_x + 2, _y + 2, 56, 36))
+            count_label = FONT_SMALL.render(str(judgement_count[judgement]), False, judgement_colors[judgement])
+            WIN.blit(count_label, (_x + 30 -  count_label.get_width() / 2, _y + 20 -  count_label.get_height() / 2))
+            already_drawn += 1
 
         # Draw Combo
         if combo > 0:
@@ -389,6 +428,7 @@ def play_song(song):
                 combo = 0
                 playing_notes.remove(note)
                 latest_judgement = "MISS"
+                judgement_count["MISS"] += 1
                 frames_since_last_judgement = 0
                 latest_judgement_offset = 150
 
