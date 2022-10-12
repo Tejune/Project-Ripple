@@ -54,9 +54,9 @@ BLACK         = (0, 0, 0)
 
 # Notes & Judement windows (milliseconds)
 NOTE_WINDOW   = 750
-MARVELOUS     = 33
-PERFECT       = 70
-GREAT         = 110
+MARVELOUS     = 10
+PERFECT       = 50
+GREAT         = 90
 GOOD          = 142
 BOO           = 175
 
@@ -74,6 +74,16 @@ arrow_outline = [
     pygame.transform.rotate(arrow_outline_original, 90),
     pygame.transform.rotate(arrow_outline_original, 180),
     pygame.transform.rotate(arrow_outline_original, 270)
+]
+
+arrow_outline_highlight_original     = pygame.image.load("arrow_outline_highlight.png").convert_alpha()
+arrow_outline_highlight_original     = pygame.transform.scale(arrow_outline_highlight_original, (120, 120))
+
+arrow_outline_highlight = [
+    arrow_outline_highlight_original,
+    pygame.transform.rotate(arrow_outline_highlight_original, 90),
+    pygame.transform.rotate(arrow_outline_highlight_original, 180),
+    pygame.transform.rotate(arrow_outline_highlight_original, 270)
 ]
 
 frames_since_last_lane_pressed = [255, 255, 255, 255]
@@ -124,6 +134,8 @@ def play_song(song):
 
     # Define variables
     rip = []
+    God_Mode = False
+
     combo_rip = []
     frames_since_last_hit = 50
     frames_since_last_judgement = 255
@@ -198,7 +210,7 @@ def play_song(song):
         closest_note = False
 
         # Add arrow hightlight
-        frames_since_last_lane_pressed[lane - 1] = 255
+        frames_since_last_lane_pressed[lane - 1] = 150
 
         # Check all notes and choose the latest one within range.
         for note in playing_notes:
@@ -240,6 +252,8 @@ def play_song(song):
 
     while is_playing:
 
+        #pygame.time.delay(10)
+
         #Set constant framerate
         delta_time = clock.tick(Framerate)
         frames_since_last_hit += 1
@@ -252,6 +266,9 @@ def play_song(song):
                 pygame.quit()
             if event.type == pygame.KEYDOWN:
                 lane = -1
+
+                if event.key == pygame.K_g:
+                    God_Mode = not  God_Mode
 
                 if event.key == pygame.K_a:
                     lane = 1
@@ -334,9 +351,11 @@ def play_song(song):
        
         # Change arrow highlight visibility
         for i, lane in enumerate(frames_since_last_lane_pressed):
-            frames_since_last_lane_pressed[i] = max(lane - 20, 90)
+            frames_since_last_lane_pressed[i] = max(lane - 35, 0)
 
         # Add arrow surfaces
+        arrow_bg = pygame.Surface((530, 675), pygame.SRCALPHA)
+        arrow_bg.set_alpha(90)
         arrow_surface_1 = pygame.Surface((530, 675), pygame.SRCALPHA)
         arrow_surface_1.set_alpha(frames_since_last_lane_pressed[0])
         arrow_surface_2 = pygame.Surface((530, 675), pygame.SRCALPHA)
@@ -347,10 +366,14 @@ def play_song(song):
         arrow_surface_4.set_alpha(frames_since_last_lane_pressed[3])
 
         # Draw arrows
-        arrow_surface_1.blit(arrow_outline[0], (12, 465))
-        arrow_surface_2.blit(arrow_outline[1], (12 + 128, 465))
-        arrow_surface_3.blit(arrow_outline[2], (12 + 128 + 128, 465))
-        arrow_surface_4.blit(arrow_outline[3], (12 + 128 + 128 + 128, 465))
+        arrow_bg.blit(arrow_outline[0], (12, 465))
+        arrow_bg.blit(arrow_outline[1], (12 + 128, 465))
+        arrow_bg.blit(arrow_outline[2], (12 + 128 + 128, 465))
+        arrow_bg.blit(arrow_outline[3], (12 + 128 + 128 + 128, 465))
+        arrow_surface_1.blit(arrow_outline_highlight[0], (12, 465))
+        arrow_surface_2.blit(arrow_outline_highlight[1], (12 + 128, 465))
+        arrow_surface_3.blit(arrow_outline_highlight[2], (12 + 128 + 128, 465))
+        arrow_surface_4.blit(arrow_outline_highlight[3], (12 + 128 + 128 + 128, 465))
 
         bg_pos = (WIDTH/2 - _bg.get_width() / 2, 64)
         WIN.blit(_bg, bg_pos)
@@ -358,6 +381,7 @@ def play_song(song):
         WIN.blit(arrow_surface_2, bg_pos)
         WIN.blit(arrow_surface_3, bg_pos)
         WIN.blit(arrow_surface_4, bg_pos)
+        WIN.blit(arrow_bg, bg_pos)
         
         # Draw judgement amounts
         already_drawn = 0
@@ -369,6 +393,11 @@ def play_song(song):
             count_label = FONT_SMALL.render(str(judgement_count[judgement]), False, judgement_colors[judgement])
             WIN.blit(count_label, (_x + 30 -  count_label.get_width() / 2, _y + 20 -  count_label.get_height() / 2))
             already_drawn += 1
+
+        # Draw God Mode label if enabled
+        if God_Mode:
+            god_label = FONT.render("GOD MODE",False,  YELLOW)
+            WIN.blit(god_label, (225 + 30 -  god_label.get_width(), 146))
 
         # Draw Combo
         if combo > 0:
@@ -424,6 +453,15 @@ def play_song(song):
             #pygame.draw.rect(_note_bg, (150,150, 0), pygame.Rect(position_x + 1, position_y + 1, 98, 38))
 
             # Delete note if passed threshold
+            if God_Mode and position_y > 465:
+                combo +=1
+                playing_notes.remove(note)
+                latest_judgement = "MARVELOUS"
+                judgement_count["MARVELOUS"] += 1
+                frames_since_last_judgement = 0
+                latest_judgement_offset = 0
+                frames_since_last_lane_pressed[note[1] - 1] = 150
+
             if position_y > 675:
                 combo = 0
                 playing_notes.remove(note)
