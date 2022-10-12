@@ -68,6 +68,8 @@ arrow                      = pygame.image.load("arrow.png").convert_alpha()
 arrow                      = pygame.transform.scale(arrow, (120, 120))
 arrow_outline_original     = pygame.image.load("arrow_outline.png").convert_alpha()
 arrow_outline_original     = pygame.transform.scale(arrow_outline_original, (120, 120))
+sparks                     = pygame.image.load("sparks.png").convert_alpha()
+sparks                     = pygame.transform.scale(sparks, (WIDTH, HEIGHT))
 
 arrow_outline = [
     arrow_outline_original,
@@ -341,6 +343,9 @@ def play_song(song):
         WIN.blit(subtitle, (227, 23))
         tooltip = FONT.render("NOW PLAYING:", False, BLACK)
         WIN.blit(tooltip, (23, 23 ))
+
+        if combo >= 100:
+            WIN.blit(sparks, (0,0))
 
         #### PLAYING THE SONG ###
 
