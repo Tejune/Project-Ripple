@@ -549,9 +549,9 @@ class Button:
 
 # Show loading screen
 text_surface = FONT_TITLE.render('PROJECT RIPPLE', False, YELLOW)
-WIN.blit(text_surface, (WIDTH/2 - text_surface.get_width()/2, 200 ))
+WIN.blit(text_surface, (WIDTH/2 - text_surface.get_width()/2, HEIGHT/2 - text_surface.get_height()/1.15))
 subtitle = FONT.render('LOADING SONG LIBRARY...', False, WHITE)
-WIN.blit(subtitle, (WIDTH/2 - subtitle.get_width()/2, 275 ))
+WIN.blit(subtitle, (WIDTH/2 - subtitle.get_width()/2, HEIGHT/2 + subtitle.get_height()/1.15))
 pygame.display.update()
 
 # Main setup loop
