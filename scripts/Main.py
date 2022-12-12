@@ -6,10 +6,13 @@
 #### Imports
 from array import array
 from asyncio.windows_events import NULL
-import math
 from platform import python_revision
 from tkinter import Frame
 from tkinter.tix import WINDOW
+
+from song_loader import load_songs
+
+import math
 import pygame
 import random
 import os
@@ -23,7 +26,7 @@ Framerate = 60
 
 #### Directory & Dictionary
 songs_directory     = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Quaver\\Songs"
-default_thumbnail   = pygame.image.load("default_thumb.jpg")
+default_thumbnail   = pygame.image.load("images\\default_thumb.jpg")
 songs               = []
 
 #### Pygame variables & Constants
@@ -31,14 +34,14 @@ songs               = []
 pygame.display.set_caption("Project Ripple") # Set Caption
 
 # Font Constants
-FONT_SMALL    = pygame.font.Font("Pixellari.ttf", 20)
-FONT          = pygame.font.Font("Pixellari.ttf", 25)
-FONT_HEADER   = pygame.font.Font("Pixellari.ttf", 35)
-FONT_TITLE    = pygame.font.Font("Pixellari.ttf", 55)
-FONT_COMBO    = pygame.font.Font("Pixellari.ttf", 80)
+FONT_SMALL    = pygame.font.Font("fonts\\Pixellari.ttf", 20)
+FONT          = pygame.font.Font("fonts\\Pixellari.ttf", 25)
+FONT_HEADER   = pygame.font.Font("fonts\\Pixellari.ttf", 35)
+FONT_TITLE    = pygame.font.Font("fonts\\Pixellari.ttf", 55)
+FONT_COMBO    = pygame.font.Font("fonts\\Pixellari.ttf", 80)
 
 # Window constants & clock
-WIDTH         = 500*2.25
+WIDTH         = 500 * 2.25
 HEIGHT        = 675
 WIN           = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
 clock         = pygame.time.Clock()
@@ -64,11 +67,11 @@ BOO           = 175
 
 scroll_offset              = 0
 selected_song              = None
-arrow                      = pygame.image.load("arrow.png").convert_alpha()
+arrow                      = pygame.image.load("images\\arrow.png").convert_alpha()
 arrow                      = pygame.transform.scale(arrow, (120, 120))
-arrow_outline_original     = pygame.image.load("arrow_outline.png").convert_alpha()
+arrow_outline_original     = pygame.image.load("images\\arrow_outline.png").convert_alpha()
 arrow_outline_original     = pygame.transform.scale(arrow_outline_original, (120, 120))
-sparks                     = pygame.image.load("sparks.png").convert_alpha()
+sparks                     = pygame.image.load("images\\sparks.png").convert_alpha()
 sparks                     = pygame.transform.scale(sparks, (WIDTH, HEIGHT))
 
 arrow_outline = [
@@ -78,7 +81,7 @@ arrow_outline = [
     pygame.transform.rotate(arrow_outline_original, 270)
 ]
 
-arrow_outline_highlight_original     = pygame.image.load("arrow_outline_highlight.png").convert_alpha()
+arrow_outline_highlight_original     = pygame.image.load("images\\arrow_outline_highlight.png").convert_alpha()
 arrow_outline_highlight_original     = pygame.transform.scale(arrow_outline_highlight_original, (120, 120))
 
 arrow_outline_highlight = [
@@ -159,13 +162,13 @@ def play_song(song):
     pygame.display.update()
 
     # Play select sound, then load song
-    pygame.mixer.Channel(0).play(pygame.mixer.Sound("select_song.wav"))
+    pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\select_song.wav"))
     pygame.mixer.Channel(0).set_volume(4)
     pygame.mixer.music.load(song["Audio"])
 
     # Load thumbnail image
     if song["Image"] == "None":
-        song["Image"] = "default_thumb.jpg"
+        song["Image"] = "images\\default_thumb.jpg"
 
     imp = song["LoadedImage"]
     imp = pygame.transform.scale(imp, (1200, 675))
@@ -554,49 +557,8 @@ subtitle = FONT.render('LOADING SONG LIBRARY...', False, WHITE)
 WIN.blit(subtitle, (WIDTH/2 - subtitle.get_width()/2, HEIGHT/2 + subtitle.get_height()/1.15))
 pygame.display.update()
 
-# Main setup loop
-for root in os.scandir(songs_directory):
-
-    # Create directory for song info
-    song_info = {}
-    song_info["Image"] = "None"
-    song_info["Title"] = "None"
-    song_info["LoadedImage"] = "None"
-    found_qua_file = False
-
-    # Check files for .QUA info file & .mp3 audio file & .png thumbnail and add to dict
-    for file in os.scandir(root):
-
-        # .QUA File
-        if file.name.endswith('.qua') and not found_qua_file:
-            found_qua_file = True
-            song_info["Data"] = file
-
-            # Get info from .QUA file
-            with open(file, "r", encoding="utf8") as info:
-                inf = info.read()
-                song_info["Title"] =  inf[inf.find("Title: ") + 7:inf.find("\n", inf.find("Title: "))]
-                song_info["BPM"] =  int(float(inf[inf.find("Bpm: ") + 5:inf.find("\n", inf.find("Bpm: "))]))
-                song_info["Description"] =  inf[inf.find("Description: ") + 13:inf.find("\n", inf.find("Description: "))]
-                print(song_info["Title"] + "\n" + song_info["Description"]+ "\nBPM: " + str(song_info["BPM"]) + "\n" )
-            
-        # .mp3 File
-        elif file.name.endswith('.mp3') or file.name.endswith('.wav'):
-            song_info["Audio"] = file
-            song_info["AudioPath"] = file.path
-
-         # .png / .jpg File
-        elif file.name.endswith('.jpg') or file.name.endswith('.png'):
-            song_info["Image"] = file
-            song_info["LoadedImage"] = pygame.image.load(file)
-    
-    # Check if a thumbnail image couldn't be found, if true load the default
-    if song_info["Image"] == "None":
-        song_info["Image"] = "default_thumb.jpg"
-        song_info["LoadedImage"] = default_thumbnail
-
-    # Add new song information to the primary dictionary
-    songs.append(song_info)
+# Load songs
+songs = load_songs()
 
 
 
