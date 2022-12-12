@@ -9,15 +9,7 @@
 import os
 import pygame
 from helper_methods import *
-
-# Constants
-WIDTH         = 500 * 2.25
-HEIGHT        = 675
-
-# Colors
-WHITE         = (255, 255, 255)
-YELLOW        = (255, 255, 0)
-BLACK         = (0, 0, 0)
+from constants import *
 
 
 
