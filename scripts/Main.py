@@ -149,7 +149,7 @@ def play_song(song):
     pygame.display.update()
 
     # Play select sound, then load song
-    pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\select_song.wav"))
+    pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\select.mp3"))
     pygame.mixer.Channel(0).set_volume(4)
     pygame.mixer.music.load(song["Audio"])
 
@@ -264,6 +264,8 @@ def play_song(song):
                 
                 if event.key == pygame.K_ESCAPE:
                     is_playing = False
+                    pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\cancel.mp3"))
+                    pygame.mixer.Channel(0).set_volume(4)
 
                 if event.key == pygame.K_a:
                     lane = 1
@@ -527,7 +529,9 @@ class Button:
             if pygame.mouse.get_pressed()[0]:
                 self.rect = pygame.Rect(self.x, self.y + scroll_offset, self.size[0], self.size[1])
                 if self.rect.collidepoint(x, y):
+                    pygame.mixer.Channel(2).stop()
                     play_song(self.song)
+                    pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound\\Title.mp3"))
 
 
 
@@ -539,6 +543,10 @@ show_loading_screen(WIN, FONT, FONT_TITLE)
 
 # Load songs
 songs = load_songs()
+
+# Start title screen bgm
+pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound\\Title.mp3"))
+pygame.mixer.Channel(2).set_volume(0.4)
 
 # Show title screen
 show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL)
@@ -574,7 +582,9 @@ while is_on_select_screen:
         if event.type == pygame.KEYDOWN:
              if event.key == pygame.K_ESCAPE:
                 
-                # Reload songs
+                # Return to title screen after playing associated sound effect
+                pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\cancel.mp3"))
+                pygame.mixer.Channel(0).set_volume(4)
                 show_loading_screen(WIN, FONT, FONT_TITLE)
                 time.sleep(0.2)
                 show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL)
@@ -582,7 +592,7 @@ while is_on_select_screen:
 
         for button in buttons:
             button.click(event)       
-                
+
 
     # Fill screen with black
     WIN.fill(BLACK)
@@ -630,9 +640,21 @@ while is_on_select_screen:
     # Draw title
     #pygame.draw.rect(WIN, (5,5,5), pygame.Rect(0, 0, 1125, 130))
     subtitle = FONT_HEADER.render('SONG SELECT', False, WHITE)
-    WIN.blit(subtitle, (25, 50 ))
-    tooltip = FONT_SMALL.render( "[" + str(len(songs)) + ' Loaded] View more songs by hovering with your mouse!', False, WHITE)
-    WIN.blit(tooltip, (25, 92 ))
+    WIN.blit(subtitle, (25, 40 ))
+    tooltip = FONT_PIXEL.render( "[" + str(len(songs)) + ' Loaded] View more songs by hovering with your mouse!', False, WHITE)
+    WIN.blit(tooltip, (25, 82 ))
+
+    # Draw song preview window
+    pygame.draw.rect(WIN, BLACK, (600, 80, 800, 290), 0, 5)
+    if selected_song:
+        sur = pygame.Surface((800, 290))
+        sur.set_alpha(255)
+        imp = selected_song["LoadedImage"]
+        imp = pygame.transform.scale(imp, (WIDTH - 600, 290))
+        sur.blit(imp, (0, 0))
+        WIN.blit(sur, (600, 80))
+    pygame.draw.rect(WIN, WHITE, (600, 80, 800, 290), 3, 5)
+
 
     # new
     wh = pygame.Surface((1200, 675))
@@ -642,7 +664,7 @@ while is_on_select_screen:
     loops += 1
 
     if loops == 1:
-        pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\select_song.wav"))
+        pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\enter.mp3"))
         pygame.mixer.Channel(0).set_volume(4)
 
 
