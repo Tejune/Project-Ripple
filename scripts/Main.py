@@ -4,13 +4,9 @@
 #------------------------------------------------------------------------------------------
 
 #### Imports
-from array import array
-from asyncio.windows_events import NULL
-from platform import python_revision
-from tkinter import Frame
-from tkinter.tix import WINDOW
-
 from song_loader import load_songs
+from start_screen import *
+from helper_methods import *
 
 import math
 import pygame
@@ -25,7 +21,6 @@ pygame.mixer.init()
 Framerate = 60
 
 #### Directory & Dictionary
-songs_directory     = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Quaver\\Songs"
 default_thumbnail   = pygame.image.load("images\\default_thumb.jpg")
 songs               = []
 
@@ -34,11 +29,12 @@ songs               = []
 pygame.display.set_caption("Project Ripple") # Set Caption
 
 # Font Constants
-FONT_SMALL    = pygame.font.Font("fonts\\Pixellari.ttf", 20)
-FONT          = pygame.font.Font("fonts\\Pixellari.ttf", 25)
-FONT_HEADER   = pygame.font.Font("fonts\\Pixellari.ttf", 35)
-FONT_TITLE    = pygame.font.Font("fonts\\Pixellari.ttf", 55)
-FONT_COMBO    = pygame.font.Font("fonts\\Pixellari.ttf", 80)
+FONT_PIXEL    = pygame.font.Font("fonts\\Pixellari.ttf", 20)
+FONT_SMALL    = pygame.font.Font("fonts\\Aller_Bd.ttf", 20)
+FONT          = pygame.font.Font("fonts\\Aller_Bd.ttf", 25)
+FONT_HEADER   = pygame.font.Font("fonts\\BigDeal.ttf", 35)
+FONT_TITLE    = pygame.font.Font("fonts\\BigDeal.ttf", 55)
+FONT_COMBO    = pygame.font.Font("fonts\\AllerDisplay.ttf", 35)
 
 # Window constants & clock
 WIDTH         = 500 * 2.25
@@ -115,16 +111,6 @@ judgement_count = {
 
 
 ############# Functions & Classes ##############
-
-## Lerp function setup
-def lerp(a: float, b: float, t: float) -> float:
-    """Linear interpolate on the scale given by a to b, using t as the point on that scale.
-    Examples
-    --------
-        50 == lerp(0, 100, 0.5)
-        4.2 == lerp(1, 5, 0.8)
-    """
-    return (1 - t) * a + t * b
 
 ## PLAY SONG FUNCTION
 def play_song(song):
@@ -409,7 +395,7 @@ def play_song(song):
 
         # Draw Combo
         if combo > 0:
-            comb = FONT_HEADER.render(str(combo), False, YELLOW)
+            comb = FONT_COMBO.render(str(combo), False, YELLOW)
             y = 236 #max(233, min(233 + frames_since_last_hit, 236))
             WIN.blit(comb, (WIDTH/2 - comb.get_width() / 2, y))
 
@@ -548,71 +534,16 @@ class Button:
 
 
 
-############ Setup Songs ############
+############ Compile songs and show menu screens ############
 
 # Show loading screen
-text_surface = FONT_TITLE.render('PROJECT RIPPLE', False, YELLOW)
-WIN.blit(text_surface, (WIDTH/2 - text_surface.get_width()/2, HEIGHT/2 - text_surface.get_height()/1.15))
-subtitle = FONT.render('LOADING SONG LIBRARY...', False, WHITE)
-WIN.blit(subtitle, (WIDTH/2 - subtitle.get_width()/2, HEIGHT/2 + subtitle.get_height()/1.15))
-pygame.display.update()
+show_loading_screen(WIN, FONT, FONT_TITLE)
 
 # Load songs
 songs = load_songs()
 
-
-
-
-############ MENU SCREEN ############
-is_on_menu_screen = True
-loop = 58
-ripples = []
-while is_on_menu_screen:
-
-    #Set constant framerate
-    clock.tick(Framerate)
-    loop += 1
-
-    # Check for events
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-
-    # Check for keys pressed
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_SPACE]:
-        is_on_menu_screen = False
-
-    # Fill screen with black
-    WIN.fill(BLACK)
-
-
-    # Title screen ripple effect
-    if loop >= 45:
-        # Create ripple
-        ripples.append(0)
-        loop = 0
-
-    for lifetime in ripples:
-
-        ripples[ripples.index(lifetime)] += 1
-
-        ripple_rect = pygame.Rect(WIDTH/2 - 6*lifetime/2, 150 - 3*lifetime/2, 6 * lifetime, 3 * lifetime)
-        ripple_shadow_rect = pygame.Rect(WIDTH/2 - (6*lifetime - 2)/2, 150 - (3*lifetime - 2)/2, (6 * lifetime) - 2, (3 * lifetime) - 2)
-        pygame.draw.ellipse(WIN, ( lerp(200, 0, lifetime / 120), lerp(200, 0, lifetime / 120), 0 ), ripple_rect) 
-        pygame.draw.ellipse(WIN, BLACK, ripple_shadow_rect) 
-
-        if lifetime >= 120:
-            ripples.remove(lifetime + 1)
-
-    # Draw title screen
-    text_surface = FONT_TITLE.render('PROJECT RIPPLE', False, YELLOW)
-    WIN.blit(text_surface, (WIDTH/2 - text_surface.get_width()/2, 200 ))
-    subtitle = FONT.render('Press [SPACE] to continue', False, WHITE)
-    WIN.blit(subtitle, (WIDTH/2 - subtitle.get_width()/2, 275 ))
-
-
-    pygame.display.update()
+# Show title screen
+show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL)
 
 
 
@@ -631,6 +562,7 @@ for song in songs:
 
 
 is_on_select_screen = True
+loops = 0
 while is_on_select_screen:
 
     #Set constant framerate
@@ -650,6 +582,8 @@ while is_on_select_screen:
 
     # Fill screen with black
     WIN.fill(BLACK)
+
+    
 
     # Draw selected song thumbnail preview
     if selected_song:
@@ -695,6 +629,17 @@ while is_on_select_screen:
     WIN.blit(subtitle, (25, 50 ))
     tooltip = FONT_SMALL.render( "[" + str(len(songs)) + ' Loaded] View more songs by hovering with your mouse!', False, WHITE)
     WIN.blit(tooltip, (25, 92 ))
+
+    # new
+    wh = pygame.Surface((1200, 675))
+    wh.set_alpha(max(150 - loops * 10, 0))
+    wh.fill(WHITE)
+    WIN.blit(wh, (0, 0))
+    loops += 1
+
+    if loops == 1:
+        pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\select_song.wav"))
+        pygame.mixer.Channel(0).set_volume(4)
 
 
     pygame.display.update()
