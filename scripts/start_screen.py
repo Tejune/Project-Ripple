@@ -27,6 +27,7 @@ BLACK         = (0, 0, 0)
 # Shows the loading screen frame when the game is compiling song data
 def show_loading_screen (WIN, FONT, FONT_TITLE):
 
+    WIN.fill(BLACK)
     text_surface = FONT_TITLE.render('PROJECT RIPPLE', False, (20, 20, 20))
     WIN.blit(text_surface, (WIDTH/2 - text_surface.get_width()/2, HEIGHT/2 - 55/2 - 10))#- text_surface.get_height()/1.15))
     #subtitle = FONT.render('LOADING SONG LIBRARY...', False, WHITE)
@@ -55,6 +56,10 @@ def show_title_screen (WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+            
 
         # Check for keys pressed
         keys = pygame.key.get_pressed()

@@ -9,6 +9,7 @@ from start_screen import *
 from helper_methods import *
 
 import math
+import time
 import pygame
 import random
 import os
@@ -260,6 +261,9 @@ def play_song(song):
 
                 if event.key == pygame.K_g:
                     God_Mode = not  God_Mode
+                
+                if event.key == pygame.K_ESCAPE:
+                    is_playing = False
 
                 if event.key == pygame.K_a:
                     lane = 1
@@ -277,12 +281,6 @@ def play_song(song):
                         frames_since_last_hit = 0
                     elif hit and judgement == "MISS":
                         combo = 0
-
-
-        # Check for keys pressed
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            is_playing = False
 
         # Fill screen with black
         WIN.fill(BLACK)
@@ -572,13 +570,19 @@ while is_on_select_screen:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
+
+        if event.type == pygame.KEYDOWN:
+             if event.key == pygame.K_ESCAPE:
+                
+                # Reload songs
+                show_loading_screen(WIN, FONT, FONT_TITLE)
+                time.sleep(0.2)
+                show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL)
+                loops = 0
+
         for button in buttons:
-            button.click(event)
-    
-    # Check for keys pressed
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_SPACE]:
-        is_on_menu_screen = False
+            button.click(event)       
+                
 
     # Fill screen with black
     WIN.fill(BLACK)
