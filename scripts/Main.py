@@ -4,12 +4,12 @@
 #------------------------------------------------------------------------------------------
 
 #### Imports
-from array import array
-from asyncio.windows_events import NULL
+from song_loader import load_songs
+from start_screen import *
+from helper_methods import *
+
 import math
-from platform import python_revision
-from tkinter import Frame
-from tkinter.tix import WINDOW
+import time
 import pygame
 import random
 import os
@@ -22,8 +22,7 @@ pygame.mixer.init()
 Framerate = 60
 
 #### Directory & Dictionary
-songs_directory     = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Quaver\\Songs"
-default_thumbnail   = pygame.image.load("default_thumb.jpg")
+default_thumbnail   = pygame.image.load("images\\default_thumb.jpg")
 songs               = []
 
 #### Pygame variables & Constants
@@ -31,14 +30,15 @@ songs               = []
 pygame.display.set_caption("Project Ripple") # Set Caption
 
 # Font Constants
-FONT_SMALL    = pygame.font.Font("Pixellari.ttf", 20)
-FONT          = pygame.font.Font("Pixellari.ttf", 25)
-FONT_HEADER   = pygame.font.Font("Pixellari.ttf", 35)
-FONT_TITLE    = pygame.font.Font("Pixellari.ttf", 55)
-FONT_COMBO    = pygame.font.Font("Pixellari.ttf", 80)
+FONT_PIXEL    = pygame.font.Font("fonts\\Pixellari.ttf", 20)
+FONT_SMALL    = pygame.font.Font("fonts\\Aller_Bd.ttf", 20)
+FONT          = pygame.font.Font("fonts\\Aller_Bd.ttf", 25)
+FONT_HEADER   = pygame.font.Font("fonts\\BigDeal.ttf", 35)
+FONT_TITLE    = pygame.font.Font("fonts\\BigDeal.ttf", 55)
+FONT_COMBO    = pygame.font.Font("fonts\\AllerDisplay.ttf", 35)
 
 # Window constants & clock
-WIDTH         = 500*2.25
+WIDTH         = 500 * 2.25
 HEIGHT        = 675
 WIN           = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
 clock         = pygame.time.Clock()
@@ -64,11 +64,11 @@ BOO           = 175
 
 scroll_offset              = 0
 selected_song              = None
-arrow                      = pygame.image.load("arrow.png").convert_alpha()
+arrow                      = pygame.image.load("images\\arrow.png").convert_alpha()
 arrow                      = pygame.transform.scale(arrow, (120, 120))
-arrow_outline_original     = pygame.image.load("arrow_outline.png").convert_alpha()
+arrow_outline_original     = pygame.image.load("images\\arrow_outline.png").convert_alpha()
 arrow_outline_original     = pygame.transform.scale(arrow_outline_original, (120, 120))
-sparks                     = pygame.image.load("sparks.png").convert_alpha()
+sparks                     = pygame.image.load("images\\sparks.png").convert_alpha()
 sparks                     = pygame.transform.scale(sparks, (WIDTH, HEIGHT))
 
 arrow_outline = [
@@ -78,7 +78,7 @@ arrow_outline = [
     pygame.transform.rotate(arrow_outline_original, 270)
 ]
 
-arrow_outline_highlight_original     = pygame.image.load("arrow_outline_highlight.png").convert_alpha()
+arrow_outline_highlight_original     = pygame.image.load("images\\arrow_outline_highlight.png").convert_alpha()
 arrow_outline_highlight_original     = pygame.transform.scale(arrow_outline_highlight_original, (120, 120))
 
 arrow_outline_highlight = [
@@ -112,16 +112,6 @@ judgement_count = {
 
 
 ############# Functions & Classes ##############
-
-## Lerp function setup
-def lerp(a: float, b: float, t: float) -> float:
-    """Linear interpolate on the scale given by a to b, using t as the point on that scale.
-    Examples
-    --------
-        50 == lerp(0, 100, 0.5)
-        4.2 == lerp(1, 5, 0.8)
-    """
-    return (1 - t) * a + t * b
 
 ## PLAY SONG FUNCTION
 def play_song(song):
@@ -159,13 +149,13 @@ def play_song(song):
     pygame.display.update()
 
     # Play select sound, then load song
-    pygame.mixer.Channel(0).play(pygame.mixer.Sound("select_song.wav"))
+    pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\select.mp3"))
     pygame.mixer.Channel(0).set_volume(4)
     pygame.mixer.music.load(song["Audio"])
 
     # Load thumbnail image
     if song["Image"] == "None":
-        song["Image"] = "default_thumb.jpg"
+        song["Image"] = "images\\default_thumb.jpg"
 
     imp = song["LoadedImage"]
     imp = pygame.transform.scale(imp, (1200, 675))
@@ -271,6 +261,11 @@ def play_song(song):
 
                 if event.key == pygame.K_g:
                     God_Mode = not  God_Mode
+                
+                if event.key == pygame.K_ESCAPE:
+                    is_playing = False
+                    pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\cancel.mp3"))
+                    pygame.mixer.Channel(0).set_volume(4)
 
                 if event.key == pygame.K_a:
                     lane = 1
@@ -288,12 +283,6 @@ def play_song(song):
                         frames_since_last_hit = 0
                     elif hit and judgement == "MISS":
                         combo = 0
-
-
-        # Check for keys pressed
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            is_playing = False
 
         # Fill screen with black
         WIN.fill(BLACK)
@@ -406,7 +395,7 @@ def play_song(song):
 
         # Draw Combo
         if combo > 0:
-            comb = FONT_HEADER.render(str(combo), False, YELLOW)
+            comb = FONT_COMBO.render(str(combo), False, YELLOW)
             y = 236 #max(233, min(233 + frames_since_last_hit, 236))
             WIN.blit(comb, (WIDTH/2 - comb.get_width() / 2, y))
 
@@ -540,117 +529,27 @@ class Button:
             if pygame.mouse.get_pressed()[0]:
                 self.rect = pygame.Rect(self.x, self.y + scroll_offset, self.size[0], self.size[1])
                 if self.rect.collidepoint(x, y):
+                    pygame.mixer.Channel(2).stop()
                     play_song(self.song)
+                    pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound\\Title.mp3"))
 
 
 
 
-############ Setup Songs ############
+############ Compile songs and show menu screens ############
 
 # Show loading screen
-text_surface = FONT_TITLE.render('PROJECT RIPPLE', False, YELLOW)
-WIN.blit(text_surface, (WIDTH/2 - text_surface.get_width()/2, HEIGHT/2 - text_surface.get_height()/1.15))
-subtitle = FONT.render('LOADING SONG LIBRARY...', False, WHITE)
-WIN.blit(subtitle, (WIDTH/2 - subtitle.get_width()/2, HEIGHT/2 + subtitle.get_height()/1.15))
-pygame.display.update()
+show_loading_screen(WIN, FONT, FONT_TITLE)
 
-# Main setup loop
-for root in os.scandir(songs_directory):
+# Load songs
+songs = load_songs()
 
-    # Create directory for song info
-    song_info = {}
-    song_info["Image"] = "None"
-    song_info["Title"] = "None"
-    song_info["LoadedImage"] = "None"
-    found_qua_file = False
+# Start title screen bgm
+pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound\\Title.mp3"))
+pygame.mixer.Channel(2).set_volume(0.4)
 
-    # Check files for .QUA info file & .mp3 audio file & .png thumbnail and add to dict
-    for file in os.scandir(root):
-
-        # .QUA File
-        if file.name.endswith('.qua') and not found_qua_file:
-            found_qua_file = True
-            song_info["Data"] = file
-
-            # Get info from .QUA file
-            with open(file, "r", encoding="utf8") as info:
-                inf = info.read()
-                song_info["Title"] =  inf[inf.find("Title: ") + 7:inf.find("\n", inf.find("Title: "))]
-                song_info["BPM"] =  int(float(inf[inf.find("Bpm: ") + 5:inf.find("\n", inf.find("Bpm: "))]))
-                song_info["Description"] =  inf[inf.find("Description: ") + 13:inf.find("\n", inf.find("Description: "))]
-                print(song_info["Title"] + "\n" + song_info["Description"]+ "\nBPM: " + str(song_info["BPM"]) + "\n" )
-            
-        # .mp3 File
-        elif file.name.endswith('.mp3') or file.name.endswith('.wav'):
-            song_info["Audio"] = file
-            song_info["AudioPath"] = file.path
-
-         # .png / .jpg File
-        elif file.name.endswith('.jpg') or file.name.endswith('.png'):
-            song_info["Image"] = file
-            song_info["LoadedImage"] = pygame.image.load(file)
-    
-    # Check if a thumbnail image couldn't be found, if true load the default
-    if song_info["Image"] == "None":
-        song_info["Image"] = "default_thumb.jpg"
-        song_info["LoadedImage"] = default_thumbnail
-
-    # Add new song information to the primary dictionary
-    songs.append(song_info)
-
-
-
-
-############ MENU SCREEN ############
-is_on_menu_screen = True
-loop = 58
-ripples = []
-while is_on_menu_screen:
-
-    #Set constant framerate
-    clock.tick(Framerate)
-    loop += 1
-
-    # Check for events
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-
-    # Check for keys pressed
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_SPACE]:
-        is_on_menu_screen = False
-
-    # Fill screen with black
-    WIN.fill(BLACK)
-
-
-    # Title screen ripple effect
-    if loop >= 45:
-        # Create ripple
-        ripples.append(0)
-        loop = 0
-
-    for lifetime in ripples:
-
-        ripples[ripples.index(lifetime)] += 1
-
-        ripple_rect = pygame.Rect(WIDTH/2 - 6*lifetime/2, 150 - 3*lifetime/2, 6 * lifetime, 3 * lifetime)
-        ripple_shadow_rect = pygame.Rect(WIDTH/2 - (6*lifetime - 2)/2, 150 - (3*lifetime - 2)/2, (6 * lifetime) - 2, (3 * lifetime) - 2)
-        pygame.draw.ellipse(WIN, ( lerp(200, 0, lifetime / 120), lerp(200, 0, lifetime / 120), 0 ), ripple_rect) 
-        pygame.draw.ellipse(WIN, BLACK, ripple_shadow_rect) 
-
-        if lifetime >= 120:
-            ripples.remove(lifetime + 1)
-
-    # Draw title screen
-    text_surface = FONT_TITLE.render('PROJECT RIPPLE', False, YELLOW)
-    WIN.blit(text_surface, (WIDTH/2 - text_surface.get_width()/2, 200 ))
-    subtitle = FONT.render('Press [SPACE] to continue', False, WHITE)
-    WIN.blit(subtitle, (WIDTH/2 - subtitle.get_width()/2, 275 ))
-
-
-    pygame.display.update()
+# Show title screen
+show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL)
 
 
 
@@ -669,6 +568,7 @@ for song in songs:
 
 
 is_on_select_screen = True
+loops = 0
 while is_on_select_screen:
 
     #Set constant framerate
@@ -678,16 +578,26 @@ while is_on_select_screen:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
+
+        if event.type == pygame.KEYDOWN:
+             if event.key == pygame.K_ESCAPE:
+                
+                # Return to title screen after playing associated sound effect
+                pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\cancel.mp3"))
+                pygame.mixer.Channel(0).set_volume(4)
+                show_loading_screen(WIN, FONT, FONT_TITLE)
+                time.sleep(0.2)
+                show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL)
+                loops = 0
+
         for button in buttons:
-            button.click(event)
-    
-    # Check for keys pressed
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_SPACE]:
-        is_on_menu_screen = False
+            button.click(event)       
+
 
     # Fill screen with black
     WIN.fill(BLACK)
+
+    
 
     # Draw selected song thumbnail preview
     if selected_song:
@@ -730,9 +640,32 @@ while is_on_select_screen:
     # Draw title
     #pygame.draw.rect(WIN, (5,5,5), pygame.Rect(0, 0, 1125, 130))
     subtitle = FONT_HEADER.render('SONG SELECT', False, WHITE)
-    WIN.blit(subtitle, (25, 50 ))
-    tooltip = FONT_SMALL.render( "[" + str(len(songs)) + ' Loaded] View more songs by hovering with your mouse!', False, WHITE)
-    WIN.blit(tooltip, (25, 92 ))
+    WIN.blit(subtitle, (25, 40 ))
+    tooltip = FONT_PIXEL.render( "[" + str(len(songs)) + ' Loaded] View more songs by hovering with your mouse!', False, WHITE)
+    WIN.blit(tooltip, (25, 82 ))
+
+    # Draw song preview window
+    pygame.draw.rect(WIN, BLACK, (600, 80, 800, 290), 0, 5)
+    if selected_song:
+        sur = pygame.Surface((800, 290))
+        sur.set_alpha(255)
+        imp = selected_song["LoadedImage"]
+        imp = pygame.transform.scale(imp, (WIDTH - 600, 290))
+        sur.blit(imp, (0, 0))
+        WIN.blit(sur, (600, 80))
+    pygame.draw.rect(WIN, WHITE, (600, 80, 800, 290), 3, 5)
+
+
+    # new
+    wh = pygame.Surface((1200, 675))
+    wh.set_alpha(max(150 - loops * 10, 0))
+    wh.fill(WHITE)
+    WIN.blit(wh, (0, 0))
+    loops += 1
+
+    if loops == 1:
+        pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\enter.mp3"))
+        pygame.mixer.Channel(0).set_volume(4)
 
 
     pygame.display.update()
