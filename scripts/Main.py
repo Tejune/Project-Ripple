@@ -149,7 +149,7 @@ def play_song(song):
     pygame.display.update()
 
     # Play select sound, then load song
-    pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\select.mp3"))
+    pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\select.wav"))
     pygame.mixer.Channel(0).set_volume(4)
     pygame.mixer.music.load(song["Audio"])
 
@@ -264,7 +264,7 @@ def play_song(song):
                 
                 if event.key == pygame.K_ESCAPE:
                     is_playing = False
-                    pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\cancel.mp3"))
+                    pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\cancel.wav"))
                     pygame.mixer.Channel(0).set_volume(4)
 
                 if event.key == pygame.K_a:
@@ -531,7 +531,7 @@ class Button:
                 if self.rect.collidepoint(x, y):
                     pygame.mixer.Channel(2).stop()
                     play_song(self.song)
-                    pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound\\Title.mp3"))
+                    pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound\\Title.wav"))
 
 
 
@@ -545,7 +545,7 @@ show_loading_screen(WIN, FONT, FONT_TITLE)
 songs = load_songs()
 
 # Start title screen bgm
-pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound\\Title.mp3"))
+pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound\\Title.wav"))
 pygame.mixer.Channel(2).set_volume(0.4)
 
 # Show title screen
@@ -583,7 +583,7 @@ while is_on_select_screen:
              if event.key == pygame.K_ESCAPE:
                 
                 # Return to title screen after playing associated sound effect
-                pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\cancel.mp3"))
+                pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\cancel.wav"))
                 pygame.mixer.Channel(0).set_volume(4)
                 show_loading_screen(WIN, FONT, FONT_TITLE)
                 time.sleep(0.2)
@@ -664,7 +664,7 @@ while is_on_select_screen:
     loops += 1
 
     if loops == 1:
-        pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\enter.mp3"))
+        pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\enter.wav"))
         pygame.mixer.Channel(0).set_volume(4)
 
 
