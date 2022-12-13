@@ -455,6 +455,7 @@ class Button:
         self.font = FONT
         self.input = text
         self.song = song
+        self.offset = 0
         if feedback == "":
             self.feedback = "text"
         else:
@@ -462,7 +463,7 @@ class Button:
         self.change_text(text, bg)
  
     def change_text(self, text, bg="black"):
-        """Change the text whe you click"""
+        """Change the text when you click"""
         if len(text) > 40:
             text = text[0:37] + "..."
         self.input = text
@@ -477,41 +478,51 @@ class Button:
         self.surface.blit(self.text, (0, 9))
         self.rect = pygame.Rect(self.x, self.y, self.size[0], self.size[1])
  
-    def show(self):
+    def show(self, currently_selected_song):
         m_x, m_y = pygame.mouse.get_pos()
         self.rect = pygame.Rect(self.x, self.y + scroll_offset, self.size[0], self.size[1])
+
+        if currently_selected_song == self.song:
+            self.offset = min(self.offset + 4, 16)
+        else:
+            self.offset = max(self.offset - 4, 0)
+
         if self.rect.collidepoint(m_x, m_y):
             self.text = self.font.render(self.input, 1, (255, 255, 200))
             self.size = (self.bound_x, self.bound_y + 18)
             self.surface = pygame.Surface(self.size, pygame.SRCALPHA)
             self.surface.convert_alpha()
-            self.surface.fill((10,10,10))
-            self.surface.blit(self.text, (0, 9))
+            #self.surface.fill((10,10,10))
+            self.surface.blit(self.text, (self.offset, 9))
         else:
             self.text = self.font.render(self.input, 1, YELLOW)
             self.size = (self.bound_x, self.bound_y + 18)
             self.surface = pygame.Surface(self.size, pygame.SRCALPHA)
             self.surface.convert_alpha()
             #self.surface.fill(BLACK)
-            self.surface.blit(self.text, (0, 9))
+            self.surface.blit(self.text, (self.offset, 9))
         WIN.blit(self.surface, (self.x, self.y + scroll_offset))
-        if self.rect.collidepoint(m_x, m_y):
-            return self.song
+        #if self.rect.collidepoint(m_x, m_y):
+            #return self.song
  
-    def click(self, event):
+    def click(self, event, currently_selected_song):
         x, y = pygame.mouse.get_pos()
         if event.type == pygame.MOUSEBUTTONDOWN:
             if pygame.mouse.get_pressed()[0]:
                 self.rect = pygame.Rect(self.x, self.y + scroll_offset, self.size[0], self.size[1])
                 if self.rect.collidepoint(x, y):
-                    pygame.mixer.Channel(2).stop()
-                    play_song(self.song)
-                    pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound\\Title.wav"))
+                    if currently_selected_song == self.song:
+                        pygame.mixer.Channel(2).stop()
+                        play_song(self.song)
+                        pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound\\Title.wav"))
+                    else:
+                        currently_selected_song = self.song
+                        return currently_selected_song
 
 
 
 
-############ Compile songs and show menu screens ############
+#--------- Compile songs and show menu screen ------------------------------------------------------------#
 
 # Show loading screen
 show_loading_screen(WIN, FONT, FONT_TITLE)
@@ -529,8 +540,9 @@ show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL)
 
 
 
-############ SONG SELECT SCREEN ############
+#--------- Song select screen ----------------------------------------------------------------------------#
 
+# Create buttons
 buttons = []
 for song in songs:
     buttons.append(Button(
@@ -541,9 +553,11 @@ for song in songs:
         bg=BLACK,
         feedback="You clicked me"))
 
-
+# Define variables
 is_on_select_screen = True
 loops = 0
+
+# Main song selection loop
 while is_on_select_screen:
 
     #Set constant framerate
@@ -566,31 +580,34 @@ while is_on_select_screen:
                 loops = 0
 
         for button in buttons:
-            button.click(event)       
+            new_selection = button.click(event, selected_song) 
+            if new_selection:
+                selected_song = new_selection      
 
 
     # Fill screen with black
     WIN.fill(BLACK)
 
-    
-
     # Draw selected song thumbnail preview
     if selected_song:
-        sur = pygame.Surface((WIDTH, HEIGHT))
-        sur.set_alpha(40)
-        imp = selected_song["LoadedImage"]
-        imp = pygame.transform.scale(imp, (WIDTH, HEIGHT))
-        sur.blit(imp, (0, 0))
-        WIN.blit(sur, (0, 0))
+        WIN.blit(selected_song["LoadedImageBlurred"], (0, 0))
     
-    # Add transparent background under song list
-    _bg = pygame.Surface((580, 675))
+    # Darken the background
+    _bg = pygame.Surface((WIDTH, HEIGHT))
     _bg.set_alpha(100)
-    pygame.draw.rect(_bg, BLACK, pygame.Rect(0, 0, 580, 675))
+    pygame.draw.rect(_bg, BLACK, pygame.Rect(0, 0, WIDTH, HEIGHT))
+    WIN.blit(_bg,(0, 0))
+
+    # Add transparent background under song list
+    _bg = pygame.Surface((580, HEIGHT))
+    _bg.set_alpha(100)
+    pygame.draw.rect(_bg, BLACK, pygame.Rect(0, 0, 580, HEIGHT))
     WIN.blit(_bg,(0, 130))
 
+    
+
     for button in buttons:
-        sel = button.show()
+        sel = button.show(selected_song)
         if sel:
             selected_song = sel
 
@@ -607,9 +624,9 @@ while is_on_select_screen:
 
 
     # Add transparent background under title
-    _title = pygame.Surface((1125, 130))
-    _title.set_alpha(230)
-    pygame.draw.rect(_title, (5,5,5), pygame.Rect(0, 0, 1125, 130))
+    _title = pygame.Surface((WIDTH, 130))
+    _title.set_alpha(175)
+    pygame.draw.rect(_title, (5,5,5), pygame.Rect(0, 0, WIDTH, 130))
     WIN.blit(_title,(0, 0))
 
     # Draw title
@@ -619,30 +636,55 @@ while is_on_select_screen:
     tooltip = FONT_PIXEL.render( "[" + str(len(songs)) + ' Loaded] View more songs by hovering with your mouse!', False, WHITE)
     WIN.blit(tooltip, (25, 82 ))
 
-    # Draw song preview window
-    pygame.draw.rect(WIN, BLACK, (600, 80, 800, 290), 0, 5)
+
+
+    #----- Drawing the song preview window -----#
+
+    # Define dimensions
+    preview_width = WIDTH * 0.5 + 5
+    preview_height = HEIGHT * 0.4
+    preview_pos_x = WIDTH * 0.5
+    preview_pos_y = 80
+    preview_corner_radius = 3
+
+    # Draw background fill
+    pygame.draw.rect(WIN, BLACK, (preview_pos_x, preview_pos_y, preview_width, preview_height), 0, 5)
+
+    # Draw preview image if a song has been selected
     if selected_song:
-        sur = pygame.Surface((800, 290))
-        sur.set_alpha(255)
-        imp = selected_song["LoadedImage"]
-        imp = pygame.transform.scale(imp, (WIDTH - 600, 290))
-        sur.blit(imp, (0, 0))
-        WIN.blit(sur, (600, 80))
-    pygame.draw.rect(WIN, WHITE, (600, 80, 800, 290), 3, 5)
+        preview_image_surface = pygame.Surface((preview_width, preview_height))
+        preview_image_surface.set_alpha(255)
+        preview_image = selected_song["LoadedImage"]
+        preview_image = pygame.transform.scale(preview_image, (preview_width, HEIGHT * 0.5))
+        preview_image_surface.blit(preview_image, (0, -(HEIGHT * 0.05)))
+        WIN.blit(preview_image_surface, (preview_pos_x, preview_pos_y))
+
+    # Draw preview window outline
+    pygame.draw.rect(WIN, WHITE, (preview_pos_x, preview_pos_y, preview_width, preview_height), preview_corner_radius, 5)
+
+    # Draw neon blur
+    #neon_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+    #pygame.draw.rect(neon_surface, WHITE, (preview_pos_x, preview_pos_y, preview_width, preview_height), preview_corner_radius, 5)
+    #neon_surface = create_neon(neon_surface)
+    #WIN.blit(neon_surface, (0, 0))
 
 
-    # new
-    wh = pygame.Surface((1200, 675))
+    #----- Drawing the flash effect when entering from main menu -----#
+
+    # Draw flash effect
+    wh = pygame.Surface((WIDTH, HEIGHT))
     wh.set_alpha(max(150 - loops * 10, 0))
     wh.fill(WHITE)
     WIN.blit(wh, (0, 0))
     loops += 1
 
+    # Play the enter sound effect when coming from the main menu
     if loops == 1:
         pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\enter.wav"))
         pygame.mixer.Channel(0).set_volume(4)
 
 
+    # Update display
     pygame.display.update()
 
 

@@ -72,8 +72,8 @@ def show_title_screen (WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL):
 
             ripples[ripples.index(lifetime)] += 1.5
 
-            ripple_rect = pygame.Rect(WIDTH/2 - 6*lifetime/2, (325) - 6*lifetime/2, 6 * lifetime, 6 * lifetime)
-            ripple_shadow_rect = pygame.Rect(WIDTH/2 - (6*lifetime - 8)/2, (325) - (6*lifetime - 8)/2, (6 * lifetime) - 8, (6 * lifetime) - 8)
+            ripple_rect = pygame.Rect(WIDTH/2 - 6*lifetime/2, (HEIGHT/2) - 6*lifetime/2, 6 * lifetime, 6 * lifetime)
+            ripple_shadow_rect = pygame.Rect(WIDTH/2 - (6*lifetime - 8)/2, (HEIGHT/2) - (6*lifetime - 8)/2, (6 * lifetime) - 8, (6 * lifetime) - 8)
             pygame.draw.ellipse(WIN, ( lerp(50, 0, lifetime / 240), lerp(50, 0, lifetime / 240), 0 ), ripple_rect) 
             pygame.draw.ellipse(WIN, BLACK, ripple_shadow_rect) 
 
