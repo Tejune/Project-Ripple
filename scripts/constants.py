@@ -8,6 +8,8 @@ pygame.init()
 infoObject = pygame.display.Info()
 
 # Font Constants
+FONT_DIFF     = pygame.font.Font("fonts\\Pixellari.ttf", 14)
+FONT_ARTIST   = pygame.font.Font("fonts\\Aller_Rg.ttf", 16)
 FONT_PIXEL    = pygame.font.Font("fonts\\Pixellari.ttf", 20)
 FONT_SMALL    = pygame.font.Font("fonts\\Aller_Bd.ttf", 20)
 FONT          = pygame.font.Font("fonts\\Aller_Bd.ttf", 25)

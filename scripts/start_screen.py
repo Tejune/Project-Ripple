@@ -63,7 +63,7 @@ def show_title_screen (WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL):
 
 
         # Title screen ripple effect
-        if loop >= 30:
+        if loop >= 60:
             # Create ripple
             ripples.append(0)
             loop = 0

@@ -32,7 +32,12 @@ def load_songs ():
         song_info["Image"]         = "None"
         song_info["Title"]         = "None"
         song_info["LoadedImage"]   = "None"
-        song_info["LoadedImageBlurred"]   = "None"
+        song_info["Artist"]        = "Unknown Artist"
+        song_info["DifficultyName"]        = "Unknown"
+        song_info["LoadedImageBlurred"]    = "None"
+        song_info["LoadedImagePreview"]    = "None"
+        song_info["LoadedImageBlurredPreview"] = "None"
+        song_info["SongPreviewTime"] = 0
         found_qua_file             = False
 
         # Check files for .QUA info file & .mp3 audio file & .png thumbnail and add to dict
@@ -49,12 +54,16 @@ def load_songs ():
                     song_info["Title"] =  inf[inf.find("Title: ") + 7:inf.find("\n", inf.find("Title: "))]
                     song_info["BPM"] =  int(float(inf[inf.find("Bpm: ") + 5:inf.find("\n", inf.find("Bpm: "))]))
                     song_info["Description"] =  inf[inf.find("Description: ") + 13:inf.find("\n", inf.find("Description: "))]
+                    song_info["DifficultyName"] =  inf[inf.find("DifficultyName: ") + 16:inf.find("\n", inf.find("DifficultyName: "))]
+                    song_info["Artist"] =  inf[inf.find("Artist: ") + 8:inf.find("\n", inf.find("Artist: "))]
+                    song_info["SongPreviewTime"] =  int(inf[inf.find("SongPreviewTime: ") + 17:inf.find("\n", inf.find("SongPreviewTime: "))])
                     print(song_info["Title"] + "\n" + song_info["Description"]+ "\nBPM: " + str(song_info["BPM"]) + "\n" )
                 
             # .mp3 File
             elif file.name.endswith('.mp3') or file.name.endswith('.wav'):
                 song_info["Audio"] = file
                 song_info["AudioPath"] = file.path
+                song_info["LoadedAudio"] = pygame.mixer.Sound(song_info["Audio"])
 
             # .png / .jpg File
             elif file.name.endswith('.jpg') or file.name.endswith('.png'):
