@@ -589,7 +589,7 @@ while is_on_select_screen:
     WIN.fill(BLACK)
 
     # Draw selected song thumbnail preview
-    if selected_song:
+    if selected_song and selected_song["LoadedImageBlurred"] != "None":
         WIN.blit(selected_song["LoadedImageBlurred"], (0, 0))
     
     # Darken the background

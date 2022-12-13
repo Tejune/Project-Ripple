@@ -32,6 +32,7 @@ def load_songs ():
         song_info["Image"]         = "None"
         song_info["Title"]         = "None"
         song_info["LoadedImage"]   = "None"
+        song_info["LoadedImageBlurred"]   = "None"
         found_qua_file             = False
 
         # Check files for .QUA info file & .mp3 audio file & .png thumbnail and add to dict
