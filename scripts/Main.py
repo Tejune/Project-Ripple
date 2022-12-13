@@ -262,6 +262,9 @@ def play_song(song):
         # Fill screen with black
         WIN.fill(BLACK)
 
+        #Marketing for the masses
+        print("buy chompy uf!!! POWER GUM")
+
         # Draw background image
         sur = pygame.Surface((1200, 675))
         sur.set_alpha(40)
@@ -517,6 +520,12 @@ class Button:
                         pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound\\Title.wav"))
                     else:
                         currently_selected_song = self.song
+
+                        #Change song
+                        pygame.mixer.Channel(2).stop()
+                        pygame.mixer.Channel(2).play(pygame.mixer.Sound(self.song["Audio"]))
+                        pygame.mixer.Channel(2).set_volume(0.4)
+
                         return currently_selected_song
 
 
@@ -589,7 +598,7 @@ while is_on_select_screen:
     WIN.fill(BLACK)
 
     # Draw selected song thumbnail preview
-    if selected_song and selected_song["LoadedImageBlurred"] != "None":
+    if selected_song:
         WIN.blit(selected_song["LoadedImageBlurred"], (0, 0))
     
     # Darken the background

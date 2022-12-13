@@ -99,6 +99,15 @@ def load_songs ():
             song_info["Image"] = "images\\default_thumb.jpg"
             song_info["LoadedImage"] = default_thumbnail
 
+            # Create blurred version (surface)
+            blur_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+            blur_surface.set_alpha(40)
+            imp = song_info["LoadedImage"]
+            imp = pygame.transform.scale(imp, (WIDTH, HEIGHT))
+            blur_surface.blit(imp, (0, 0))
+            blur_surface = create_neon(blur_surface)
+            song_info["LoadedImageBlurred"] = blur_surface
+
         # Add new song information to the primary dictionary
         songs.append(song_info)
 
