@@ -615,7 +615,7 @@ class Button:
                         #Change song
                         pygame.mixer.music.stop()
                         pygame.mixer.music.load(self.song["Audio"])
-                        pygame.mixer.music.play(start = (self.song["SongPreviewTime"] / 1000))
+                        pygame.mixer.music.play(start = (int(self.song["SongPreviewTime"]) / 1000))
                         pygame.mixer.music.set_volume(0.4)
                         pygame.mixer.Channel(2).stop()
 
@@ -673,7 +673,7 @@ for song in songs:
         selected_song = song
         pygame.mixer.music.stop()
         pygame.mixer.music.load(song["Audio"])
-        pygame.mixer.music.play(start = (song["SongPreviewTime"] / 1000))
+        pygame.mixer.music.play(start = (int(song["SongPreviewTime"]) / 1000))
         pygame.mixer.music.set_volume(0.4)
         scroll_offset = -song_y + HEIGHT / 2 - 60
 

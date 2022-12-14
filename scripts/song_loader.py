@@ -56,7 +56,7 @@ def load_songs ():
                     song_info["Description"] =  inf[inf.find("Description: ") + 13:inf.find("\n", inf.find("Description: "))]
                     song_info["DifficultyName"] =  inf[inf.find("DifficultyName: ") + 16:inf.find("\n", inf.find("DifficultyName: "))]
                     song_info["Artist"] =  inf[inf.find("Artist: ") + 8:inf.find("\n", inf.find("Artist: "))]
-                    song_info["SongPreviewTime"] =  int(inf[inf.find("SongPreviewTime: ") + 17:inf.find("\n", inf.find("SongPreviewTime: "))])
+                    song_info["SongPreviewTime"] =  inf[inf.find("SongPreviewTime: ") + 17:inf.find("\n", inf.find("SongPreviewTime: "))]
                     print(song_info["Title"] + "\n" + song_info["Description"]+ "\nBPM: " + str(song_info["BPM"]) + "\n" )
                 
             # .mp3 File
