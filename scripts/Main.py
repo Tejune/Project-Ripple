@@ -469,6 +469,8 @@ class Button:
 
         # Ripple related (visible when selected)
         self.ripple_time = 0
+        if song["BPM"] == 1:
+            print(song["Title"])
         self.ripple_spawn_frequency = (60 / song["BPM"]) * 1000
         self.ripples = []
 
@@ -802,9 +804,9 @@ while is_on_select_screen:
 
     # Draw title
     subtitle = FONT_HEADER.render('SONG SELECT', False, WHITE)
-    fps_text = FONT_HEADER.render(f'FPS: {str(clock.get_fps())}', False, WHITE)
+    #fps_text = FONT_HEADER.render(f'FPS: {str(clock.get_fps())}', False, WHITE)
     WIN.blit(subtitle, (25, 30))
-    WIN.blit(fps_text, (25, 700))
+    #WIN.blit(fps_text, (25, 700))
 
     #----- Drawing the song preview window -----#
 

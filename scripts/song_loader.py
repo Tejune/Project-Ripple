@@ -6,12 +6,14 @@
 
 # Imports and Variables
 import os
+import json
 import base64
 import zlib
 from PIL import Image, ImageFilter
 from constants import *
 from helper_methods import *
 from start_screen import show_loading_screen
+from quaver_cacher import convert_json
 import pygame
 
 songs_directory     = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Quaver\\Songs"
@@ -27,49 +29,41 @@ def load_songs (WIN):
     total = len(os.listdir(songs_directory))
     print(total)
 
+    # Convert quaver files to json, then load the json file
+    convert_json(songs_directory)
+    info = open(".\\cache.json")
+    info = json.load(info)
+
+
     # Iterate through each folder in the song directory
     for root in os.scandir(songs_directory):
 
-        # Create directories for song info
+        # Create and get data from json file
         song_info                  = {}
-        song_info["Image"]         = "None"
-        song_info["Title"]         = "None"
-        song_info["LoadedImage"]   = "None"
-        song_info["Artist"]        = "Unknown Artist"
-        song_info["DifficultyName"]        = "Unknown"
-        song_info["LoadedImageBlurred"]    = "None"
-        song_info["LoadedImagePreview"]    = "None"
-        song_info["LoadedImageBlurredPreview"] = "None"
-        song_info["SongPreviewTime"] = 0
         found_qua_file             = False
 
-        # Check files for .QUA info file & .mp3 audio file & .png thumbnail and add to dict
         for file in os.scandir(root):
-
-            # .QUA File
             if file.name.endswith('.qua') and not found_qua_file:
-                found_qua_file = True
-                song_info["Data"] = file
+                    found_qua_file = True
+                    song_info = info[root.name + "/" + file.name]  
+                    song_info["Data"] = songs_directory + "/" + root.name + "/" + file.name
 
-                # Get info from .QUA file
-                with open(file, "r", encoding="utf8") as info:
-                    inf = info.read()
-                    song_info["Title"] =  inf[inf.find("Title: ") + 7:inf.find("\n", inf.find("Title: "))]
-                    song_info["BPM"] =  int(float(inf[inf.find("Bpm: ") + 5:inf.find("\n", inf.find("Bpm: "))]))
-                    song_info["Description"] =  inf[inf.find("Description: ") + 13:inf.find("\n", inf.find("Description: "))]
-                    song_info["DifficultyName"] =  inf[inf.find("DifficultyName: ") + 16:inf.find("\n", inf.find("DifficultyName: "))]
-                    song_info["Artist"] =  inf[inf.find("Artist: ") + 8:inf.find("\n", inf.find("Artist: "))]
-
-                    # Update loading screen here
+                    # Also, update the loading screen
                     show_loading_screen(WIN, FONT, FONT_TITLE, song_info["Title"], total)
 
-                    if not (inf.find("SongPreviewTime: ") == -1):
-                        song_info["SongPreviewTime"] =  inf[inf.find("SongPreviewTime: ") + 17:inf.find("\n", inf.find("SongPreviewTime: "))]
-                    
-                    print(song_info["Title"] + "\n" + song_info["Description"]+ "\nBPM: " + str(song_info["BPM"]) + "\n" )
-                
+        # Create some additional keys for objects
+        song_info["Image"] = "None"
+        song_info["LoadedImageBlurredPreview"] = "None"
+        song_info["LoadedImagePreview"] = "None"
+
+        if not ("SongPreviewTime" in song_info):
+            song_info["SongPreviewTime"] = 0
+
+        # Check files for.mp3 audio file & .png thumbnail and add to dict
+        for file in os.scandir(root):
+   
             # .mp3 File
-            elif file.name.endswith('.mp3') or file.name.endswith('.wav'):
+            if file.name.endswith('.mp3') or file.name.endswith('.wav'):
                 song_info["Audio"] = file
                 song_info["AudioPath"] = file.path
                 song_info["LoadedAudio"] = pygame.mixer.Sound(song_info["Audio"])
@@ -86,6 +80,7 @@ def load_songs (WIN):
                 imp = pygame.transform.scale(imp, (WIDTH, HEIGHT)).convert()
                 blur_surface.blit(imp, (0, 0))
                 blur_surface = create_neon(blur_surface)
+                blur_surface = pygame.transform.scale(blur_surface, (WIDTH, HEIGHT)).convert()
 
                 song_info["LoadedImageBlurred"] = blur_surface
 
