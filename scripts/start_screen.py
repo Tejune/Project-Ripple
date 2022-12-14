@@ -11,19 +11,24 @@ import pygame
 from helper_methods import *
 from constants import *
 
-
+shown = 0
 
 ##### Methods
 
 
 # Shows the loading screen frame when the game is compiling song data
-def show_loading_screen (WIN, FONT, FONT_TITLE):
+def show_loading_screen (WIN, FONT, FONT_TITLE, currentFile, total_files):
+
+    global shown
+    shown += 1
 
     WIN.fill(BLACK)
     text_surface = FONT_TITLE.render('PROJECT RIPPLE', False, (20, 20, 20))
     WIN.blit(text_surface, (WIDTH/2 - text_surface.get_width()/2, HEIGHT/2 - 55/2 - 10))#- text_surface.get_height()/1.15))
-    #subtitle = FONT.render('LOADING SONG LIBRARY...', False, WHITE)
-    #WIN.blit(subtitle, (WIDTH/2 - subtitle.get_width()/2, HEIGHT/2 + subtitle.get_height()/1.15))
+    subtitle = FONT_PIXEL.render(f'Compiling song library ({currentFile})', False, WHITE)
+    WIN.blit(subtitle, (WIDTH/2 - subtitle.get_width()/2, HEIGHT/2 + 55/2 + 10 ))
+    pygame.draw.rect(WIN, (30,30,30), pygame.Rect(WIDTH * 0.25, HEIGHT/2 + 55/2 + 42 , (WIDTH/2), 10))
+    pygame.draw.rect(WIN, WHITE, pygame.Rect(WIDTH * 0.25, HEIGHT/2 + 55/2 + 42 , (WIDTH/2) * (shown / total_files), 10))
     pygame.display.update()
 
 

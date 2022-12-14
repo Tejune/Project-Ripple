@@ -471,6 +471,9 @@ class Button:
         self.ripple_spawn_frequency = (60 / song["BPM"]) * 1000
         self.ripples = []
 
+        if self.ripple_spawn_frequency > 200:
+            self.ripple_spawn_frequency = self.ripple_spawn_frequency / 2
+
         if feedback == "":
             self.feedback = "text"
         else:
@@ -627,10 +630,10 @@ class Button:
 #--------- Compile songs and show menu screen ------------------------------------------------------------#
 
 # Show loading screen
-show_loading_screen(WIN, FONT, FONT_TITLE)
+show_loading_screen(WIN, FONT, FONT_TITLE, "Preparing...", 10)
 
 # Load songs
-songs = load_songs()
+songs = load_songs(WIN)
 
 # Start title screen bgm
 pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound\\Title.wav"))
@@ -703,8 +706,6 @@ while is_on_select_screen:
                 # Return to title screen after playing associated sound effect
                 pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\cancel.wav"))
                 pygame.mixer.Channel(0).set_volume(4)
-                show_loading_screen(WIN, FONT, FONT_TITLE)
-                time.sleep(0.2)
                 show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, selected_song)
                 loops = 0
             

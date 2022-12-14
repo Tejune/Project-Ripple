@@ -11,6 +11,7 @@ import zlib
 from PIL import Image, ImageFilter
 from constants import *
 from helper_methods import *
+from start_screen import show_loading_screen
 import pygame
 
 songs_directory     = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Quaver\\Songs"
@@ -19,10 +20,12 @@ default_thumbnail   = pygame.image.load("images\\default_thumb.jpg")
 
 
 # Main Function
-def load_songs ():
+def load_songs (WIN):
 
     # Define the song array where all data is stored.
     songs = []
+    total = len(os.listdir(songs_directory))
+    print(total)
 
     # Iterate through each folder in the song directory
     for root in os.scandir(songs_directory):
@@ -56,6 +59,9 @@ def load_songs ():
                     song_info["Description"] =  inf[inf.find("Description: ") + 13:inf.find("\n", inf.find("Description: "))]
                     song_info["DifficultyName"] =  inf[inf.find("DifficultyName: ") + 16:inf.find("\n", inf.find("DifficultyName: "))]
                     song_info["Artist"] =  inf[inf.find("Artist: ") + 8:inf.find("\n", inf.find("Artist: "))]
+
+                    # Update loading screen here
+                    show_loading_screen(WIN, FONT, FONT_TITLE, song_info["Title"], total)
 
                     if not (inf.find("SongPreviewTime: ") == -1):
                         song_info["SongPreviewTime"] =  inf[inf.find("SongPreviewTime: ") + 17:inf.find("\n", inf.find("SongPreviewTime: "))]
