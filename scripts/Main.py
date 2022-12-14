@@ -23,9 +23,10 @@ pygame.mixer.init()
 Framerate = 120
 
 #### Directory & Dictionary
-default_thumbnail   = pygame.image.load("images\\default_thumb.jpg")
-song_select_fade    = pygame.image.load("images\\song_select_fade.png")
-songs               = []
+default_thumbnail     = pygame.image.load("images\\default_thumb.jpg")
+song_select_fade      = pygame.image.load("images\\song_select_fade.png")
+song_selected_fade    = pygame.image.load("images\\song_selected_fade.png")
+songs                 = []
 
 #### Pygame variables & Constants
 
@@ -46,6 +47,9 @@ arrow_outline_original     = pygame.image.load("images\\arrow_outline.png").conv
 arrow_outline_original     = pygame.transform.scale(arrow_outline_original, (120, 120))
 sparks                     = pygame.image.load("images\\sparks.png").convert_alpha()
 sparks                     = pygame.transform.scale(sparks, (WIDTH, HEIGHT))
+
+play_button                = pygame.image.load("images\\play_button.png").convert_alpha()
+play_button                = pygame.transform.scale(play_button, (48, 48))
 
 arrow_outline = [
     arrow_outline_original,
@@ -133,8 +137,7 @@ def play_song(song):
     if song["Image"] == "None":
         song["Image"] = "images\\default_thumb.jpg"
 
-    imp = song["LoadedImage"]
-    imp = pygame.transform.scale(imp, (1200, 675))
+    imp = song["LoadedImageBlurred"]
 
     # Setup note data using .QUA file
     f = song["Data"]
@@ -267,13 +270,13 @@ def play_song(song):
         print("buy chompy uf!!! POWER GUM")
 
         # Draw background image
-        sur = pygame.Surface((1200, 675))
+        sur = pygame.Surface((WIDTH, HEIGHT))
         sur.set_alpha(40)
         sur.blit(imp, (0, 0))
         WIN.blit(sur, (0, 0))
 
         # Draw topbar surfaces
-        pygame.draw.rect(WIN, BLACK, pygame.Rect(0, 0, 1500, 64))
+        pygame.draw.rect(WIN, BLACK, pygame.Rect(0, 0, WIDTH, 64))
         corner = pygame.Surface((210, 64))
         pygame.draw.rect(corner, YELLOW, pygame.Rect(0, 0, 210, 64))
         pygame.draw.rect(WIN, YELLOW, pygame.Rect(0, 0, 210, 64))
@@ -318,9 +321,9 @@ def play_song(song):
         #### PLAYING THE SONG ###
 
         # Draw background
-        _bg = pygame.Surface((530, 675))
+        _bg = pygame.Surface((530, HEIGHT))
         _bg.set_alpha(140)
-        pygame.draw.rect(_bg, BLACK, pygame.Rect(0, 0, 500, 675))
+        pygame.draw.rect(_bg, BLACK, pygame.Rect(0, 0, 500, HEIGHT))
        
         # Change arrow highlight visibility
         for i, lane in enumerate(frames_since_last_lane_pressed):
@@ -359,7 +362,7 @@ def play_song(song):
         # Draw judgement amounts
         already_drawn = 0
         for judgement in judgement_count:
-            _x = 225
+            _x = 420
             _y = 200 + 54 * already_drawn
             pygame.draw.rect(WIN, judgement_colors[judgement], pygame.Rect(_x , _y, 60, 40))
             pygame.draw.rect(WIN, BLACK, pygame.Rect(_x + 2, _y + 2, 56, 36))
@@ -370,7 +373,7 @@ def play_song(song):
         # Draw God Mode label if enabled
         if God_Mode:
             god_label = FONT.render("GOD MODE",False,  YELLOW)
-            WIN.blit(god_label, (225 + 30 -  god_label.get_width(), 146))
+            WIN.blit(god_label, (420 + 30 -  god_label.get_width(), 146))
 
         # Draw Combo
         if combo > 0:
@@ -462,6 +465,12 @@ class Button:
         self.song = song
         self.selected_song_offset = 0
         self.offset = 0
+
+        # Ripple related (visible when selected)
+        self.ripple_time = 0
+        self.ripple_spawn_frequency = (60 / song["BPM"]) * 1000
+        self.ripples = []
+
         if feedback == "":
             self.feedback = "text"
         else:
@@ -485,7 +494,7 @@ class Button:
         self.surface.blit(self.text, (WIDTH - WIDTH * 0.4 + 9, 9))
         self.rect = pygame.Rect(self.x, self.y, self.size[0], self.size[1])
  
-    def show(self, currently_selected_song):
+    def show(self, delta_time):
 
         # Get mouse position and create collision mask
         m_x, m_y = pygame.mouse.get_pos()
@@ -498,7 +507,7 @@ class Button:
             self.selected_song_offset = min(self.selected_song_offset / 2, 0)
 
         # Collision check with mouse (hover)
-        if self.rect.collidepoint(m_x, m_y) or self.song == selected_song:
+        if self.rect.collidepoint(m_x, m_y):
             self.text = self.font.render(self.input, 1, (200, 200, 255))  # Make the text slightly brighter when hovered over or selected
             
         else:
@@ -525,7 +534,12 @@ class Button:
         # Add transparent background under song list
         _bg = pygame.Surface((self.bound_x, self.bound_y + 18), pygame.SRCALPHA)
         _bg.set_alpha(200)
-        bg_fade = song_select_fade
+
+        if self.song == selected_song:
+            bg_fade = song_selected_fade
+        else:
+            bg_fade = song_select_fade
+
         bg_fade = pygame.transform.scale(bg_fade, (self.bound_x, self.bound_y + 18))
         _bg.blit(bg_fade, (0, 0))
         #pygame.draw.rect(_bg, BLACK, pygame.Rect(0, 0, self.bound_x, self.bound_y + 18))
@@ -549,15 +563,41 @@ class Button:
         else:
             pygame.draw.rect(self.surface, WHITE, (0, 0, self.bound_x, self.bound_y + 18), 2, 5)
 
+
+        scrolling_effect_offset = (abs((WIDTH / 4) - (self.y + scroll_offset)) / 9) + self.selected_song_offset
+
+        #Topbar ripple effect
+        self.ripple_time += delta_time
+        if self.ripple_time >= self.ripple_spawn_frequency:
+            # Create ripple
+            self.ripples.append(0)
+            self.ripple_time = 0
+        for lifetime in self.ripples:
+
+            self.ripples[ self.ripples.index(lifetime)] += 1
+
+            if self.song == selected_song and lifetime > 5:
+                ripple_surface = pygame.Surface((self.bound_x, self.bound_y + 18), pygame.SRCALPHA)
+                ripple_surface.set_alpha(60 - lifetime)
+                ripple_rect = pygame.Rect((self.bound_x - 152 ) - 9*lifetime/2, (26 + 28) - 9*lifetime/2, 9 * lifetime, 9 * lifetime)
+                pygame.draw.ellipse(ripple_surface, (200,200,255), ripple_rect, 3) 
+                self.surface.blit(ripple_surface, (0, 0))
+
+            if lifetime >= 60:
+                self.ripples.remove(lifetime + 1)
+
+
         self.surface.blit(self.text, (self.offset + 12, 16))
         self.surface.blit(subtext, (self.offset + 13, 48))
         self.surface.blit(_extras, (0,0))
         self.surface.blit(difficulty, (24, 78))
         self.surface.blit(bpm, (19 + 26 + diff_bound_x + 13, 78))
 
-        # Draw the text surface to the screen
-        WIN.blit(self.surface, (self.x + (abs((WIDTH / 4) - (self.y + scroll_offset)) / 9) + self.selected_song_offset, self.y + scroll_offset))
+        if self.song == selected_song:
+            self.surface.blit(play_button, (self.bound_x - 176 , 30))
 
+        # Draw the text surface to the screen
+        WIN.blit(self.surface, (self.x + scrolling_effect_offset, self.y + scroll_offset))
  
     def click(self, event, currently_selected_song):
         x, y = pygame.mouse.get_pos()
@@ -596,8 +636,13 @@ songs = load_songs()
 pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound\\Title.wav"))
 pygame.mixer.Channel(2).set_volume(0.4)
 
+# Select a random track
+total_songs = len(songs)
+random_song = random.randint(0, total_songs)
+selected_song = songs[random_song]
+
 # Show title screen
-show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL)
+show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, selected_song)
 
 
 #--------- Song select screen ----------------------------------------------------------------------------#
@@ -609,8 +654,8 @@ buttons         = []
 button_offset   = 120
 button_x        = WIDTH * 0.6 - 50
 button_y        = 144
-total_songs     = len(songs)
-random_song     = random.randint(0, total_songs)
+
+
 last_song_y     = 0
 
 # Define variables
@@ -622,7 +667,7 @@ scroll = 0
 for song in songs:
 
     song_y = button_y + len(buttons) * button_offset
-    last_song_y = -song_y + HEIGHT
+    last_song_y = -song_y + HEIGHT - button_offset - 20
 
     if len(buttons) == random_song:
         selected_song = song
@@ -645,7 +690,7 @@ for song in songs:
 while is_on_select_screen:
 
     #Set constant framerate
-    clock.tick(Framerate)
+    delta_time = clock.tick(Framerate)
 
     # Check for events
     for event in pygame.event.get():
@@ -660,7 +705,7 @@ while is_on_select_screen:
                 pygame.mixer.Channel(0).set_volume(4)
                 show_loading_screen(WIN, FONT, FONT_TITLE)
                 time.sleep(0.2)
-                show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL)
+                show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, selected_song)
                 loops = 0
             
         if event.type == pygame.MOUSEWHEEL:
@@ -707,7 +752,7 @@ while is_on_select_screen:
     # Draw all buttons currently on screen
     for button in buttons:
         if button.y + scroll_offset < HEIGHT and button.y + scroll_offset > -200:
-            sel = button.show(selected_song)
+            sel = button.show(delta_time)
             if sel:
                 selected_song = sel
 

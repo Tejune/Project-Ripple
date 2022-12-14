@@ -29,7 +29,7 @@ def show_loading_screen (WIN, FONT, FONT_TITLE):
 
 
 # Shows the title screen and plays the animation before switching to song selection
-def show_title_screen (WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL):
+def show_title_screen (WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, selected_song):
 
     # Define variables
     is_on_menu_screen = True
@@ -61,6 +61,11 @@ def show_title_screen (WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL):
         # Fill screen with black
         WIN.fill(BLACK)
 
+        # Draw background image
+        WIN.blit(selected_song["LoadedImageBlurred"], (0, 0))
+        bg_surface = pygame.Surface((WIDTH, HEIGHT))
+        bg_surface.set_alpha(max(255 - real_loops * 5, 180))
+        WIN.blit(bg_surface, (0,0))
 
         # Title screen ripple effect
         if loop >= 60:
@@ -72,10 +77,11 @@ def show_title_screen (WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL):
 
             ripples[ripples.index(lifetime)] += 1.5
 
+            ripple_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+            ripple_surface.set_alpha(60 - lifetime / 4)
             ripple_rect = pygame.Rect(WIDTH/2 - 6*lifetime/2, (HEIGHT/2) - 6*lifetime/2, 6 * lifetime, 6 * lifetime)
-            ripple_shadow_rect = pygame.Rect(WIDTH/2 - (6*lifetime - 8)/2, (HEIGHT/2) - (6*lifetime - 8)/2, (6 * lifetime) - 8, (6 * lifetime) - 8)
-            pygame.draw.ellipse(WIN, ( lerp(50, 0, lifetime / 240), lerp(50, 0, lifetime / 240), 0 ), ripple_rect) 
-            pygame.draw.ellipse(WIN, BLACK, ripple_shadow_rect) 
+            pygame.draw.ellipse(ripple_surface, (255,255,255), ripple_rect, 3) 
+            WIN.blit(ripple_surface, (0, 0))
 
             if lifetime >= 240:
                 ripples.remove(lifetime + 1.5)
