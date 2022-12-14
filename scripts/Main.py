@@ -472,7 +472,7 @@ class Button:
         self.ripples = []
 
         if self.ripple_spawn_frequency > 200:
-            self.ripple_spawn_frequency = self.ripple_spawn_frequency / 2
+            self.ripple_spawn_frequency = self.ripple_spawn_frequency * 2
 
         if feedback == "":
             self.feedback = "text"
