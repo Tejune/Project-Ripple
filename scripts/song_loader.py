@@ -77,36 +77,17 @@ def load_songs (WIN):
             # .png / .jpg File
             elif file.name.endswith('.jpg') or file.name.endswith('.png'):
                 song_info["Image"] = file
-                song_info["LoadedImage"] = pygame.image.load(file)
+                song_info["LoadedImage"] = pygame.image.load(file).convert()
 
                 # Create blurred version (surface)
                 blur_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
                 blur_surface.set_alpha(40)
                 imp = song_info["LoadedImage"]
-                imp = pygame.transform.scale(imp, (WIDTH, HEIGHT))
+                imp = pygame.transform.scale(imp, (WIDTH, HEIGHT)).convert()
                 blur_surface.blit(imp, (0, 0))
                 blur_surface = create_neon(blur_surface)
 
                 song_info["LoadedImageBlurred"] = blur_surface
-
-                # Create blurred version for background use
-                #with open(file, "rb") as image:
-                #    
-                #    # Convert image file to base64 and decode
-                #    image_base64 = base64.b64encode(image.read())
-                #    image_clear  = Image.open(file.path)
-#
-                #    data = base64.b64decode(image_base64)
-                #    data = data if isinstance(data, bytes) else data.encode('utf-8')
-#
-                #    size, image_mode, raw = (image_clear.width, image_clear.height), 'RGBA', zlib.decompress(data)
-                #    
-                #    # Create a PIL image and blur it
-                #    pil_blurred = Image.fromstring("RGBA", size, raw).filter(ImageFilter.GaussianBlur(radius=6))
-#
-                #    # Convert it back to a pygame surface
-                #    image_blurred = pygame.image.fromstring(pil_blurred.tostring("raw", image_mode), size, image_mode)
-                #    song_info["LoadedBlurredImage"] = image_blurred
 
 
 

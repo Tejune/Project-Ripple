@@ -9,13 +9,11 @@ from start_screen import *
 from helper_methods import *
 from constants import *
 
-import math
-import time
 import pygame
 import random
-import os
 
 #### Initialize pygame module
+pygame.mixer.pre_init(44100, 16, 2, 4096)
 pygame.init()
 pygame.mixer.init()
 
@@ -47,6 +45,9 @@ arrow_outline_original     = pygame.image.load("images\\arrow_outline.png").conv
 arrow_outline_original     = pygame.transform.scale(arrow_outline_original, (120, 120))
 sparks                     = pygame.image.load("images\\sparks.png").convert_alpha()
 sparks                     = pygame.transform.scale(sparks, (WIDTH, HEIGHT))
+
+last_song                  = None
+frames_since_last_song     = 500 #Any value high enough will do
 
 play_button                = pygame.image.load("images\\play_button.png").convert_alpha()
 play_button                = pygame.transform.scale(play_button, (48, 48))
@@ -474,6 +475,33 @@ class Button:
         if self.ripple_spawn_frequency > 200:
             self.ripple_spawn_frequency = self.ripple_spawn_frequency * 2
 
+        # Calculate bounds
+        self.bound_x, self.bound_y = FONT.size(text)
+        self.bound_x = WIDTH * 0.5
+        self.bound_y = self.bound_y + 60
+        
+        # Create image surface
+        preview_image_surface = pygame.Surface((self.bound_x, self.bound_y))
+        preview_image_surface.set_alpha(255)
+
+        if self.song["LoadedImageBlurredPreview"] == "None":
+            self.song["LoadedImageBlurredPreview"] = pygame.transform.scale(self.song["LoadedImageBlurred"], (self.bound_x, HEIGHT * 0.5))
+
+        # Create subtext
+        self.subtext = FONT_ARTIST.render("by " + self.song["Artist"], 1, WHITE)
+
+        # Create fade surface
+        self.song_select_fade = pygame.transform.scale(song_select_fade, (self.bound_x, self.bound_y + 18))
+        self.song_selected_fade = pygame.transform.scale(song_selected_fade, (self.bound_x, self.bound_y + 18))
+        self.bg_fade = self.song_select_fade
+
+        # Create tags
+        self.diff_bound_x, self.diff_bound_y = FONT_DIFF.size(self.song["DifficultyName"].upper())
+        self.difficulty = FONT_DIFF.render(self.song["DifficultyName"].upper(), 1, WHITE)
+
+        self.bpm_bound_x, self.bpm_bound_y = FONT_DIFF.size(str(self.song["BPM"]).upper() + " BPM")
+        self.bpm = FONT_DIFF.render(str(self.song["BPM"]).upper() + " BPM", 1, WHITE)
+
         if feedback == "":
             self.feedback = "text"
         else:
@@ -486,7 +514,11 @@ class Button:
             text = text[0:37] + "..."
         self.input = text
 
-        self.text = self.font.render(text, 1, WHITE)
+        # Create text objects
+        self.text_standard = self.font.render(self.input, 1, WHITE) 
+        self.text_highlighted = self.font.render(self.input, 1, (200, 200, 255))
+        self.text = self.text_standard
+
         self.bound_x, self.bound_y = FONT.size(text)
         self.bound_x = WIDTH * 0.5
         self.bound_y = self.bound_y + 60
@@ -511,54 +543,36 @@ class Button:
 
         # Collision check with mouse (hover)
         if self.rect.collidepoint(m_x, m_y):
-            self.text = self.font.render(self.input, 1, (200, 200, 255))  # Make the text slightly brighter when hovered over or selected
-            
+            self.text = self.text_highlighted  # Make the text slightly brighter when hovered over or selected
         else:
-            self.text = self.font.render(self.input, 1, WHITE)           # Otherwise remain white
-
-        # Create subtext
-        subtext = FONT_ARTIST.render("by " + self.song["Artist"], 1, WHITE)
+            self.text = self.text_standard     # Otherwise remain white
 
         # Create button surface
         self.size = (self.bound_x, self.bound_y + 18)
         self.surface = pygame.Surface(self.size, pygame.SRCALPHA)
         self.surface.convert_alpha()
 
-        # Create and draw image to surface
-        preview_image_surface = pygame.Surface((self.bound_x, self.bound_y))
-        preview_image_surface.set_alpha(255)
-
-        if self.song["LoadedImageBlurredPreview"] == "None":
-            self.song["LoadedImageBlurredPreview"] = pygame.transform.scale(self.song["LoadedImageBlurred"], (self.bound_x, HEIGHT * 0.5))
-
-        preview_image = self.song["LoadedImageBlurredPreview"]
-        self.surface.blit(preview_image, (0, -(HEIGHT * 0.18)))
+        # Draw image to surface
+        self.surface.blit(self.song["LoadedImageBlurredPreview"], (0, -(HEIGHT * 0.18)))
 
         # Add transparent background under song list
         _bg = pygame.Surface((self.bound_x, self.bound_y + 18), pygame.SRCALPHA)
         _bg.set_alpha(200)
 
         if self.song == selected_song:
-            bg_fade = song_selected_fade
+            self.bg_fade = self.song_selected_fade
         else:
-            bg_fade = song_select_fade
+            self.bg_fade = self.song_select_fade
 
-        bg_fade = pygame.transform.scale(bg_fade, (self.bound_x, self.bound_y + 18))
-        _bg.blit(bg_fade, (0, 0))
-        #pygame.draw.rect(_bg, BLACK, pygame.Rect(0, 0, self.bound_x, self.bound_y + 18))
+        _bg.blit(self.bg_fade, (0, 0))
         self.surface.blit(_bg,(0, 0))
 
         # Draw difficulty rating and BPM
         _extras = pygame.Surface((self.bound_x, self.bound_y + 18), pygame.SRCALPHA)
         _extras.set_alpha(200)
 
-        diff_bound_x, diff_bound_y = FONT_DIFF.size(self.song["DifficultyName"].upper())
-        pygame.draw.rect(_extras, BLACK, pygame.Rect(13, 75, 26 + diff_bound_x, 18), 0, 9)
-        difficulty = FONT_DIFF.render(self.song["DifficultyName"].upper(), 1, WHITE)
-
-        bpm_bound_x, bpm_bound_y = FONT_DIFF.size(str(self.song["BPM"]).upper() + " BPM")
-        pygame.draw.rect(_extras, BLACK, pygame.Rect(19 + 26 + diff_bound_x, 75, 26 + bpm_bound_x, 18), 0, 9)
-        bpm = FONT_DIFF.render(str(self.song["BPM"]).upper() + " BPM", 1, WHITE)
+        pygame.draw.rect(_extras, BLACK, pygame.Rect(13, 75, 26 + self.diff_bound_x, 18), 0, 9)
+        pygame.draw.rect(_extras, BLACK, pygame.Rect(19 + 26 + self.diff_bound_x, 75, 26 + self.bpm_bound_x, 18), 0, 9)
 
         # Draw text and background to surface
         if self.song == selected_song:
@@ -591,10 +605,10 @@ class Button:
 
 
         self.surface.blit(self.text, (self.offset + 12, 16))
-        self.surface.blit(subtext, (self.offset + 13, 48))
+        self.surface.blit(self.subtext, (self.offset + 13, 48))
         self.surface.blit(_extras, (0,0))
-        self.surface.blit(difficulty, (24, 78))
-        self.surface.blit(bpm, (19 + 26 + diff_bound_x + 13, 78))
+        self.surface.blit(self.difficulty, (24, 78))
+        self.surface.blit(self.bpm, (19 + 26 + self.diff_bound_x + 13, 78))
 
         if self.song == selected_song:
             self.surface.blit(play_button, (self.bound_x - 176 , 30))
@@ -613,6 +627,12 @@ class Button:
                         play_song(self.song)
                         pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound\\Title.wav"))
                     else:
+                        
+                        global last_song
+                        global frames_since_last_song
+
+                        last_song = selected_song
+                        frames_since_last_song = 0
                         currently_selected_song = self.song
                         self.selected_song_offset = 60
                         #Change song
@@ -641,8 +661,9 @@ pygame.mixer.Channel(2).set_volume(0.4)
 
 # Select a random track
 total_songs = len(songs)
-random_song = random.randint(0, total_songs)
+random_song = random.randint(0, total_songs - 1)
 selected_song = songs[random_song]
+last_song = selected_song
 
 # Show title screen
 show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, selected_song)
@@ -693,7 +714,7 @@ for song in songs:
 while is_on_select_screen:
 
     #Set constant framerate
-    delta_time = clock.tick(Framerate)
+    delta_time = clock.tick()
 
     # Check for events
     for event in pygame.event.get():
@@ -735,7 +756,22 @@ while is_on_select_screen:
 
     # Draw selected song thumbnail preview
     if selected_song:
-        WIN.blit(selected_song["LoadedImageBlurred"], (0, 0))
+
+        # Draw the previous song's background
+        prev_blur_bg_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+        prev_blur_bg_surface.set_alpha(max(255 - frames_since_last_song  * 150, 0))
+        prev_blur_bg_surface.blit(last_song["LoadedImageBlurred"], (0, 0))
+        
+        # Draw the current songs background
+        _blur_bg_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+        _blur_bg_surface.set_alpha(min(frames_since_last_song * 150, 255))
+        _blur_bg_surface.blit(selected_song["LoadedImageBlurred"], (0, 0))
+
+        WIN.blit(prev_blur_bg_surface, (0, 0))
+        WIN.blit(_blur_bg_surface, (0, 0))
+
+        # Increment loop counter
+        frames_since_last_song += 1
     
     # Darken the background
     _bg = pygame.Surface((WIDTH, HEIGHT))
@@ -766,8 +802,9 @@ while is_on_select_screen:
 
     # Draw title
     subtitle = FONT_HEADER.render('SONG SELECT', False, WHITE)
+    fps_text = FONT_HEADER.render(f'FPS: {str(clock.get_fps())}', False, WHITE)
     WIN.blit(subtitle, (25, 30))
-
+    WIN.blit(fps_text, (25, 700))
 
     #----- Drawing the song preview window -----#
 
@@ -784,14 +821,22 @@ while is_on_select_screen:
     # Draw preview image if a song has been selected
     if selected_song:
         preview_image_surface = pygame.Surface((preview_width, preview_height))
-        preview_image_surface.set_alpha(255)
+        preview_image_surface.set_alpha(min(frames_since_last_song * 150, 255))
+
+        prev_preview_image_surface = pygame.Surface((preview_width, preview_height))
+        prev_preview_image_surface.set_alpha(max(255 - frames_since_last_song  * 150, 0))
 
         if selected_song["LoadedImagePreview"] == "None":
             selected_song["LoadedImagePreview"] = pygame.transform.scale(selected_song["LoadedImage"], (preview_width, HEIGHT * 0.5))
 
         preview_image = selected_song["LoadedImagePreview"]
+        prev_preview_image = last_song["LoadedImagePreview"]
+        
         preview_image_surface.blit(preview_image, (0, -(HEIGHT * 0.05)))
+        prev_preview_image_surface.blit(prev_preview_image, (0, -(HEIGHT * 0.05)))
+
         WIN.blit(preview_image_surface, (preview_pos_x, preview_pos_y))
+        WIN.blit(prev_preview_image_surface, (preview_pos_x, preview_pos_y))
 
     # Draw preview window outline
     pygame.draw.rect(WIN, WHITE, (preview_pos_x, preview_pos_y, preview_width, preview_height), preview_corner_radius, 5)
