@@ -49,6 +49,8 @@ sparks                     = pygame.transform.scale(sparks, (WIDTH, HEIGHT))
 last_song                  = None
 frames_since_last_song     = 500 #Any value high enough will do
 
+song_select_offset         = 0
+
 play_button                = pygame.image.load("images\\play_button.png").convert_alpha()
 play_button                = pygame.transform.scale(play_button, (48, 48))
 
@@ -616,7 +618,7 @@ class Button:
             self.surface.blit(play_button, (self.bound_x - 176 , 30))
 
         # Draw the text surface to the screen
-        WIN.blit(self.surface, (self.x + scrolling_effect_offset, self.y + scroll_offset))
+        WIN.blit(self.surface, (self.x + scrolling_effect_offset + song_select_offset, self.y + scroll_offset))
  
     def click(self, event, currently_selected_song):
         x, y = pygame.mouse.get_pos()
@@ -687,6 +689,7 @@ last_song_y     = 0
 # Define variables
 is_on_select_screen = True
 loops = 0
+real_loops = 0
 scroll = 0
 
 # Create buttons
@@ -731,6 +734,7 @@ while is_on_select_screen:
                 pygame.mixer.Channel(0).set_volume(4)
                 show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, selected_song)
                 loops = 0
+                real_loops = 0
             
         if event.type == pygame.MOUSEWHEEL:
             if event.y > 0:
@@ -747,6 +751,10 @@ while is_on_select_screen:
 
     # Adjust scroll offset by current scroll speed
     scroll_offset = max(last_song_y, min(scroll_offset + scroll, 0))
+
+    # Asjust song select offset, which offsets the menu elements when opening the menu for a nice effect
+    real_loops += 1
+    song_select_offset = round(max((WIDTH * 0.5 / (real_loops * 8)) - 5, 0))
 
     if scroll > 0:
         scroll = scroll / 1.4
@@ -813,12 +821,12 @@ while is_on_select_screen:
     # Define dimensions
     preview_width = WIDTH * 0.5 + 5
     preview_height = HEIGHT * 0.4
-    preview_pos_x = -5
+    preview_pos_x = -5 - song_select_offset
     preview_pos_y = 80
     preview_corner_radius = 3
 
     # Draw background fill
-    pygame.draw.rect(WIN, BLACK, (preview_pos_x, preview_pos_y, preview_width, preview_height), 0, 5)
+    #pygame.draw.rect(WIN, BLACK, (preview_pos_x, preview_pos_y, preview_width, preview_height), 0, 5)
 
     # Draw preview image if a song has been selected
     if selected_song:
@@ -847,10 +855,10 @@ while is_on_select_screen:
     #----- Drawing the flash effect when entering from main menu -----#
 
     # Draw flash effect
-    wh = pygame.Surface((WIDTH, HEIGHT))
-    wh.set_alpha(max(150 - loops * 10, 0))
-    wh.fill(WHITE)
-    WIN.blit(wh, (0, 0))
+    #wh = pygame.Surface((WIDTH, HEIGHT))
+    #wh.set_alpha(max(150 - loops * 10, 0))
+    #wh.fill(WHITE)
+    #WIN.blit(wh, (0, 0))
     loops += 1
 
     # Play the enter sound effect when coming from the main menu
