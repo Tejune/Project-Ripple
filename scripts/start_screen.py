@@ -67,7 +67,7 @@ def show_title_screen (WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, sele
         WIN.fill(BLACK)
 
         # Draw background image
-        WIN.blit(selected_song["LoadedImageBlurred"], (0, 0))
+        WIN.blit(selected_song["LoadedImageBlurredFull"], (0, 0))
         bg_surface = pygame.Surface((WIDTH, HEIGHT))
         bg_surface.set_alpha(max(255 - real_loops * 5, 180))
         WIN.blit(bg_surface, (0,0))

@@ -140,7 +140,7 @@ def play_song(song):
     if song["Image"] == "None":
         song["Image"] = "images\\default_thumb.jpg"
 
-    imp = song["LoadedImageBlurred"]
+    imp = song["LoadedImageBlurredFull"]
 
     # Setup note data using .QUA file
     f = song["Data"]
@@ -489,7 +489,7 @@ class Button:
         preview_image_surface.set_alpha(255)
 
         if self.song["LoadedImageBlurredPreview"] == "None":
-            self.song["LoadedImageBlurredPreview"] = pygame.transform.scale(self.song["LoadedImageBlurred"], (self.bound_x, HEIGHT * 0.5))
+            self.song["LoadedImageBlurredPreview"] = self.song["LoadedImage"] #pygame.transform.scale(self.song["LoadedImageBlurred"], (self.bound_x, HEIGHT * 0.5))
 
         # Create subtext
         self.subtext = FONT_ARTIST.render("by " + self.song["Artist"], 1, WHITE)
@@ -654,7 +654,7 @@ class Button:
 #--------- Compile songs and show menu screen ------------------------------------------------------------#
 
 # Show loading screen
-show_loading_screen(WIN, FONT, FONT_TITLE, "Preparing...", 10)
+show_loading_screen(WIN, FONT, FONT_TITLE, "Converting new image files...", 10)
 
 # Load songs
 songs = load_songs(WIN)
@@ -770,12 +770,12 @@ while is_on_select_screen:
         # Draw the previous song's background
         prev_blur_bg_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
         prev_blur_bg_surface.set_alpha(max(255 - frames_since_last_song  * 150, 0))
-        prev_blur_bg_surface.blit(last_song["LoadedImageBlurred"], (0, 0))
+        prev_blur_bg_surface.blit(last_song["LoadedImageBlurredFull"], (0, 0))
         
         # Draw the current songs background
         _blur_bg_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
         _blur_bg_surface.set_alpha(min(frames_since_last_song * 150, 255))
-        _blur_bg_surface.blit(selected_song["LoadedImageBlurred"], (0, 0))
+        _blur_bg_surface.blit(selected_song["LoadedImageBlurredFull"], (0, 0))
 
         WIN.blit(prev_blur_bg_surface, (0, 0))
         WIN.blit(_blur_bg_surface, (0, 0))
@@ -837,7 +837,7 @@ while is_on_select_screen:
         prev_preview_image_surface.set_alpha(max(255 - frames_since_last_song  * 150, 0))
 
         if selected_song["LoadedImagePreview"] == "None":
-            selected_song["LoadedImagePreview"] = pygame.transform.scale(selected_song["LoadedImage"], (preview_width, HEIGHT * 0.5))
+            selected_song["LoadedImagePreview"] = selected_song["LoadedImage"] #pygame.transform.scale(, (preview_width, HEIGHT * 0.5))
 
         preview_image = selected_song["LoadedImagePreview"]
         prev_preview_image = last_song["LoadedImagePreview"]

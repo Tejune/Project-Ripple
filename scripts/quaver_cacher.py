@@ -19,7 +19,7 @@ def convert_json(songs_path):
             if item.endswith(".qua"):
                 quaves.append(directory + "/" +item)
 
-    print(quaves)
+    #print(quaves)
     for item in quaves:
         
         if item not in cached_items:
