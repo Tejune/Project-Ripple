@@ -70,8 +70,19 @@ def load_songs (WIN):
 
             # .png / .jpg File
             elif file.name.endswith('.jpg') or file.name.endswith('.png'):
-                song_info["Image"] = file
-                song_info["LoadedImage"] = pygame.image.load(file).convert()
+
+                # Check if image is in cache
+
+                image_name, extension = os.path.splitext(file.name) 
+
+                try:
+                    song_info["Image"] = ".\\imagecache\\quaves_" + root.name + "_" + image_name + "_background.png"
+                    song_info["LoadedImage"] = pygame.image.load(song_info["Image"]).convert()
+                except:
+                    print(".\\imagecache\\quaves_" + root.name + "_" + image_name + "_background" + extension)
+                    quit()
+                    song_info["Image"] = file
+                    song_info["LoadedImage"] = pygame.image.load(file).convert()
 
                 # Create blurred version (surface)
                 blur_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)

@@ -618,7 +618,7 @@ class Button:
             self.surface.blit(play_button, (self.bound_x - 176 , 30))
 
         # Draw the text surface to the screen
-        WIN.blit(self.surface, (self.x + scrolling_effect_offset + song_select_offset, self.y + scroll_offset))
+        WIN.blit(self.surface, (self.x + scrolling_effect_offset + (song_select_offset), self.y + scroll_offset))
  
     def click(self, event, currently_selected_song):
         x, y = pygame.mouse.get_pos()
@@ -812,9 +812,9 @@ while is_on_select_screen:
 
     # Draw title
     subtitle = FONT_HEADER.render('SONG SELECT', False, WHITE)
-    #fps_text = FONT_HEADER.render(f'FPS: {str(clock.get_fps())}', False, WHITE)
+    fps_text = FONT_HEADER.render(f'FPS: {str(clock.get_fps())}', False, WHITE)
     WIN.blit(subtitle, (25, 30))
-    #WIN.blit(fps_text, (25, 700))
+    WIN.blit(fps_text, (25, 700))
 
     #----- Drawing the song preview window -----#
 
