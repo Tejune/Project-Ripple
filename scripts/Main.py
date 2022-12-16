@@ -459,7 +459,6 @@ while is_on_select_screen:
         pygame.mixer.Channel(0).set_volume(4)
         pygame.mixer.Channel(2).stop()
 
-
     # Update display
     pygame.display.update()
 
