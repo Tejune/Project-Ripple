@@ -11,6 +11,9 @@ infoObject = pygame.display.Info()
 SONGS_DIRECTORY = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Quaver\\Songs"
 CLEAR_IMAGE_CACHE_ON_STARTUP = False
 
+# Framerate
+Framerate = 120
+
 # Font Constants
 FONT_DIFF     = pygame.font.Font("fonts\\Pixellari.ttf", 14)
 FONT_ARTIST   = pygame.font.Font("fonts\\Aller_Rg.ttf", 16)
