@@ -89,9 +89,9 @@ def play_song(song, WIN, clock):
     global latest_judgement
 
     # Ripple related variables
-    ripple_spawn_frequency        = (60 / song["BPM"]) * 1000   # The amount of time between each ripple
-    rip                           = []                          # Array storing all ripple lifetimes
-    ripple_time                   = 0
+    tempo_spawn_frequency         = (60 / song["BPM"]) * 1000   # The amount of time between each ripple
+    tempo_lines                   = []                          # Array storing all ripple lifetimes
+    tempo_time                    = 0
 
     # Modifier variables
     God_Mode                      = False
@@ -103,9 +103,11 @@ def play_song(song, WIN, clock):
     # Runtine variables
     is_playing                    = True
     song_playing                  = False
-    song_time                     = -2000
+    song_time                     = -5000                       # Time delay in milliseconds until song starts after loading
     playing_notes                 = []
     combo                         = 0
+    arrow_y_postion               = 890
+    y_sweet_spot                  = arrow_y_postion - 274
 
     ########################################################################################################
 
@@ -206,13 +208,9 @@ def play_song(song, WIN, clock):
 
     while is_playing:
 
-        #pygame.time.delay(10)
-
         #Set constant framerate
         delta_time = clock.tick(Framerate)
         frames_since_last_hit += 1
-
-        #print(len(notes))
 
         # Check for events
         for event in pygame.event.get():
@@ -259,48 +257,11 @@ def play_song(song, WIN, clock):
         sur.blit(song["LoadedImageBlurredFull"], (0, 0))
         WIN.blit(sur, (0, 0))
 
-        # Draw topbar surfaces
-        pygame.draw.rect(WIN, BLACK, pygame.Rect(0, 0, WIDTH, 64))
-        corner = pygame.Surface((210, 64))
-        pygame.draw.rect(corner, YELLOW, pygame.Rect(0, 0, 210, 64))
-        pygame.draw.rect(WIN, YELLOW, pygame.Rect(0, 0, 210, 64))
-
-        #Topbar ripple effect
-        ripple_time += delta_time
-        if ripple_time >= ripple_spawn_frequency:
-            # Create ripple
-            rip.append(0)
-            ripple_time = 0
-        for lifetime in rip:
-
-            rip[rip.index(lifetime)] += 1
-
-            ripple_rect = pygame.Rect(210/2 - 3*lifetime/2, 32 - 3*lifetime/2, 3 * lifetime, 3 * lifetime)
-            ripple_shadow_rect = pygame.Rect(210/2 - (3*lifetime - 4)/2, 32 - (3*lifetime - 4)/2, (3 * lifetime) - 4, (3 * lifetime) - 4)
-            pygame.draw.ellipse(corner, (210,210,0), ripple_rect) 
-            pygame.draw.ellipse(corner, YELLOW, ripple_shadow_rect) 
-            WIN.blit(corner, (0,0))
-
-            if lifetime >= 120:
-                rip.remove(lifetime + 1)
-
-
-
-        #COMBO ripple effect
-        surface = pygame.Surface((1300,675), pygame.SRCALPHA)
-        surface.set_alpha(50)
-
-        # Draw topbar labels
-        display_t = song["Title"]
-        if len(display_t) > 100:
-            display_t = display_t[0:97] + "..."
-        subtitle = FONT.render("" + display_t, False, WHITE)
-        WIN.blit(subtitle, (227, 23))
-        tooltip = FONT.render("NOW PLAYING:", False, BLACK)
-        WIN.blit(tooltip, (23, 23 ))
-
         if combo >= 100:
-            WIN.blit(sparks, (0,0))
+            combo_surface = pygame.Surface((WIDTH,HEIGHT), pygame.SRCALPHA)
+            combo_surface.set_alpha(50)
+            combo_surface.blit(sparks, (0,0))
+            WIN.blit(combo_surface, (0,0))
 
         #### PLAYING THE SONG ###
 
@@ -314,28 +275,28 @@ def play_song(song, WIN, clock):
             frames_since_last_lane_pressed[i] = max(lane - 35, 0)
 
         # Add arrow surfaces
-        arrow_bg = pygame.Surface((530, 675), pygame.SRCALPHA)
+        arrow_bg = pygame.Surface((530, arrow_y_postion), pygame.SRCALPHA)
         arrow_bg.set_alpha(90)
-        arrow_surface_1 = pygame.Surface((530, 675), pygame.SRCALPHA)
+        arrow_surface_1 = pygame.Surface((530, arrow_y_postion), pygame.SRCALPHA)
         arrow_surface_1.set_alpha(frames_since_last_lane_pressed[0])
-        arrow_surface_2 = pygame.Surface((530, 675), pygame.SRCALPHA)
+        arrow_surface_2 = pygame.Surface((530, arrow_y_postion), pygame.SRCALPHA)
         arrow_surface_2.set_alpha(frames_since_last_lane_pressed[1])
-        arrow_surface_3 = pygame.Surface((530, 675), pygame.SRCALPHA)
+        arrow_surface_3 = pygame.Surface((530, arrow_y_postion), pygame.SRCALPHA)
         arrow_surface_3.set_alpha(frames_since_last_lane_pressed[2])
-        arrow_surface_4 = pygame.Surface((530, 675), pygame.SRCALPHA)
+        arrow_surface_4 = pygame.Surface((530, arrow_y_postion), pygame.SRCALPHA)
         arrow_surface_4.set_alpha(frames_since_last_lane_pressed[3])
 
         # Draw arrows
-        arrow_bg.blit(arrow_outline[0], (12, 465))
-        arrow_bg.blit(arrow_outline[1], (12 + 128, 465))
-        arrow_bg.blit(arrow_outline[2], (12 + 128 + 128, 465))
-        arrow_bg.blit(arrow_outline[3], (12 + 128 + 128 + 128, 465))
-        arrow_surface_1.blit(arrow_outline_highlight[0], (12, 465))
-        arrow_surface_2.blit(arrow_outline_highlight[1], (12 + 128, 465))
-        arrow_surface_3.blit(arrow_outline_highlight[2], (12 + 128 + 128, 465))
-        arrow_surface_4.blit(arrow_outline_highlight[3], (12 + 128 + 128 + 128, 465))
+        arrow_bg.blit(arrow_outline[0], (12, y_sweet_spot))
+        arrow_bg.blit(arrow_outline[1], (12 + 128, y_sweet_spot))
+        arrow_bg.blit(arrow_outline[2], (12 + 128 + 128, y_sweet_spot))
+        arrow_bg.blit(arrow_outline[3], (12 + 128 + 128 + 128, y_sweet_spot))
+        arrow_surface_1.blit(arrow_outline_highlight[0], (12, y_sweet_spot))
+        arrow_surface_2.blit(arrow_outline_highlight[1], (12 + 128, y_sweet_spot))
+        arrow_surface_3.blit(arrow_outline_highlight[2], (12 + 128 + 128, y_sweet_spot))
+        arrow_surface_4.blit(arrow_outline_highlight[3], (12 + 128 + 128 + 128, y_sweet_spot))
 
-        bg_pos = (WIDTH/2 - _bg.get_width() / 2, 64)
+        bg_pos = (WIDTH/2 - _bg.get_width() / 2, 0)
         WIN.blit(_bg, bg_pos)
         WIN.blit(arrow_surface_1, bg_pos)
         WIN.blit(arrow_surface_2, bg_pos)
@@ -362,13 +323,13 @@ def play_song(song, WIN, clock):
         # Draw Combo
         if combo > 0:
             comb = FONT_COMBO.render(str(combo), False, YELLOW)
-            y = 236 #max(233, min(233 + frames_since_last_hit, 236))
+            y = 286 #max(233, min(233 + frames_since_last_hit, 236))
             WIN.blit(comb, (WIDTH/2 - comb.get_width() / 2, y))
 
         # Draw Latest Judgement
         judgement_label = FONT.render(latest_judgement + "  (" + str(latest_judgement_offset) + " ms)", False, judgement_colors[latest_judgement])
         judgement_label.set_alpha(255 - frames_since_last_judgement)
-        WIN.blit(judgement_label, (WIDTH/2 - judgement_label.get_width() / 2, 280))
+        WIN.blit(judgement_label, (WIDTH/2 - judgement_label.get_width() / 2, 330))
 
         frames_since_last_judgement += 10
 
@@ -380,9 +341,6 @@ def play_song(song, WIN, clock):
             if note[0] - current_time <= NOTE_WINDOW:
                 playing_notes.append(note)
                 notes.remove(note)
-                #ADD NOTES
-                #print("NEW NOTE ADDED")
-                #print(note[0] - current_time)
             if note[0] - current_time > NOTE_WINDOW:
                 break
 
@@ -392,7 +350,7 @@ def play_song(song, WIN, clock):
             pygame.mixer.music.play()
 
         # Draw and calculate notes
-        _note_bg = pygame.Surface((500, 675), pygame.SRCALPHA)
+        _note_bg = pygame.Surface((530, HEIGHT), pygame.SRCALPHA)
         _note_bg = _note_bg.convert_alpha()
         for note in playing_notes:
             #print("NEW NOTE ROLL")
@@ -401,7 +359,7 @@ def play_song(song, WIN, clock):
             # FINAL Y = 500
             #p = p1 + (p2 - p1) * t
             a = ( note[0] - current_time ) / NOTE_WINDOW
-            position_y = -120 + (465 + 120 ) * (1 - a)
+            position_y = -120 + (y_sweet_spot + 120 ) * (1 - a)
             
             # Add notes to surface
             note_surface = pygame.Surface((120, 120), pygame.SRCALPHA)
@@ -413,7 +371,7 @@ def play_song(song, WIN, clock):
             #pygame.draw.rect(_note_bg, (150,150, 0), pygame.Rect(position_x + 1, position_y + 1, 98, 38))
 
             # Delete note if passed threshold
-            if God_Mode and position_y > 465:
+            if God_Mode and position_y > y_sweet_spot:
                 combo +=1
                 playing_notes.remove(note)
                 latest_judgement = "MARVELOUS"
@@ -422,7 +380,7 @@ def play_song(song, WIN, clock):
                 latest_judgement_offset = 0
                 frames_since_last_lane_pressed[note[1] - 1] = 150
 
-            if position_y > 675:
+            if position_y > arrow_y_postion:
                 combo = 0
                 playing_notes.remove(note)
                 latest_judgement = "MISS"
@@ -430,7 +388,32 @@ def play_song(song, WIN, clock):
                 frames_since_last_judgement = 0
                 latest_judgement_offset = 150
 
-        WIN.blit(_note_bg,(WIDTH/2 - _bg.get_width() / 2, 64))
+        # Create tempo lines
+        tempo_time += delta_time
+        if tempo_time >= tempo_spawn_frequency * 2:
+            tempo_lines.append(current_time + tempo_spawn_frequency * 2)
+            tempo_time = 0
+
+        # Draw tempo lines
+        tempo_surface = pygame.Surface((530, HEIGHT), pygame.SRCALPHA)
+        tempo_surface.set_alpha(40)
+
+        for line in tempo_lines:
+
+            position_x = 0
+            a = (line - current_time ) / NOTE_WINDOW
+            position_y = -120 + (y_sweet_spot + 120 ) * (1 - a)
+            
+            # Add lines to surface
+            pygame.draw.rect(tempo_surface, WHITE, pygame.Rect(position_x, position_y, 530, 3))
+
+            if position_y >= arrow_y_postion:
+               tempo_lines.remove(line)
+
+        _note_bg.blit(tempo_surface, (0, 0))
+
+
+        WIN.blit(_note_bg,(WIDTH/2 - _bg.get_width() / 2, 0))
 
 
         # Update screen
