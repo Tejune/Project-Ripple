@@ -3462,5 +3462,24 @@
     "SoundEffects": "[]",
     "BPM": 150,
     "SliderVelocities": "[]"
+  },
+  "23687 - 362/105479.qua": {
+    "AudioFile": "audio.mp3",
+    "BackgroundFile": "Temp.jpg",
+    "MapId": "105479",
+    "MapSetId": "23687",
+    "Mode": "Keys4",
+    "Title": "Carol of the Bells",
+    "Artist": "The Living Tombstone",
+    "Source": "''",
+    "Tags": "''",
+    "Creator": "JozziBoi",
+    "DifficultyName": "Out of Season Pass [Cut Version]",
+    "Description": "Created at 1668278626000",
+    "EditorLayers": "[]",
+    "CustomAudioSamples": "[]",
+    "SoundEffects": "[]",
+    "BPM": 183,
+    "SliderVelocities": "[]"
   }
 }
