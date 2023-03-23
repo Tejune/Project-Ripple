@@ -1,7 +1,12 @@
 #------------------------------------------------------------------------------------------
-#   Project Ripple
+#   Project Ripple: Classic
+#   The original from way back
 #   by Oskar
 #------------------------------------------------------------------------------------------
+
+#
+#   This file does not function anymore. Please use the "Main.py" file to run the game.
+#
 
 from array import array
 import pygame
@@ -13,7 +18,7 @@ pygame.mixer.init()
 Framerate = 60
 
 pygame.display.set_caption("Project Ripple")
-font = pygame.font.Font("Pixellari.ttf", 25)
+font = pygame.font.Font("fonts\\Pixellari.ttf", 25)
 screen = pygame.display.set_mode((500, 500), pygame.DOUBLEBUF)
 clock = pygame.time.Clock()
 
