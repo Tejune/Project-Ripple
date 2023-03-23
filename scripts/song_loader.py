@@ -7,8 +7,6 @@
 # Imports and Variables
 import os
 import json
-import base64
-import zlib
 from PIL import Image, ImageFilter
 from constants import *
 from helper_methods import *
