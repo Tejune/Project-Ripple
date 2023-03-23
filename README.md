@@ -8,3 +8,5 @@ Created just for fun, don't expect many updates or anything of the sort.
 - Python 3.11
 
 Have fun, or not, I don't care.
+
+Tejune/Project-Ripple is licensed under the GNU General Public License v3.0.
