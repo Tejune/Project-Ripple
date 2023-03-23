@@ -1,3 +1,9 @@
-# Project-Ripple
+# Project Ripple
 
-Project Ripple is a lightweight song player that runs on Quaver maps. 
+Project Ripple is a (somewhat) lightweight 4-key rhythm player that runs using Quaver maps.
+
+## Dependencies
+- Quaver installed (downloaded songs in the quaver folder are used by the player)
+- Python 3.11
+
+Have fun!
