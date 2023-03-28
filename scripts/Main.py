@@ -442,9 +442,11 @@ while is_on_select_screen:
 
     # Draw title
     subtitle = FONT_HEADER.render('SONG SELECT', False, WHITE)
-    #fps_text = FONT_HEADER.render(f'FPS: {str(clock.get_fps())}', False, WHITE)
     WIN.blit(subtitle, (25, 30))
-    #WIN.blit(fps_text, (25, 700))
+
+    if FPS_COUNTER_ENABLED:
+        fps_text = FONT_SMALL.render(f'FPS: {str(round(clock.get_fps()))}', False, WHITE)
+        WIN.blit(fps_text, (10, HEIGHT - 24))
 
     #----- Drawing the song preview window -----#
 
