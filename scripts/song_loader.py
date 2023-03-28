@@ -11,7 +11,7 @@ from PIL import Image, ImageFilter
 from constants import *
 from helper_methods import *
 from start_screen import show_loading_screen
-from quaver_cacher import convert_json
+from song_quacher import convert_json
 from image_quacher import update_image_cache
 import pygame
 

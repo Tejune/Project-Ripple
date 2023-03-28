@@ -100,7 +100,7 @@ def play_song(song, WIN, clock):
     frames_since_last_hit         = 50
     frames_since_last_judgement   = 255
 
-    # Runtine variables
+    # Runtime variables
     is_playing                    = True
     song_playing                  = False
     song_time                     = -5000                       # Time delay in milliseconds until song starts after loading
@@ -125,34 +125,7 @@ def play_song(song, WIN, clock):
     pygame.mixer.music.load(song["Audio"])
 
     # Setup note data using .QUA file
-    f = song["Data"]
-    notes = []
-    with open(f, "r", encoding="utf8") as info:
-
-        # Create variables
-        Lines = info.readlines()
-        iteration = 0
-
-        # Iterate through each line in the .QUA file
-        for Line in Lines:
-
-            #If the text signaling the start of a note is found:
-            if Line.find("StartTime: ") != -1 and iteration >= 17:
-
-                # Set variables for start time + the next lane
-                start_time = Line[Line.find("StartTime: ") + 11 : Line.find("\n", Line.find("StartTime"))]
-                next_line = Lines[iteration + 1]
-
-                # Make sure a line is also specified on the line below
-                if next_line.find("Lane: ") != -1:
-
-                    # Find lane for note
-                    lane = next_line[next_line.find("Lane: ") + 6 : next_line.find("\n", next_line.find("Lane: "))]
-
-                    # Append to notes array (File is structured so start_times are ordered by default, neat!)
-                    notes.append([int(start_time), int(lane)])
-
-            iteration += 1
+    notes = song["Notes"]
 
     # Note hit detection
     def hit_detect (lane):

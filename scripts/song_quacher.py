@@ -21,9 +21,13 @@ def convert_json(songs_path):
 
     #print(quaves)
     for item in quaves:
-        
+        bpm_is_set = False
+        has_been_hitobject = False
+        time_index = 0
+        lane_index = 0
         if item not in cached_items:
             cache[item] = {}
+            cache[item]["Notes"] = []
             with open(songs_path+"/"+item, "r", encoding="utf8") as f:
                 
                 for line in f:
@@ -33,138 +37,160 @@ def convert_json(songs_path):
                             cache[item]["AudioFile"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["AudioFile"] = "None"
+                        continue
 
-                    if line.startswith("SongPreviewTime"):
+                    elif line.startswith("SongPreviewTime"):
                         try:
                             cache[item]["SongPreviewTime"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["SongPreviewTime"] = "0"
-                    if line.startswith("Backgro"):
+                    elif line.startswith("Backgro"):
                         try:
                             cache[item]["BackgroundFile"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["BackgroundFile"] = "None"
+                        continue
         
-                    if line.startswith("MapId"):
+                    elif line.startswith("MapId"):
                         try:
                             cache[item]["MapId"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["MapId"] = "None"
+                        continue
 
                     
-                    if line.startswith("MapSetId: "):
+                    elif line.startswith("MapSetId: "):
                         try:
                             cache[item]["MapSetId"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["MapSetId"] = "None"
+                        continue
 
                     
-                    if line.startswith("Mode"):
+                    elif line.startswith("Mode"):
                         try:
                             cache[item]["Mode"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["Mode"] = "None"
+                        continue
 
                     
-                    if line.startswith("Title"):
+                    elif line.startswith("Title"):
                         try:
                             cache[item]["Title"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["Title"] = "None"
+                        continue
 
                     
-                    if line.startswith("Artist"):
+                    elif line.startswith("Artist"):
                         try:
                             cache[item]["Artist"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["Artist"] = "None"
+                        continue
 
                     
-                    if line.startswith("Source"):
+                    elif line.startswith("Source"):
                         try:
                             cache[item]["Source"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["Source"] = "None"
+                        continue
 
 
-                    if line.startswith("Tags"):
+                    elif line.startswith("Tags"):
                         try:
                             cache[item]["Tags"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["Tags"] = "None"
+                        continue
 
                     
-                    if line.startswith("Creator"):
+                    elif line.startswith("Creator"):
                         try:
                             cache[item]["Creator"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["Creator"] = "None"
+                        continue
 
                     
-                    if line.startswith("DifficultyName"):
+                    elif line.startswith("DifficultyName"):
                         try:
                             cache[item]["DifficultyName"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["DifficultyName"] = "None"
+                        continue
 
                     
-                    if line.startswith("Description"):
+                    elif line.startswith("Description"):
                         try:
                             cache[item]["Description"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["Description"] = "None"
+                        continue
 
 
-                    if line.startswith("EditorLayers"):
+                    elif line.startswith("EditorLayers"):
                         try:
                             cache[item]["EditorLayers"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["EditorLayers"] = "None"
+                        continue
 
                         
-                    if line.startswith("CustomAudioSamples"):
+                    elif line.startswith("CustomAudioSamples"):
                         try:
                             cache[item]["CustomAudioSamples"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["CustomAudioSamples"] = "None"
+                        continue
 
                         
-                    if line.startswith("SoundEffects"):
+                    elif line.startswith("SoundEffects"):
                         try:
                             cache[item]["SoundEffects"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["SoundEffects"] = "None"
+                        continue
 
                         
-                    if line.startswith("StartTime"):
+                    elif line.startswith("StartTime"):
                         try:
                             cache[item]["StartTime"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["StartTime"] = "None"
+                        continue
 
-                    if line.startswith("SliderVelocities"):
+                    elif line.startswith("SliderVelocities"):
                         try:
                             cache[item]["SliderVelocities"] = " ".join(line.split(" ")[1:])
                         except:
                             cache[item]["SliderVelocities"] = "None"
+                        continue
 
-                    # Getting the BPM like this because quaver is stupid
-                    for i in range(10):
-                        if line.startswith(" "*i + "Bpm"):
-                            try:
-                                cache[item]["BPM"] = int(" ".join(line[i:].split(" ")[1:]))
-                            except:
-                                cache[item]["BPM"] = 1
 
+                    # Instead of using the old trash method, we use this new magic one :sunglasses:
                     
-                    if line.startswith("- Bpm"):
-                        try:
-                            cache[item]["BPM"] = int(" ".join(line[3:].split(" ")[1:]))
-                        except:
-                            cache[item]["BPM"] = 1
-
+                    try: z = line.split("Bpm: ")[1]; cache[item]["BPM"] = int(z); bpm_is_set = True; continue
+                    except Exception: 
+                        if not bpm_is_set: cache[item]["BPM"] = 1
+                    " Bpm"
                     if line.startswith("HitObjects"):
-                        break
+                        has_been_hitobject = True
+
+                    if not has_been_hitobject: continue
+                    
+                    if line.startswith("- StartTime: "):
+                        cache[item]["Notes"].append([])
+                        cache[item]["Notes"][time_index].append(int(line.split(" ")[2]))
+                        time_index += 1
+                        continue
+                    
+                    if line.startswith("  Lane: "):
+                        cache[item]["Notes"][lane_index].append(int(line.rsplit(": ")[1]))
+                        lane_index += 1
+                        continue
 
     with open("cache.json", "w") as f:
         json.dump(cache, f, indent=2)
