@@ -216,6 +216,7 @@ def play_song(song, WIN, clock):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                exit()
             if event.type == pygame.KEYDOWN:
                 lane = -1
 
@@ -378,7 +379,10 @@ def play_song(song, WIN, clock):
                 judgement_count["MARVELOUS"] += 1
                 frames_since_last_judgement = 0
                 latest_judgement_offset = 0
-                frames_since_last_lane_pressed[note[1] - 1] = 150
+                try:
+                    frames_since_last_lane_pressed[note[1] - 1] = 150
+                except:
+                    pass
 
             if position_y > arrow_y_postion:
                 combo = 0

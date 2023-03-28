@@ -6,7 +6,7 @@
 import json
 import os
 from PIL import Image, ImageFilter
-from constants import *
+from constants import SONGS_DIRECTORY, HEIGHT, WIDTH
 
 
 
