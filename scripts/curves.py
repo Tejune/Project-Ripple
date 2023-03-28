@@ -1,5 +1,4 @@
 import pygame
-import numpy
 from helper_methods import lerp
 
 pygame.init()
