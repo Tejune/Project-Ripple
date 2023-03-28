@@ -8,7 +8,6 @@
 #   This file does not function anymore. Please use the "Main.py" file to run the game.
 #
 
-from array import array
 import pygame
 import random
 

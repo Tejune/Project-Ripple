@@ -19,7 +19,6 @@ def convert_json(songs_path):
             if item.endswith(".qua"):
                 quaves.append(directory + "/" +item)
 
-    #print(quaves)
     for item in quaves:
         bpm_is_set = False
         has_been_hitobject = False
