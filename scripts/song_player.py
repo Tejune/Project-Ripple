@@ -311,7 +311,7 @@ def play_song(song, WIN, clock):
         current_time = song_time + delta_time
         song_time = current_time
         for note in notes:
-            if note[0] - current_time <= NOTE_WINDOW:
+            if note[0] - current_time <= NOTE_WINDOW and note[1] <= 4: # TODO: Add suport for more than 4 lanes
                 playing_notes.append(note)
                 notes.remove(note)
             if note[0] - current_time > NOTE_WINDOW:

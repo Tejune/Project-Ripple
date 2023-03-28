@@ -272,12 +272,12 @@ log("Finished compiling songs.", "update", line())
 #----- Create buttons -----#
 
 log("Initializing song select screen...", "info", line())
+
 # Define button variables
 buttons         = []
 button_offset   = 120
 button_x        = WIDTH * 0.6 - 50
 button_y        = 144
-
 
 last_song_y     = 0
 
@@ -288,6 +288,7 @@ real_loops = 0
 scroll = 0
 
 log("Creating buttons...", "update", line())
+
 # Create buttons
 for song in songs:
 
@@ -310,6 +311,37 @@ for song in songs:
         font=30,
         bg=BLACK,
         feedback="You clicked me"))
+    
+    # Create additional buttons for other versions (TODO: Replace with a proper difficulty system)
+    if song.get("OtherDifficulties") != None:
+        for difficulty, notes in song["OtherDifficulties"]:
+
+            new_song = song.copy()
+            new_song["Notes"] = notes
+            new_song["DifficultyName"] = difficulty
+
+            song_y = button_y + len(buttons) * button_offset
+            last_song_y = -song_y + HEIGHT - button_offset - 20
+
+            if len(buttons) == random_song:
+                selected_song = new_song
+                pygame.mixer.music.stop()
+                pygame.mixer.music.load(new_song["Audio"])
+                pygame.mixer.music.play(start = (int(new_song["SongPreviewTime"]) / 1000))
+                pygame.mixer.music.set_volume(0.4)
+                scroll_offset = -song_y + HEIGHT / 2 - 60
+
+            # Create button class
+            buttons.append(Button(
+                new_song,
+                new_song["Title"],
+                (button_x, song_y),
+                font=30,
+                bg=BLACK,
+                feedback="You clicked me"))
+
+
+
 log("Finished initializing song select screen.", "update", line())
 
 log("All outer initialization complete. Entering game loop", "info", line())
@@ -436,6 +468,10 @@ while is_on_select_screen:
 
         if selected_song["LoadedImagePreview"] == "None":
             selected_song["LoadedImagePreview"] = selected_song["LoadedImage"] #pygame.transform.scale(, (preview_width, HEIGHT * 0.5))
+     
+        if last_song["LoadedImagePreview"] == "None":
+            last_song["LoadedImagePreview"] = last_song["LoadedImage"] #pygame.transform.scale(, (preview_width, HEIGHT * 0.5))
+
 
         preview_image = selected_song["LoadedImagePreview"]
         prev_preview_image = last_song["LoadedImagePreview"]

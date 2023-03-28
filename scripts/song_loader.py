@@ -47,11 +47,13 @@ def load_songs (WIN):
         # Create and get data from json file
         song_info                  = {}
         found_qua_file             = False
+        found_qua_file_path        = None
 
         for file in os.scandir(root):
             if file.name.endswith('.qua') and not found_qua_file:
                     found_qua_file = True
                     song_info = info[root.name + "/" + file.name]  
+                    found_qua_file_path = file.name
                     song_info["Data"] = songs_directory + "/" + root.name + "/" + file.name
 
                     # Also, update the loading screen
@@ -133,8 +135,23 @@ def load_songs (WIN):
             song_info["LoadedImageBlurred"] = pygame.transform.scale(imp, (int(WIDTH * 0.5), int(HEIGHT * 0.5)))
             song_info["LoadedImageBlurredFull"] = pygame.transform.scale(imp, (WIDTH,HEIGHT))
 
+        # Check for other difficulties if enabled
+        if LOAD_ALL_DIFFICULTIES:
+            for file in os.scandir(root):
+                if file.name.endswith('.qua') and found_qua_file_path != file.name:
+
+                    # This means there are several difficulties for this song.
+                    if song_info.get("OtherDifficulties") == None:
+                        song_info["OtherDifficulties"] = []
+
+                    # Gets difficulty data and appends it to the OtherDifficulties key.
+                    version_info = info[root.name + "/" + file.name]
+                    song_info["OtherDifficulties"].append( (version_info["DifficultyName"], version_info["Notes"]) )
+
         # Add new song information to the primary dictionary
         songs.append(song_info)
+
+    logs.log(f"Loaded {total} songs from the songs directory.", "update", line())
 
     # Return the songs array
     return songs
