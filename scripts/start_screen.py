@@ -6,7 +6,6 @@
 
 ##### Imports and Variables
 
-import os
 import pygame
 from helper_methods import *
 from constants import *

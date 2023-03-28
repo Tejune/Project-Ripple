@@ -308,7 +308,6 @@ def play_song(song, WIN, clock):
         frames_since_last_judgement += 10
 
         # Find and add notes within time window
-        #print(song_time)
         current_time = song_time + delta_time
         song_time = current_time
         for note in notes:
@@ -327,7 +326,6 @@ def play_song(song, WIN, clock):
         _note_bg = pygame.Surface((530, HEIGHT), pygame.SRCALPHA)
         _note_bg = _note_bg.convert_alpha()
         for note in playing_notes:
-            #print("NEW NOTE ROLL")
             position_x = 120 * (note[1] - 1) + ((note[1] - 1) * 8) + 12
 
             # FINAL Y = 500

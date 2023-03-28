@@ -7,13 +7,14 @@
 # Imports and Variables
 import os
 import json
-from PIL import Image, ImageFilter
 from constants import *
 from helper_methods import *
 from start_screen import show_loading_screen
 from song_quacher import convert_json
 from image_quacher import update_image_cache
+from inspect import currentframe as line
 import pygame
+import logs
 
 songs_directory     = SONGS_DIRECTORY
 default_thumbnail   = pygame.image.load("images\\default_thumb.jpg")
@@ -26,7 +27,7 @@ def load_songs (WIN):
     # Define the song array where all data is stored.
     songs = []
     total = len(os.listdir(songs_directory))
-    print(total)
+    logs.log(f"Loading {total} songs from the songs directory.", "info", line())
 
     # Convert quaver files to json, then load the json file
     convert_json(songs_directory)

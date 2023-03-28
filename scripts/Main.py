@@ -8,44 +8,46 @@ from song_loader import load_songs
 from start_screen import *
 from helper_methods import *
 from constants import *
-
+from inspect import currentframe as line
+from  logs import log
 import pygame
 import random
 
+log("Initializing pygame", "info", line())
 #### Initialize pygame module
 pygame.mixer.pre_init(44100, 16, 2, 4096)
 pygame.init()
 pygame.mixer.init()
+log("Finished initializing pygame", "update", line())
 
+log("Loading image related directories and dictionaries", "info", line())
 #### Directory & Dictionary
 default_thumbnail     = pygame.image.load("images\\default_thumb.jpg")
 song_select_fade      = pygame.image.load("images\\song_select_fade.png")
 song_selected_fade    = pygame.image.load("images\\song_selected_fade.png")
 songs                 = []
+log("Finished loading image related directories and dictionaries", "update", line())
 
 #### Pygame variables & Constants
-
+log("Initializing pygame variables", "info", line())
 pygame.display.set_caption("Project Ripple") # Set Caption
 infoObject = pygame.display.Info()
 WIN           = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
 clock         = pygame.time.Clock()
-
+log("Finished initializing pygame variables", "update", line())
 
 
 #### Song selection & Playing songs
-
+log("Loading song selection and prerequisites for playing songs", "info", line())
 scroll_offset              = 0
 selected_song              = None
 last_song                  = None
 frames_since_last_song     = 500 #Any value high enough will do
 song_select_offset         = 0
-
 play_button                = pygame.image.load("images\\play_button.png").convert_alpha()
 play_button                = pygame.transform.scale(play_button, (48, 48))
-
-
-
-from song_player import play_song
+from song_player import play_song # Tejune stupid? Lägg imports på toppen
+log("Finished loading song selection and prerequisites for playing songs", "update", line())
 
 ############# Functions & Classes ##############
 
@@ -63,8 +65,6 @@ class Button:
 
         # Ripple related (visible when selected)
         self.ripple_time = 0
-        if song["BPM"] == 1:
-            print(song["Title"])
         self.ripple_spawn_frequency = (60 / song["BPM"]) * 1000
         self.ripples = []
 
@@ -213,8 +213,7 @@ class Button:
         WIN.blit(self.surface, (self.x + scrolling_effect_offset + (song_select_offset), self.y + scroll_offset))
  
     def click(self, event, currently_selected_song):
-        try:
-            x, y = pygame.mouse.get_pos()
+        try: x, y = pygame.mouse.get_pos()
         except: exit() # Allow f4 exit
         if event.type == pygame.MOUSEBUTTONDOWN:
             if pygame.mouse.get_pressed()[0]:
@@ -247,6 +246,7 @@ class Button:
 
 #--------- Compile songs and show menu screen ------------------------------------------------------------#
 
+log("Compiling songs...", "info", line())
 # Show loading screen
 show_loading_screen(WIN, FONT, FONT_TITLE, "Converting new image files...", 10)
 
@@ -265,12 +265,13 @@ last_song = selected_song
 
 # Show title screen
 show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, selected_song)
-
+log("Finished compiling songs.", "update", line())
 
 #--------- Song select screen ----------------------------------------------------------------------------#
 
 #----- Create buttons -----#
 
+log("Initializing song select screen...", "info", line())
 # Define button variables
 buttons         = []
 button_offset   = 120
@@ -286,6 +287,7 @@ loops = 0
 real_loops = 0
 scroll = 0
 
+log("Creating buttons...", "update", line())
 # Create buttons
 for song in songs:
 
@@ -308,7 +310,9 @@ for song in songs:
         font=30,
         bg=BLACK,
         feedback="You clicked me"))
+log("Finished initializing song select screen.", "update", line())
 
+log("All outer initialization complete. Entering game loop", "info", line())
 # Main song selection loop
 while is_on_select_screen:
 
