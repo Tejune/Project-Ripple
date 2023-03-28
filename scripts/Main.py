@@ -213,7 +213,9 @@ class Button:
         WIN.blit(self.surface, (self.x + scrolling_effect_offset + (song_select_offset), self.y + scroll_offset))
  
     def click(self, event, currently_selected_song):
-        x, y = pygame.mouse.get_pos()
+        try:
+            x, y = pygame.mouse.get_pos()
+        except: exit() # Allow f4 exit
         if event.type == pygame.MOUSEBUTTONDOWN:
             if pygame.mouse.get_pressed()[0]:
                 self.rect = pygame.Rect(self.x, self.y + scroll_offset, self.size[0], self.size[1])
