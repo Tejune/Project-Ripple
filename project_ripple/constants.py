@@ -2,14 +2,17 @@
 #   Ripple / constants
 #------------------------------------------------------------------------------------------
 
+import platform
 import pygame
 pygame.init()
 
 infoObject = pygame.display.Info()
 
 # Songs directory
-SONGS_DIRECTORY = "C:/Program Files (x86)/Steam/steamapps/common/Quaver/Songs"
-# SONGS_DIRECTORY = "/mnt/c/Program Files (x86)/Steam/steamapps/common/Quaver/Songs"
+if platform.system() == "Linux":
+    SONGS_DIRECTORY = "/mnt/c/Program Files (x86)/Steam/steamapps/common/Quaver/Songs"
+else:
+    SONGS_DIRECTORY = "C:/Program Files (x86)/Steam/steamapps/common/Quaver/Songs"
 CLEAR_IMAGE_CACHE_ON_STARTUP = False
 LOAD_ALL_DIFFICULTIES = True
 FPS_COUNTER_ENABLED = True

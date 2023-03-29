@@ -1,6 +1,6 @@
 import datetime
 from . import pycolors
-parent_folder_name = __file__.split("/")[-3]
+name = "Project-Ripple"
 
 def log(message, type, line):
     type = type.lower()
@@ -24,4 +24,4 @@ def log(message, type, line):
     
     date = datetime.datetime.now().replace(microsecond=0)
 
-    print(f"{pycolors.bold}{pycolors.purple}{parent_folder_name} {pycolors.clear}{formatting}{type}{pycolors.cyan} →  {message_color}{message} @ {pycolors.colort((100,100,100))}{date} line {line.f_lineno}, {pycolors.clear}")
+    print(f"{pycolors.bold}{pycolors.purple}{name} {pycolors.clear}{formatting}{type}{pycolors.cyan} →  {message_color}{message} @ {pycolors.colort((100,100,100))}{date} line {line.f_lineno}, {pycolors.clear}")
