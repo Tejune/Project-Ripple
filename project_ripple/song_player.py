@@ -5,7 +5,7 @@
 
 
 import pygame
-from constants import *
+from .constants import *
 
 pygame.mixer.pre_init(44100, 16, 2, 4096)
 pygame.init()
@@ -15,11 +15,11 @@ pygame.init()
 
 
 # Create reusable image objects
-arrow                      = pygame.image.load("images\\arrow.png").convert_alpha()
+arrow                      = pygame.image.load("images/arrow.png").convert_alpha()
 arrow                      = pygame.transform.scale(arrow, (120, 120))
-arrow_outline_original     = pygame.image.load("images\\arrow_outline.png").convert_alpha()
+arrow_outline_original     = pygame.image.load("images/arrow_outline.png").convert_alpha()
 arrow_outline_original     = pygame.transform.scale(arrow_outline_original, (120, 120))
-sparks                     = pygame.image.load("images\\sparks.png").convert_alpha()
+sparks                     = pygame.image.load("images/sparks.png").convert_alpha()
 sparks                     = pygame.transform.scale(sparks, (WIDTH, HEIGHT))
 
 
@@ -32,7 +32,7 @@ arrow_outline = [
 ]
 
 # Create arrow highlight image
-arrow_outline_highlight_original     = pygame.image.load("images\\arrow_outline_highlight.png").convert_alpha()
+arrow_outline_highlight_original     = pygame.image.load("images/arrow_outline_highlight.png").convert_alpha()
 arrow_outline_highlight_original     = pygame.transform.scale(arrow_outline_highlight_original, (120, 120))
 
 
@@ -49,7 +49,7 @@ arrow_outline_highlight = [
 frames_since_last_lane_pressed = [255, 255, 255, 255]
 
 # Create sound objects
-sfx_hit = pygame.mixer.Sound("sound\\sound-hit.wav")
+sfx_hit = pygame.mixer.Sound("sound/sound-hit.wav")
 
 
 # Judgement related variables 
@@ -120,7 +120,7 @@ def play_song(song, WIN, clock):
     pygame.display.update()
 
     # Play select sound, then load song
-    pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\select.wav"))
+    pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound/select.wav"))
     pygame.mixer.Channel(0).set_volume(4)
     pygame.mixer.music.load(song["Audio"])
 
@@ -225,7 +225,7 @@ def play_song(song, WIN, clock):
                 
                 if event.key == pygame.K_ESCAPE:
                     is_playing = False
-                    pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\cancel.wav"))
+                    pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound/cancel.wav"))
                     pygame.mixer.Channel(0).set_volume(4)
 
                 if event.key == pygame.K_z:
