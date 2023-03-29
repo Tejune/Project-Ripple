@@ -1,3 +1,5 @@
+# VARFÖR ÄR DETTA I PROJECT RIPPLE?
+
 import pygame
 from .helper_methods import lerp
 
@@ -10,7 +12,7 @@ HEIGHT = 600
 WIN        = pygame.display.set_mode((WIDTH, HEIGHT))
 FONT       = pygame.font.Font("fonts/NotoSerif-Bold.ttf", 20)
 
-START_COLOR = [255, 112, 119]
+start_color = [255, 112, 119]
 END_COLOR = [255, 172, 8]
 
 class Point:
@@ -28,10 +30,18 @@ Points = [P1, P2, P3, P4]
 Point_being_dragged = False
 P_D = 25
 
+class color:
+    def __init__(self, r, g, b):
+        self.r = r
+        self.b = b
+        self.g = g
 bg_color = (20,20,30)
 
 loops = 0
 loops_since_finished = 0
+
+rgb1 = color(0,0,0)
+rgb2 = color(0,0,0)
 while True:
 
     # Fill screen with black
@@ -73,6 +83,18 @@ while True:
     for i in range(loops):
         t = i / 1000
 
+
+        rgb1.r = int((-0.00939 * P1.x ** 2 + 2.19 * P1.x) * (abs(50 - P1.y) / 250)) if int((-0.00939 * P1.x ** 2 + 2.19 * P1.x) * (abs(50 - P1.y) / 250)) > 0 else 0
+        rgb1.g = int(-0.00939 * P1.x ** 2 + 6.57 * P1.x - 1021) * (abs(50 - P1.y) / 250) - 2 if (-0.00939 * P1.x ** 2 + 6.57 * P1.x - 1021) * (abs(50 - P1.y) / 250) - 2 > 2 else 0
+        rgb1.b = int(-0.00931422 * P1.x ** 2 + 10.86038 * P1.x + -3038.298) * (abs(50 - P1.y) / 250) if (-0.00931422 * P1.x ** 2 + 10.86038 * P1.x + -3038.298) * (abs(50 - P1.y) / 250) > 0 else 0
+
+        rgb2.r = int((-0.00939 * P4.x ** 2 + 2.19 * P4.x) * (abs(50 - P4.y) / 250)) if int((-0.00939 * P4.x ** 2 + 2.19 * P4.x) * (abs(50 - P4.y) / 250)) > 0 else 0
+        rgb2.g = int(-0.00939 * P4.x ** 2 + 6.57 * P4.x - 1021) * (abs(50 - P4.y) / 250) - 2 if (-0.00939 * P4.x ** 2 + 6.57 * P4.x - 1021) * (abs(50 - P4.y) / 250) - 2 > 2 else 0
+        rgb2.b = int(-0.00931422 * P4.x ** 2 + 10.86038 * P4.x + -3038.298) * (abs(50 - P4.y) / 250) if (-0.00931422 * P4.x ** 2 + 10.86038 * P4.x + -3038.298) * (abs(50 - P4.y) / 250) > 0 else 0
+
+        start_color = (rgb1.r, rgb1.g, rgb1.b)
+        END_COLOR = (rgb2.r, rgb2.g, rgb2.b)
+
         L1 = Point(lerp(P1.x, P2.x, t), lerp(P1.y, P2.y, t))
         L2 = Point(lerp(P2.x, P3.x, t), lerp(P2.y, P3.y, t))
         L3 = Point(lerp(P3.x, P4.x, t), lerp(P3.y, P4.y, t))
@@ -94,7 +116,7 @@ while True:
 
             pygame.draw.line(WIN, grey, (L4.x, L4.y), (L5.x, L5.y), 2)
 
-        color = (lerp(START_COLOR[0], END_COLOR[0], t), lerp(START_COLOR[1], END_COLOR[1], t), lerp(START_COLOR[2], END_COLOR[2], t))
+        color = (lerp(start_color[0], END_COLOR[0], t), lerp(start_color[1], END_COLOR[1], t), lerp(start_color[2], END_COLOR[2], t))
 
         pygame.draw.circle(WIN, color, (B.x, B.y), 2) 
 
@@ -124,12 +146,12 @@ while True:
     pygame.draw.circle(WIN, bg_color, (P3.x, P3.y), 10, 0) 
     pygame.draw.circle(WIN, bg_color, (P4.x, P4.y), 10, 0) 
     
-    pygame.draw.circle(WIN, (START_COLOR), (P1.x, P1.y), 10, 2) 
+    pygame.draw.circle(WIN, start_color, (P1.x, P1.y), 10, 2) 
     pygame.draw.circle(WIN, (255,255,255), (P2.x, P2.y), 10, 2) 
     pygame.draw.circle(WIN, (255,255,255), (P3.x, P3.y), 10, 2) 
     pygame.draw.circle(WIN, (END_COLOR), (P4.x, P4.y), 10, 2) 
 
-    p1_label = FONT.render("P0", 1, (START_COLOR))
+    p1_label = FONT.render("P0", 1, start_color)
     p2_label = FONT.render("P1", 1, (255,255,255))
     p3_label = FONT.render("P2", 1, (255,255,255))
     p4_label = FONT.render("P3", 1, (END_COLOR))
@@ -139,9 +161,9 @@ while True:
     WIN.blit(p3_label, (P3.x - 35, P3.y - 35))
     WIN.blit(p4_label, (P4.x - 35, P4.y - 35))
 
-    title = FONT.render("Bezier Curve Visualization", 1, (START_COLOR))
+    title = FONT.render("Bezier Curve Visualization", 1, start_color)
     WIN.blit(title, (24, 36))
-    sub = FONT.render("Cubic Variation", 1, (255,255,255))
+    sub = FONT.render("Cubic Variation", 1, END_COLOR)
     WIN.blit(sub, (24, 64))
 
     pygame.display.update()

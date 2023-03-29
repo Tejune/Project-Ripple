@@ -11,6 +11,8 @@ infoObject = pygame.display.Info()
 SONGS_DIRECTORY = "C:/Program Files (x86)/Steam/steamapps/common/Quaver/Songs"
 # SONGS_DIRECTORY = "/mnt/c/Program Files (x86)/Steam/steamapps/common/Quaver/Songs"
 CLEAR_IMAGE_CACHE_ON_STARTUP = False
+LOAD_ALL_DIFFICULTIES = True
+FPS_COUNTER_ENABLED = True
 
 # Framerate
 Framerate = 120

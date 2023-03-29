@@ -8,32 +8,37 @@ from .song_loader import load_songs
 from .start_screen import *
 from .helper_methods import *
 from .constants import *
-
+from inspect import currentframe as line
+from .logs import log
 import pygame
 import random
 
+log("Initializing pygame", "info", line())
 #### Initialize pygame module
 pygame.mixer.pre_init(44100, 16, 2, 4096)
 pygame.init()
 pygame.mixer.init()
+log("Finished initializing pygame", "update", line())
 
+log("Loading image related directories and dictionaries", "info", line())
 #### Directory & Dictionary
 default_thumbnail     = pygame.image.load("images/default_thumb.jpg")
 song_select_fade      = pygame.image.load("images/song_select_fade.png")
 song_selected_fade    = pygame.image.load("images/song_selected_fade.png")
 songs                 = []
+log("Finished loading image related directories and dictionaries", "update", line())
 
 #### Pygame variables & Constants
-
+log("Initializing pygame variables", "info", line())
 pygame.display.set_caption("Project Ripple") # Set Caption
 infoObject = pygame.display.Info()
 WIN           = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
 clock         = pygame.time.Clock()
-
+log("Finished initializing pygame variables", "update", line())
 
 
 #### Song selection & Playing songs
-
+log("Loading song selection and prerequisites for playing songs", "info", line())
 scroll_offset              = 0
 selected_song              = None
 last_song                  = None
@@ -44,8 +49,8 @@ play_button                = pygame.image.load("images/play_button.png").convert
 play_button                = pygame.transform.scale(play_button, (48, 48))
 
 
-
-from .song_player import play_song
+from .song_player import play_song # Tejune stupid? Lägg imports på toppen
+log("Finished loading song selection and prerequisites for playing songs", "update", line())
 
 ############# Functions & Classes ##############
 
@@ -63,8 +68,6 @@ class Button:
 
         # Ripple related (visible when selected)
         self.ripple_time = 0
-        if song["BPM"] == 1:
-            print(song["Title"])
         self.ripple_spawn_frequency = (60 / song["BPM"]) * 1000
         self.ripples = []
 
@@ -213,7 +216,8 @@ class Button:
         WIN.blit(self.surface, (self.x + scrolling_effect_offset + (song_select_offset), self.y + scroll_offset))
  
     def click(self, event, currently_selected_song):
-        x, y = pygame.mouse.get_pos()
+        try: x, y = pygame.mouse.get_pos()
+        except: exit() # Allow f4 exit
         if event.type == pygame.MOUSEBUTTONDOWN:
             if pygame.mouse.get_pressed()[0]:
                 self.rect = pygame.Rect(self.x, self.y + scroll_offset, self.size[0], self.size[1])
@@ -245,6 +249,7 @@ class Button:
 
 #--------- Compile songs and show menu screen ------------------------------------------------------------#
 
+log("Compiling songs...", "info", line())
 # Show loading screen
 show_loading_screen(WIN, FONT, FONT_TITLE, "Converting new image files...", 10)
 
@@ -263,18 +268,19 @@ last_song = selected_song
 
 # Show title screen
 show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, selected_song)
-
+log("Finished compiling songs.", "update", line())
 
 #--------- Song select screen ----------------------------------------------------------------------------#
 
 #----- Create buttons -----#
+
+log("Initializing song select screen...", "info", line())
 
 # Define button variables
 buttons         = []
 button_offset   = 120
 button_x        = WIDTH * 0.6 - 50
 button_y        = 144
-
 
 last_song_y     = 0
 
@@ -283,6 +289,8 @@ is_on_select_screen = True
 loops = 0
 real_loops = 0
 scroll = 0
+
+log("Creating buttons...", "update", line())
 
 # Create buttons
 for song in songs:
@@ -306,7 +314,40 @@ for song in songs:
         font=30,
         bg=BLACK,
         feedback="You clicked me"))
+    
+    # Create additional buttons for other versions (TODO: Replace with a proper difficulty system)
+    if song.get("OtherDifficulties") != None:
+        for difficulty, notes in song["OtherDifficulties"]:
 
+            new_song = song.copy()
+            new_song["Notes"] = notes
+            new_song["DifficultyName"] = difficulty
+
+            song_y = button_y + len(buttons) * button_offset
+            last_song_y = -song_y + HEIGHT - button_offset - 20
+
+            if len(buttons) == random_song:
+                selected_song = new_song
+                pygame.mixer.music.stop()
+                pygame.mixer.music.load(new_song["Audio"])
+                pygame.mixer.music.play(start = (int(new_song["SongPreviewTime"]) / 1000))
+                pygame.mixer.music.set_volume(0.4)
+                scroll_offset = -song_y + HEIGHT / 2 - 60
+
+            # Create button class
+            buttons.append(Button(
+                new_song,
+                new_song["Title"],
+                (button_x, song_y),
+                font=30,
+                bg=BLACK,
+                feedback="You clicked me"))
+
+
+
+log("Finished initializing song select screen.", "update", line())
+
+log("All outer initialization complete. Entering game loop", "info", line())
 # Main song selection loop
 while is_on_select_screen:
 
@@ -404,9 +445,11 @@ while is_on_select_screen:
 
     # Draw title
     subtitle = FONT_HEADER.render('SONG SELECT', False, WHITE)
-    #fps_text = FONT_HEADER.render(f'FPS: {str(clock.get_fps())}', False, WHITE)
     WIN.blit(subtitle, (25, 30))
-    #WIN.blit(fps_text, (25, 700))
+
+    if FPS_COUNTER_ENABLED:
+        fps_text = FONT_SMALL.render(f'FPS: {str(round(clock.get_fps()))}', False, WHITE)
+        WIN.blit(fps_text, (10, HEIGHT - 24))
 
     #----- Drawing the song preview window -----#
 
@@ -430,6 +473,10 @@ while is_on_select_screen:
 
         if selected_song["LoadedImagePreview"] == "None":
             selected_song["LoadedImagePreview"] = selected_song["LoadedImage"] #pygame.transform.scale(, (preview_width, HEIGHT * 0.5))
+     
+        if last_song["LoadedImagePreview"] == "None":
+            last_song["LoadedImagePreview"] = last_song["LoadedImage"] #pygame.transform.scale(, (preview_width, HEIGHT * 0.5))
+
 
         preview_image = selected_song["LoadedImagePreview"]
         prev_preview_image = last_song["LoadedImagePreview"]

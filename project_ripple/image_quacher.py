@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------------------
-#   Ripple / image_quacher (by Wilmer) 
+#   Ripple / image_quacher (by Hatns) 
 #   Preloads and caches resized images for better performance using pygame
 #------------------------------------------------------------------------------------------
 
@@ -34,8 +34,6 @@ def update_image_cache ():
         while not chosen_file.endswith(".qua"):
             chosen_file = my_files.pop(0)
         quave_files.append(dir + "/" + chosen_file)
-    print(len(quave_files))
-
 
     # Find the path of all images to convert using information from the song data cache file
     image_paths = []
@@ -53,16 +51,12 @@ def update_image_cache ():
 
         # Image path as a string
         image_path = str(image_path)
-        print(f"Now converting: {image_path}")
-        print(f"Also known as: {image_path[:len(image_path) - 4]}\n")
 
         # Converting the first image (blurred version)
         try:
             
             # Only cache file if it isn't already present in the cache folder
             if f"{image_path[:len(image_path) - 4]}_background.png".replace("/","_") not in current_images:
-                print("WOOO!")
-
                 # Define the path
                 temp_image_path = SONGS_DIRECTORY + "/" + image_path
 
@@ -88,8 +82,6 @@ def update_image_cache ():
 
             # Again, only cache file if it isn't already present in the cache folder
             if f"{image_path[:len(image_path) - 4]}_preview.png".replace("/","_") not in current_images:
-
-                print("NAHHH!")
                 
                 # Define the path
                 temp_image_path = SONGS_DIRECTORY + "/" + image_path
