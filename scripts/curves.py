@@ -30,10 +30,18 @@ Points = [P1, P2, P3, P4]
 Point_being_dragged = False
 P_D = 25
 
+class color:
+    def __init__(self, r, g, b):
+        self.r = r
+        self.b = b
+        self.g = g
 bg_color = (20,20,30)
 
 loops = 0
 loops_since_finished = 0
+
+rgb1 = color(0,0,0)
+rgb2 = color(0,0,0)
 while True:
 
     # Fill screen with black
@@ -74,8 +82,19 @@ while True:
 
     for i in range(loops):
         t = i / 1000
-        start_color = (int(P1.x/10), int(P1.y/10), int(P2.x/10))
-        END_COLOR = (int(P4.x/10), int(P4.y/10), int(P3.x/10))
+
+
+        rgb1.r = int((-0.00939 * P1.x ** 2 + 2.19 * P1.x) * (abs(50 - P1.y) / 250)) if int((-0.00939 * P1.x ** 2 + 2.19 * P1.x) * (abs(50 - P1.y) / 250)) > 0 else 0
+        rgb1.g = int(-0.00939 * P1.x ** 2 + 6.57 * P1.x - 1021) * (abs(50 - P1.y) / 250) - 2 if (-0.00939 * P1.x ** 2 + 6.57 * P1.x - 1021) * (abs(50 - P1.y) / 250) - 2 > 2 else 0
+        rgb1.b = int(-0.00931422 * P1.x ** 2 + 10.86038 * P1.x + -3038.298) * (abs(50 - P1.y) / 250) if (-0.00931422 * P1.x ** 2 + 10.86038 * P1.x + -3038.298) * (abs(50 - P1.y) / 250) > 0 else 0
+
+        rgb2.r = int((-0.00939 * P4.x ** 2 + 2.19 * P4.x) * (abs(50 - P4.y) / 250)) if int((-0.00939 * P4.x ** 2 + 2.19 * P4.x) * (abs(50 - P4.y) / 250)) > 0 else 0
+        rgb2.g = int(-0.00939 * P4.x ** 2 + 6.57 * P4.x - 1021) * (abs(50 - P4.y) / 250) - 2 if (-0.00939 * P4.x ** 2 + 6.57 * P4.x - 1021) * (abs(50 - P4.y) / 250) - 2 > 2 else 0
+        rgb2.b = int(-0.00931422 * P4.x ** 2 + 10.86038 * P4.x + -3038.298) * (abs(50 - P4.y) / 250) if (-0.00931422 * P4.x ** 2 + 10.86038 * P4.x + -3038.298) * (abs(50 - P4.y) / 250) > 0 else 0
+
+        start_color = (rgb1.r, rgb1.g, rgb1.b)
+        END_COLOR = (rgb2.r, rgb2.g, rgb2.b)
+
         L1 = Point(lerp(P1.x, P2.x, t), lerp(P1.y, P2.y, t))
         L2 = Point(lerp(P2.x, P3.x, t), lerp(P2.y, P3.y, t))
         L3 = Point(lerp(P3.x, P4.x, t), lerp(P3.y, P4.y, t))
