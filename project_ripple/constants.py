@@ -2,13 +2,17 @@
 #   Ripple / constants
 #------------------------------------------------------------------------------------------
 
+import platform
 import pygame
 pygame.init()
 
 infoObject = pygame.display.Info()
 
 # Songs directory
-SONGS_DIRECTORY = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Quaver\\Songs"
+if platform.system() == "Linux":
+    SONGS_DIRECTORY = "/mnt/c/Program Files (x86)/Steam/steamapps/common/Quaver/Songs"
+else:
+    SONGS_DIRECTORY = "C:/Program Files (x86)/Steam/steamapps/common/Quaver/Songs"
 CLEAR_IMAGE_CACHE_ON_STARTUP = False
 LOAD_ALL_DIFFICULTIES = True
 FPS_COUNTER_ENABLED = True
@@ -17,14 +21,14 @@ FPS_COUNTER_ENABLED = True
 Framerate = 120
 
 # Font Constants
-FONT_DIFF     = pygame.font.Font("fonts\\Pixellari.ttf", 14)
-FONT_ARTIST   = pygame.font.Font("fonts\\Aller_Rg.ttf", 16)
-FONT_PIXEL    = pygame.font.Font("fonts\\Pixellari.ttf", 20)
-FONT_SMALL    = pygame.font.Font("fonts\\Aller_Bd.ttf", 20)
-FONT          = pygame.font.Font("fonts\\Aller_Bd.ttf", 25)
-FONT_HEADER   = pygame.font.Font("fonts\\BigDeal.ttf", 35)
-FONT_TITLE    = pygame.font.Font("fonts\\BigDeal.ttf", 55)
-FONT_COMBO    = pygame.font.Font("fonts\\AllerDisplay.ttf", 35)
+FONT_DIFF     = pygame.font.Font("fonts/Pixellari.ttf", 14)
+FONT_ARTIST   = pygame.font.Font("fonts/Aller_Rg.ttf", 16)
+FONT_PIXEL    = pygame.font.Font("fonts/Pixellari.ttf", 20)
+FONT_SMALL    = pygame.font.Font("fonts/Aller_Bd.ttf", 20)
+FONT          = pygame.font.Font("fonts/Aller_Bd.ttf", 25)
+FONT_HEADER   = pygame.font.Font("fonts/BigDeal.ttf", 35)
+FONT_TITLE    = pygame.font.Font("fonts/BigDeal.ttf", 55)
+FONT_COMBO    = pygame.font.Font("fonts/AllerDisplay.ttf", 35)
 
 # Window constants & clock
 WIDTH         = infoObject.current_w #500 * 2.25

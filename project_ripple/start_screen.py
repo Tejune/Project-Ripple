@@ -7,8 +7,8 @@
 ##### Imports and Variables
 
 import pygame
-from helper_methods import *
-from constants import *
+from .helper_methods import *
+from .constants import *
 
 shown = 0
 
