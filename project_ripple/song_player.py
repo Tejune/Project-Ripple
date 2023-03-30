@@ -73,6 +73,14 @@ judgement_count = {
     "MARVELOUS": 0
 }
 
+score_per_judgement = {
+    "MISS": 0,
+    "GOOD": 30,
+    "GREAT": 70,
+    "PERFECT": 95,
+    "MARVELOUS": 100
+}
+
 
 
 
@@ -92,6 +100,11 @@ def play_song(song, WIN, clock):
     tempo_spawn_frequency         = (60 / song["BPM"]) * 1000   # The amount of time between each ripple
     tempo_lines                   = []                          # Array storing all ripple lifetimes
     tempo_time                    = 0
+
+    # Score variables
+    Score                         = 0
+    Accuracy                      = 100
+    Notes_Played                  = 0
 
     # Modifier variables
     God_Mode                      = False
@@ -134,6 +147,10 @@ def play_song(song, WIN, clock):
         global latest_judgement_offset
         global frames_since_last_judgement
         global combo
+        
+        global Notes_Played
+        global Score
+        global Accuracy
 
         # Variable definition
         closest_note = False
@@ -172,6 +189,16 @@ def play_song(song, WIN, clock):
         if closest_note:
             playing_notes.remove(closest_note)
             judgement_count[judgement] += 1
+
+            # Update score
+            Score += score_per_judgement[judgement]
+            
+            # Update accuracy
+            old_accuracy_total = Accuracy * Notes_Played
+            Notes_Played += 1
+            old_accuracy_total += score_per_judgement[judgement] / score_per_judgement["MARVELOUS"]
+            Accuracy = old_accuracy_total / Notes_Played
+
             return True, judgement
         else:
             return False, judgement
@@ -303,6 +330,13 @@ def play_song(song, WIN, clock):
         if God_Mode:
             god_label = FONT.render("GOD MODE",False,  YELLOW)
             WIN.blit(god_label, (420 + 30 -  god_label.get_width(), 146))
+
+        # Draw score and accuracy
+        score_abel = FONT.render(f"SCORE: {Score}", False, YELLOW)
+        accuracy_label = FONT.render(f"ACCURACY: {Accuracy}%", False, YELLOW)
+        
+        WIN.blit(score_abel, (WIDTH - 30 -  score_abel.get_width(), 146))
+        WIN.blit(accuracy_label, (WIDTH - 30 -  accuracy_label.get_width(), 190))
 
         # Draw Combo
         if combo > 0:

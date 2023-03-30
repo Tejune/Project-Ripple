@@ -11,6 +11,7 @@ from .constants import *
 from inspect import currentframe as line
 from .logs import log
 import pygame
+import traceback
 import random
 
 log("Initializing pygame", "info", line())
@@ -44,6 +45,9 @@ selected_song              = None
 last_song                  = None
 frames_since_last_song     = 500 #Any value high enough will do
 song_select_offset         = 0
+
+time_since_error_raised    = 500
+error_message              = ""
 
 play_button                = pygame.image.load("images/play_button.png").convert_alpha()
 play_button                = pygame.transform.scale(play_button, (48, 48))
@@ -224,7 +228,20 @@ class Button:
                 if self.rect.collidepoint(x, y):
                     if currently_selected_song == self.song:
                         pygame.mixer.Channel(2).stop()
-                        play_song(self.song, WIN, clock)
+
+                        # Play song using the song player. Catch errors and alert the player.
+                        try:
+                            play_song(self.song, WIN, clock)
+                        except Exception as error:
+                            log(f"Error while playing song: {str(error)}", "error", line())
+                            log(f"{str(traceback.format_exc())}", "error", line())
+
+                            global error_message
+                            global time_since_error_raised
+
+                            error_message = error
+                            time_since_error_raised = 0
+
                         pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound/Title.wav"))
                     else:
                         
@@ -458,6 +475,19 @@ while is_on_select_screen:
     if FPS_COUNTER_ENABLED:
         fps_text = FONT_SMALL.render(f'FPS: {str(round(clock.get_fps()))}', False, WHITE)
         WIN.blit(fps_text, (10, HEIGHT - 24))
+    
+    # If an error occured recently, display it in the bottom of the screen
+    if time_since_error_raised < 5000:
+
+        # Drawing the background
+        error_surface = pygame.Surface((WIDTH, 50))
+        error_surface.set_alpha(175)
+        pygame.draw.rect(error_surface, (5,5,5), pygame.Rect(0, 0, WIDTH, 50))
+        WIN.blit(error_surface,(0, HEIGHT - 90))
+
+        # Error label
+        error_text = FONT.render(f'Exception raised: {error_message}', False, RED)
+        WIN.blit(error_text, (WIDTH / 2 - error_text.get_width() / 2, HEIGHT - 80))
 
     #----- Drawing the song preview window -----#
 
@@ -507,6 +537,7 @@ while is_on_select_screen:
     #wh.fill(WHITE)
     #WIN.blit(wh, (0, 0))
     loops += 1
+    time_since_error_raised += delta_time
 
     # Play the enter sound effect when coming from the main menu
     if loops == 1:

@@ -37,6 +37,7 @@ HEIGHT        = infoObject.current_h #675
 # Colors
 WHITE         = (255, 255, 255)
 YELLOW        = (255, 255, 0)
+RED           = (255, 20, 20)
 BLACK         = (0, 0, 0)
 
 # Notes & Judement windows (milliseconds)
