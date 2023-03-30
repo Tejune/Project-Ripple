@@ -4,12 +4,12 @@
 #------------------------------------------------------------------------------------------
 
 #### Imports
-from song_loader import load_songs
-from start_screen import *
-from helper_methods import *
-from constants import *
+from .song_loader import load_songs
+from .start_screen import *
+from .helper_methods import *
+from .constants import *
 from inspect import currentframe as line
-from  logs import log
+from .logs import log
 import pygame
 import random
 
@@ -22,9 +22,9 @@ log("Finished initializing pygame", "update", line())
 
 log("Loading image related directories and dictionaries", "info", line())
 #### Directory & Dictionary
-default_thumbnail     = pygame.image.load("images\\default_thumb.jpg")
-song_select_fade      = pygame.image.load("images\\song_select_fade.png")
-song_selected_fade    = pygame.image.load("images\\song_selected_fade.png")
+default_thumbnail     = pygame.image.load("images/default_thumb.jpg")
+song_select_fade      = pygame.image.load("images/song_select_fade.png")
+song_selected_fade    = pygame.image.load("images/song_selected_fade.png")
 songs                 = []
 log("Finished loading image related directories and dictionaries", "update", line())
 
@@ -44,9 +44,12 @@ selected_song              = None
 last_song                  = None
 frames_since_last_song     = 500 #Any value high enough will do
 song_select_offset         = 0
-play_button                = pygame.image.load("images\\play_button.png").convert_alpha()
+
+play_button                = pygame.image.load("images/play_button.png").convert_alpha()
 play_button                = pygame.transform.scale(play_button, (48, 48))
-from song_player import play_song # Tejune stupid? Lägg imports på toppen
+
+
+from .song_player import play_song # Tejune stupid? Lägg imports på toppen
 log("Finished loading song selection and prerequisites for playing songs", "update", line())
 
 ############# Functions & Classes ##############
@@ -222,7 +225,7 @@ class Button:
                     if currently_selected_song == self.song:
                         pygame.mixer.Channel(2).stop()
                         play_song(self.song, WIN, clock)
-                        pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound\\Title.wav"))
+                        pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound/Title.wav"))
                     else:
                         
                         global last_song
@@ -254,7 +257,7 @@ show_loading_screen(WIN, FONT, FONT_TITLE, "Converting new image files...", 10)
 songs = load_songs(WIN)
 
 # Start title screen bgm
-pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound\\Title.wav"))
+pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound/Title.wav"))
 pygame.mixer.Channel(2).set_volume(0.4)
 
 # Select a random track
@@ -361,7 +364,7 @@ while is_on_select_screen:
             if event.key == pygame.K_ESCAPE:
                 
                 # Return to title screen after playing associated sound effect
-                pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\cancel.wav"))
+                pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound/cancel.wav"))
                 pygame.mixer.Channel(0).set_volume(4)
                 show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, selected_song)
                 loops = 0
@@ -507,7 +510,7 @@ while is_on_select_screen:
 
     # Play the enter sound effect when coming from the main menu
     if loops == 1:
-        pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound\\enter.wav"))
+        pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound/enter.wav"))
         pygame.mixer.Channel(0).set_volume(4)
         pygame.mixer.Channel(2).stop()
 

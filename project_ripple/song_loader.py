@@ -7,17 +7,17 @@
 # Imports and Variables
 import os
 import json
-from constants import *
-from helper_methods import *
-from start_screen import show_loading_screen
-from song_quacher import convert_json
-from image_quacher import update_image_cache
+from .constants import *
+from .helper_methods import *
+from .start_screen import show_loading_screen
+from .song_quacher import convert_json
+from .image_quacher import update_image_cache
 from inspect import currentframe as line
 import pygame
-import logs
+from . import logs
 
 songs_directory     = SONGS_DIRECTORY
-default_thumbnail   = pygame.image.load("images\\default_thumb.jpg")
+default_thumbnail   = pygame.image.load("images/default_thumb.jpg")
 
 
 
@@ -31,12 +31,12 @@ def load_songs (WIN):
 
     # Convert quaver files to json, then load the json file
     convert_json(songs_directory)
-    info = open(".\\cache.json")
+    info = open("./cache.json")
     info = json.load(info)
 
     # Clear image cache if applicable
     #if CLEAR_IMAGE_CACHE_ON_STARTUP:
-    #    os.remove(".\\images\\imagecache\\")
+    #    os.remove("./images/imagecache/")
 
     # Run image_quacher to convert new images
     update_image_cache()
@@ -87,7 +87,7 @@ def load_songs (WIN):
 
                     try:
 
-                        song_info["Image"] = "images\\imagecache\\" + root.name + "_" + image_name + "_preview.png"
+                        song_info["Image"] = "images/imagecache/" + root.name + "_" + image_name + "_preview.png"
                         song_info["LoadedImage"] = pygame.image.load(song_info["Image"]).convert()
 
                     except Exception as e:
@@ -99,7 +99,7 @@ def load_songs (WIN):
                     # Get blurred version
                     try:
 
-                        song_info["ImageBlurred"] = "images\\imagecache\\" + root.name + "_" + image_name + "_background.png"
+                        song_info["ImageBlurred"] = "images/imagecache/" + root.name + "_" + image_name + "_background.png"
                         song_info["LoadedImageBlurred"] = pygame.image.load(song_info["ImageBlurred"]).convert()
                         song_info["LoadedImageBlurredFull"] = pygame.transform.scale(song_info["LoadedImageBlurred"], (WIDTH, HEIGHT)).convert()
 
@@ -122,7 +122,7 @@ def load_songs (WIN):
         
         # Check if a thumbnail image couldn't be found, if true load the default
         if song_info["Image"] == "None":
-            song_info["Image"] = "images\\default_thumb.jpg"
+            song_info["Image"] = "images/default_thumb.jpg"
             song_info["LoadedImage"] = pygame.transform.scale(default_thumbnail, (WIDTH * 0.5 + 5,HEIGHT * 0.5))
 
             # Create blurred version (surface)

@@ -6,7 +6,7 @@
 import json
 import os
 from PIL import Image, ImageFilter
-from constants import SONGS_DIRECTORY, HEIGHT, WIDTH
+from .constants import SONGS_DIRECTORY, HEIGHT, WIDTH
 
 
 
@@ -15,7 +15,8 @@ def update_image_cache ():
     # Create image cache directory if not present
     try:
         os.mkdir("images/imagecache")
-    except:
+    except Exception as e:
+        print(e)
         pass
 
 
@@ -98,5 +99,6 @@ def update_image_cache ():
                 img.save(f"images/imagecache/" + stemp_image_path[:len(stemp_image_path) - 4] + "_preview.png")
 
         # If something throws and exception, ignore it and continue              
-        except Exception:
+        except Exception as e:
+            print(e)
             pass

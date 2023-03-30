@@ -5,7 +5,14 @@ Created just for fun, don't expect many updates or anything of the sort.
 
 ## Dependencies
 - Quaver installed (downloaded songs in the quaver folder are used by the player)
+- Poetry
 - Python 3.11
+
+## Installing and running
+```
+poetry install
+poetry run ripple
+```
 
 Have fun, or not, I don't care.
 

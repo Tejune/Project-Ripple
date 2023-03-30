@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "project-ripple"
+version = "0.1.0"
+description = "A totally \"lightweight\" 4-key rhythm song player for Quaver files"
+authors = ["Your Name <you@example.com>"]
+license = "GPLv3-only"
+readme = "README.md"
+packages = [{include = "project_ripple"}]
+
+[tool.poetry.scripts]
+ripple = "project_ripple.Main:__main__"
+
+[tool.poetry.dependencies]
+python = "3.11.*"
+pygame = "^2.3.0"
+Pillow = "^9.4.0"
+numpy = "^1.24.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

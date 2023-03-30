@@ -1,7 +1,7 @@
 # VARFÖR ÄR DETTA I PROJECT RIPPLE?
 
 import pygame
-from helper_methods import lerp
+from .helper_methods import lerp
 
 pygame.init()
 pygame.display.set_caption("Curves") # Set Caption
