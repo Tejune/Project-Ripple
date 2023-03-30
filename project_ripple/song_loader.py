@@ -74,7 +74,9 @@ def load_songs (WIN):
             if file.name.endswith('.mp3') or file.name.endswith('.wav'):
                 song_info["Audio"] = file
                 song_info["AudioPath"] = file.path
-                song_info["LoadedAudio"] = pygame.mixer.Sound(song_info["Audio"])
+
+                # Songs take a long while to load. To improve load times they are
+                # loaded on demand when needed.
 
             # .png / .jpg File
             elif file.name.endswith('.jpg') or file.name.endswith('.png'):

@@ -227,17 +227,26 @@ def play_song(song, WIN, clock):
 
         # Draw background image
         sur = pygame.Surface((WIDTH, HEIGHT))
-        sur.set_alpha(40)
+        #sur.set_alpha(40)
         sur.blit(song["LoadedImageBlurredFull"], (0, 0))
         WIN.blit(sur, (0, 0))
 
         if combo >= 100:
-            combo_surface = pygame.Surface((WIDTH,HEIGHT), pygame.SRCALPHA)
-            combo_surface.set_alpha(50)
-            combo_surface.blit(sparks, (0,0))
-            WIN.blit(combo_surface, (0,0))
+            pass
+
+            # TODO: Replace with other effect. This is too costly on performance.
+
+            #combo_surface = pygame.Surface((WIDTH,HEIGHT), pygame.SRCALPHA)
+            #combo_surface.set_alpha(50)
+            #combo_surface.blit(sparks, (0,0))
+            #WIN.blit(combo_surface, (0,0))
 
         #### PLAYING THE SONG ###
+
+        # TEST: Transparent background
+        __bg = pygame.Surface((WIDTH, HEIGHT))
+        __bg.set_alpha(100)
+        pygame.draw.rect(__bg, BLACK, pygame.Rect(0, 0, 0, 0))
 
         # Draw background
         _bg = pygame.Surface((530, HEIGHT))
@@ -272,6 +281,7 @@ def play_song(song, WIN, clock):
 
         bg_pos = (WIDTH/2 - _bg.get_width() / 2, 0)
         WIN.blit(_bg, bg_pos)
+        WIN.blit(__bg, (0, 0))
         WIN.blit(arrow_surface_1, bg_pos)
         WIN.blit(arrow_surface_2, bg_pos)
         WIN.blit(arrow_surface_3, bg_pos)
@@ -390,6 +400,9 @@ def play_song(song, WIN, clock):
 
         WIN.blit(_note_bg,(WIDTH/2 - _bg.get_width() / 2, 0))
 
+        if FPS_COUNTER_ENABLED:
+            fps_text = FONT_SMALL.render(f'FPS: {str(round(clock.get_fps()))}', False, WHITE)
+            WIN.blit(fps_text, (10, HEIGHT - 24))
 
         # Update screen
         pygame.display.update()
