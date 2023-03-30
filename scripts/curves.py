@@ -10,7 +10,7 @@ infoObject = pygame.display.Info()
 WIDTH = 800
 HEIGHT = 600
 WIN        = pygame.display.set_mode((WIDTH, HEIGHT))
-FONT       = pygame.font.Font("fonts\\NotoSerif-Bold.ttf", 20)
+FONT       = pygame.font.Font("fonts/NotoSerif-Bold.ttf", 20)
 
 start_color = [255, 112, 119]
 END_COLOR = [255, 172, 8]
