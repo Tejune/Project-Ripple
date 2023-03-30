@@ -1,0 +1,4 @@
+{
+    "needs_poetry": true,
+    "needs_packages": true
+}
