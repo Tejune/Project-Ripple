@@ -218,7 +218,7 @@ class Button:
     def click(self, event, currently_selected_song):
         try: x, y = pygame.mouse.get_pos()
         except: exit() # Allow f4 exit
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.type == pygame.MOUSEBUTTONDOWN :
             if pygame.mouse.get_pressed()[0]:
                 self.rect = pygame.Rect(self.x, self.y + scroll_offset, self.size[0], self.size[1])
                 if self.rect.collidepoint(x, y):
@@ -264,6 +264,7 @@ pygame.mixer.Channel(2).set_volume(0.4)
 total_songs = len(songs)
 random_song = random.randint(0, total_songs - 1)
 selected_song = songs[random_song]
+current_song = random_song
 last_song = selected_song
 
 # Show title screen
@@ -370,11 +371,18 @@ while is_on_select_screen:
                 real_loops = 0
             
         if event.type == pygame.MOUSEWHEEL:
+            print(scroll)
             if event.y > 0:
                 scroll = min(scroll + event.y * 30, 120)
             if event.y < 0:
                 scroll = max(scroll + event.y * 30, -120)
-                
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                scroll = min(scroll + 30, 120)
+            if event.key == pygame.K_DOWN:
+                scroll = max(scroll - 30, -120)
+
 
 
         for button in buttons:
