@@ -27,7 +27,7 @@ def show_loading_screen (WIN, FONT, FONT_TITLE, currentFile, total_files):
     subtitle = FONT_PIXEL.render(f'Compiling song library ({currentFile})', False, WHITE)
     WIN.blit(subtitle, (WIDTH/2 - subtitle.get_width()/2, HEIGHT/2 + 55/2 + 10 ))
     pygame.draw.rect(WIN, (30,30,30), pygame.Rect(WIDTH * 0.25, HEIGHT/2 + 55/2 + 42 , (WIDTH/2), 10))
-    pygame.draw.rect(WIN, WHITE, pygame.Rect(WIDTH * 0.25, HEIGHT/2 + 55/2 + 42 , (WIDTH/2) * (shown / total_files), 10))
+    pygame.draw.rect(WIN, WHITE, pygame.Rect(WIDTH * 0.25, HEIGHT/2 + 55/2 + 42 , (WIDTH/2) * min((shown / total_files), 1), 10))
     pygame.display.update()
 
 
