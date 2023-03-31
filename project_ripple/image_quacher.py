@@ -56,6 +56,7 @@ def update_image_cache ():
         # Converting the first image (blurred version)
         try:
             
+
             # Only cache file if it isn't already present in the cache folder
             if f"{image_path[:len(image_path) - 4]}_background.png".replace("/","_") not in current_images:
                 # Define the path
