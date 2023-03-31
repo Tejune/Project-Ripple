@@ -46,7 +46,7 @@ last_song                  = None
 frames_since_last_song     = 500 #Any value high enough will do
 song_select_offset         = 0
 
-time_since_error_raised    = 500
+time_since_error_raised    = 6000
 error_message              = ""
 
 play_button                = pygame.image.load("images/play_button.png").convert_alpha()
