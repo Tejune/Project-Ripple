@@ -9,7 +9,7 @@ Created just for fun, don't expect many updates or anything of the sort.
 - Python 3.11
 
 ## Installing and running
-Run run.pyw, if this does not work you can manually install the project:
+Run `run.pyw,` if this does not work you can manually install the project:
 ```
 poetry install
 poetry run ripple
