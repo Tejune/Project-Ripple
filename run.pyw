@@ -11,9 +11,8 @@ if config["needs_poetry"]:
 
 if config["needs_packages"]:
     os.system("poetry install")
-    config["needs_packages"] = False
 
-if any(config.values()):
+if any(config.values()):        
     json.dump(config, open("run_conf.json", "w"), indent=4)
 
 

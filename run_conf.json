@@ -1,4 +1,4 @@
 {
-    "needs_poetry": true,
+    "needs_poetry": false,
     "needs_packages": true
 }
