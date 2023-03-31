@@ -1,6 +1,6 @@
 # Project Ripple <img align="right" width="150" height="150" src="https://github.com/Tejune/Project-Ripple/blob/master/images/arrow.png?raw=true">
 
-Project Ripple is a (somewhat) lightweight 4-key rhythm player that runs using Quaver maps.<br>
+Project Ripple is a lightweight 4-key rhythm player that runs using Quaver maps.<br>
 Created just for fun, don't expect many updates or anything of the sort.
 
 ## Dependencies
@@ -9,6 +9,7 @@ Created just for fun, don't expect many updates or anything of the sort.
 - Python 3.11
 
 ## Installing and running
+Run run.pyw, if this does not work you can manually install the project:
 ```
 poetry install
 poetry run ripple
