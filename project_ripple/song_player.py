@@ -193,15 +193,16 @@ def play_song(song, WIN, clock):
         # Calculate new grade
         highest_required_yet = 0
        
-        print(f"Accuracy is {Accuracy}")
+        #print(f"Accuracy is {Accuracy}")
         for accuracy_required, grade in grade_per_accuracy:
-            print(f"Is it greater than: {accuracy_required} ({grade})")
+            #print(f"Is it greater than: {accuracy_required} ({grade})")
             if accuracy_required <= Accuracy * 100 and highest_required_yet < accuracy_required:
                 highest_required_yet = accuracy_required
                 Grade = grade
-                print("YES!")
+                #print("YES!")
             else:
-                print("No...")
+                pass
+                #print("No...")
 
     # Note hit detection
     def hit_detect (lane):
