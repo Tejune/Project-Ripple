@@ -9,6 +9,8 @@
 import pygame
 from .helper_methods import *
 from .constants import *
+from .logs import log
+from inspect import currentframe as line
 
 shown = 0
 
@@ -55,6 +57,7 @@ def show_title_screen (WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, sele
                 exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
+                    log("Shutting down... Thanks for playing!", "info", line())
                     pygame.quit()
                     exit()
             

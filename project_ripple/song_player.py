@@ -472,11 +472,17 @@ def play_song(song, WIN, clock):
         # Draw score and accuracy
         score_label = FONT_TITLE.render(f"{Display_Score}", False, YELLOW)
         accuracy_label = FONT.render(f"{round(Accuracy * 100, 2)}%", False, YELLOW)
-        grade_label = FONT.render(f"{Grade}", False, grade_colors[Grade])
+
+        text_to_render = f"{Grade}"
+        if judgement_count["MISS"] == 0:
+            text_to_render = f"{Grade} (FC)"
         
+        grade_label = FONT.render(text_to_render, False, grade_colors[Grade])
+        
+
         WIN.blit(score_label, (WIDTH / 2 -  score_label.get_width() / 2, 46))
-        WIN.blit(accuracy_label, (WIDTH / 2 -  accuracy_label.get_width() / 2 - 40, 106))
-        WIN.blit(grade_label, (WIDTH / 2 -  grade_label.get_width() / 2 + 40, 106))
+        WIN.blit(accuracy_label, (WIDTH / 2 -  accuracy_label.get_width() / 2 - 50, 106))
+        WIN.blit(grade_label, (WIDTH / 2 -  grade_label.get_width() / 2 + 50, 106))
 
         # Draw Combo
         if combo > 0:
