@@ -1,7 +1,7 @@
 from . import pycolors
 import datetime, inspect, pathlib
 
-name = "Project-Ripple"
+name = pathlib.Path(__file__).parents[1].name
 def log(message, type, line):
     type = type.lower()
     match type:
@@ -23,5 +23,5 @@ def log(message, type, line):
             message_color = pycolors.colort((123, 42, 164))
     
     date = datetime.datetime.now().replace(microsecond=0)
-    name = pathlib.Path(inspect.getframeinfo(line).filename).name
-    print(f"{pycolors.bold}{pycolors.purple}{name} {pycolors.clear}{formatting}{type}{pycolors.cyan} →  {message_color}{message} @ {pycolors.colort((100,100,100))}{date} line {line.f_lineno}, {name} {pycolors.clear}")
+    filename = pathlib.Path(inspect.getframeinfo(line).filename).name
+    print(f"{pycolors.bold}{pycolors.purple}{name} {pycolors.clear}{formatting}{type}{pycolors.cyan} →  {message_color}{message} @ {pycolors.colort((100,100,100))}{date} line {line.f_lineno}, {filename} {pycolors.clear}")
