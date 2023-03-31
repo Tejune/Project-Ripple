@@ -6,6 +6,7 @@
 
 import pygame
 from .constants import *
+from . import logs
 
 pygame.mixer.pre_init(44100, 16, 2, 4096)
 pygame.init()
@@ -75,11 +76,32 @@ judgement_count = {
 
 score_per_judgement = {
     "MISS": 0,
-    "GOOD": 30,
-    "GREAT": 70,
-    "PERFECT": 95,
-    "MARVELOUS": 100
+    "GOOD": 300,
+    "GREAT": 700,
+    "PERFECT": 950,
+    "MARVELOUS": 1000
 }
+
+grade_per_accuracy = {
+    (0, "F"),
+    (50, "D"),
+    (75, "C"),
+    (85, "B"),
+    (90, "A"),
+    (95, "S"),
+    (100,  "P")
+}
+
+grade_colors = {
+    "F": (255, 0, 0),
+    "D": (255, 184, 51),
+    "C": YELLOW,
+    "B": (97, 255, 102),
+    "A": (112, 253, 255),
+    "S": (255, 255, 255),
+    "P": (204, 51, 255)
+}
+
 
 
 
@@ -95,6 +117,11 @@ def play_song(song, WIN, clock):
     global judgement_colors
     global latest_judgement_offset
     global latest_judgement
+    global Notes_Played
+    global Score
+    global Accuracy
+    global Display_Score
+    global Grade
 
     # Ripple related variables
     tempo_spawn_frequency         = (60 / song["BPM"]) * 1000   # The amount of time between each ripple
@@ -103,7 +130,9 @@ def play_song(song, WIN, clock):
 
     # Score variables
     Score                         = 0
-    Accuracy                      = 100
+    Display_Score                 = "0"
+    Grade                         = "P"
+    Accuracy                      = 0
     Notes_Played                  = 0
 
     # Modifier variables
@@ -140,6 +169,39 @@ def play_song(song, WIN, clock):
     # Setup note data using .QUA file
     notes = song["Notes"]
 
+    def update_score (judgement):
+        global Score
+        global Notes_Played
+        global Accuracy
+        global Display_Score
+        global Grade
+
+        # Update score
+        Score += score_per_judgement[judgement]
+
+        # Update display score
+        Display_Score = str(Score)[::-1]
+        Display_Score = ','.join(Display_Score[i:i+3] for i in range(0, len(Display_Score), 3))[::-1]
+            
+        # Update accuracy
+        old_accuracy_total = Accuracy * Notes_Played
+        Notes_Played += 1
+        old_accuracy_total += score_per_judgement[judgement] / score_per_judgement["MARVELOUS"]
+        Accuracy = old_accuracy_total / Notes_Played
+
+        # Calculate new grade
+        highest_required_yet = 0
+       
+        print(f"Accuracy is {Accuracy}")
+        for accuracy_required, grade in grade_per_accuracy:
+            print(f"Is it greater than: {accuracy_required} ({grade})")
+            if accuracy_required <= Accuracy * 100 and highest_required_yet < accuracy_required:
+                highest_required_yet = accuracy_required
+                Grade = grade
+                print("YES!")
+            else:
+                print("No...")
+
     # Note hit detection
     def hit_detect (lane):
         # Define global
@@ -147,7 +209,6 @@ def play_song(song, WIN, clock):
         global latest_judgement_offset
         global frames_since_last_judgement
         global combo
-        
         global Notes_Played
         global Score
         global Accuracy
@@ -190,14 +251,7 @@ def play_song(song, WIN, clock):
             playing_notes.remove(closest_note)
             judgement_count[judgement] += 1
 
-            # Update score
-            Score += score_per_judgement[judgement]
-            
-            # Update accuracy
-            old_accuracy_total = Accuracy * Notes_Played
-            Notes_Played += 1
-            old_accuracy_total += score_per_judgement[judgement] / score_per_judgement["MARVELOUS"]
-            Accuracy = old_accuracy_total / Notes_Played
+            update_score(judgement)
 
             return True, judgement
         else:
@@ -258,16 +312,6 @@ def play_song(song, WIN, clock):
         sur.blit(song["LoadedImageBlurredFull"], (0, 0))
         WIN.blit(sur, (0, 0))
 
-        if combo >= 100:
-            pass
-
-            # TODO: Replace with other effect. This is too costly on performance.
-
-            #combo_surface = pygame.Surface((WIDTH,HEIGHT), pygame.SRCALPHA)
-            #combo_surface.set_alpha(50)
-            #combo_surface.blit(sparks, (0,0))
-            #WIN.blit(combo_surface, (0,0))
-
         #### PLAYING THE SONG ###
 
         # TEST: Transparent background
@@ -318,7 +362,7 @@ def play_song(song, WIN, clock):
         # Draw judgement amounts
         already_drawn = 0
         for judgement in judgement_count:
-            _x = 360
+            _x = 340
             _y = 200 + 54 * already_drawn
             pygame.draw.rect(WIN, judgement_colors[judgement], pygame.Rect(_x , _y, 60, 40), 2, 10)
             #pygame.draw.rect(WIN, BLACK, pygame.Rect(_x + 2, _y + 2, 56, 36), 0, 10)
@@ -330,26 +374,6 @@ def play_song(song, WIN, clock):
         if God_Mode:
             god_label = FONT.render("GOD MODE",False,  YELLOW)
             WIN.blit(god_label, (420 + 30 -  god_label.get_width(), 146))
-
-        # Draw score and accuracy
-        score_abel = FONT.render(f"SCORE: {Score}", False, YELLOW)
-        accuracy_label = FONT.render(f"ACCURACY: {Accuracy}%", False, YELLOW)
-        
-        WIN.blit(score_abel, (WIDTH - 30 -  score_abel.get_width(), 146))
-        WIN.blit(accuracy_label, (WIDTH - 30 -  accuracy_label.get_width(), 190))
-
-        # Draw Combo
-        if combo > 0:
-            comb = FONT_COMBO.render(str(combo), False, YELLOW)
-            y = 286 #max(233, min(233 + frames_since_last_hit, 236))
-            WIN.blit(comb, (WIDTH/2 - comb.get_width() / 2, y))
-
-        # Draw Latest Judgement
-        judgement_label = FONT.render(latest_judgement + "  (" + str(latest_judgement_offset) + " ms)", False, judgement_colors[latest_judgement])
-        judgement_label.set_alpha(255 - frames_since_last_judgement)
-        WIN.blit(judgement_label, (WIDTH/2 - judgement_label.get_width() / 2, 330))
-
-        frames_since_last_judgement += 10
 
         # Find and add notes within time window
         current_time = song_time + delta_time
@@ -394,6 +418,9 @@ def play_song(song, WIN, clock):
                 judgement_count["MARVELOUS"] += 1
                 frames_since_last_judgement = 0
                 latest_judgement_offset = 0
+
+                update_score("MARVELOUS")   
+
                 try:
                     frames_since_last_lane_pressed[note[1] - 1] = 150
                 except:
@@ -406,6 +433,8 @@ def play_song(song, WIN, clock):
                 judgement_count["MISS"] += 1
                 frames_since_last_judgement = 0
                 latest_judgement_offset = 150
+
+                update_score("MISS")
 
         # Create tempo lines
         tempo_time += delta_time
@@ -437,6 +466,29 @@ def play_song(song, WIN, clock):
         if FPS_COUNTER_ENABLED:
             fps_text = FONT_SMALL.render(f'FPS: {str(round(clock.get_fps()))}', False, WHITE)
             WIN.blit(fps_text, (10, HEIGHT - 24))
+        
+        # Draw score and accuracy
+        score_label = FONT_TITLE.render(f"{Display_Score}", False, YELLOW)
+        accuracy_label = FONT.render(f"{round(Accuracy * 100, 2)}%", False, YELLOW)
+        grade_label = FONT.render(f"{Grade}", False, grade_colors[Grade])
+        
+        WIN.blit(score_label, (WIDTH / 2 -  score_label.get_width() / 2, 46))
+        WIN.blit(accuracy_label, (WIDTH / 2 -  accuracy_label.get_width() / 2 - 40, 106))
+        WIN.blit(grade_label, (WIDTH / 2 -  grade_label.get_width() / 2 + 40, 106))
+
+        # Draw Combo
+        if combo > 0:
+            comb = FONT_COMBO.render(str(combo), False, YELLOW)
+            y = 286 #max(233, min(233 + frames_since_last_hit, 236))
+            WIN.blit(comb, (WIDTH/2 - comb.get_width() / 2, y))
+
+        # Draw Latest Judgement
+        judgement_label = FONT.render(latest_judgement + "  (" + str(latest_judgement_offset) + " ms)", False, judgement_colors[latest_judgement])
+        judgement_label.set_alpha(255 - frames_since_last_judgement)
+        WIN.blit(judgement_label, (WIDTH/2 - judgement_label.get_width() / 2, 330))
+
+        frames_since_last_judgement += 10
+
 
         # Update screen
         pygame.display.update()
