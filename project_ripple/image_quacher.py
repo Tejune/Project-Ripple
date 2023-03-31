@@ -51,6 +51,7 @@ def update_image_cache ():
 
         # Image path as a string
         image_path = str(image_path)
+        
 
         # Converting the first image (blurred version)
         try:

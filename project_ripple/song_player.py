@@ -124,7 +124,8 @@ def play_song(song, WIN, clock):
     global Grade
 
     # Ripple related variables
-    tempo_spawn_frequency         = (60 / song["BPM"]) * 1000   # The amount of time between each ripple
+    tempo_spawn_frequency         = (60 / song["BPM"]) * 1000 if isinstance(song["BPM"], int) else 1000 # The amount of time between each ripple
+
     tempo_lines                   = []                          # Array storing all ripple lifetimes
     tempo_time                    = 0
 

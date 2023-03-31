@@ -72,7 +72,8 @@ class Button:
 
         # Ripple related (visible when selected)
         self.ripple_time = 0
-        self.ripple_spawn_frequency = (60 / song["BPM"]) * 1000
+        try: self.ripple_spawn_frequency = (60 / song["BPM"]) * 1000
+        except TypeError: self.ripple_spawn_frequency = 1000
         self.ripples = []
 
         if self.ripple_spawn_frequency > 200:
@@ -222,7 +223,7 @@ class Button:
     def click(self, event, currently_selected_song):
         try: x, y = pygame.mouse.get_pos()
         except: exit() # Allow f4 exit
-        if event.type == pygame.MOUSEBUTTONDOWN :
+        if event.type == pygame.MOUSEBUTTONDOWN:
             if pygame.mouse.get_pressed()[0]:
                 self.rect = pygame.Rect(self.x, self.y + scroll_offset, self.size[0], self.size[1])
                 if self.rect.collidepoint(x, y):
@@ -244,7 +245,6 @@ class Button:
 
                         pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound/Title.wav"))
                     else:
-                        
                         global last_song
                         global frames_since_last_song
 
@@ -271,7 +271,8 @@ log("Compiling songs...", "info", line())
 show_loading_screen(WIN, FONT, FONT_TITLE, "Converting new image files...", 10)
 
 # Load songs
-songs = load_songs(WIN)
+try: songs = load_songs(WIN)
+except FileNotFoundError: open("cache.json","w").write("{}"); songs = load_songs(WIN)
 
 # Start title screen bgm
 pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound/Title.wav"))
@@ -402,6 +403,7 @@ while is_on_select_screen:
 
 
 
+
         for button in buttons:
             new_selection = button.click(event, selected_song) 
             if new_selection:
@@ -525,8 +527,6 @@ while is_on_select_screen:
         WIN.blit(preview_image_surface, (preview_pos_x, preview_pos_y))
         WIN.blit(prev_preview_image_surface, (preview_pos_x, preview_pos_y))
 
-    # Draw preview window outline
-    pygame.draw.rect(WIN, WHITE, (preview_pos_x, preview_pos_y, preview_width, preview_height), preview_corner_radius, 5)
 
 
     #----- Drawing the flash effect when entering from main menu -----#

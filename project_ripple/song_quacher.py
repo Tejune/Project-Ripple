@@ -173,8 +173,8 @@ def convert_json(songs_path):
                     
                     try: z = line.split("Bpm: ")[1]; cache[item]["BPM"] = int(z); bpm_is_set = True; continue
                     except Exception: 
-                        if not bpm_is_set: cache[item]["BPM"] = 1
-                    " Bpm"
+                        if not bpm_is_set: cache[item]["BPM"] = "?"
+                    if cache[item]["BPM"] == 1: cache[item]["BPM"] = "?" 
                     if line.startswith("HitObjects"):
                         has_been_hitobject = True
 
