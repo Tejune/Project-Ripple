@@ -17,12 +17,13 @@ import pygame
 from . import logs
 
 songs_directory     = SONGS_DIRECTORY
-default_thumbnail   = pygame.image.load("images/default_thumb.jpg")
 
 
 
 # Main Function
 def load_songs (WIN):
+
+    default_thumbnail   = pygame.image.load("images/default_thumb.jpg").convert()
 
     # Define the song array where all data is stored.
     songs = []

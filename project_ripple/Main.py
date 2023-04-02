@@ -21,14 +21,6 @@ pygame.init()
 pygame.mixer.init()
 log("Finished initializing pygame", "update", line())
 
-log("Loading image related directories and dictionaries", "info", line())
-#### Directory & Dictionary
-default_thumbnail     = pygame.image.load("images/default_thumb.jpg")
-song_select_fade      = pygame.image.load("images/song_select_fade.png")
-song_selected_fade    = pygame.image.load("images/song_selected_fade.png")
-songs                 = []
-log("Finished loading image related directories and dictionaries", "update", line())
-
 #### Pygame variables & Constants
 log("Initializing pygame variables", "info", line())
 pygame.display.set_caption("Project Ripple") # Set Caption
@@ -36,6 +28,14 @@ infoObject = pygame.display.Info()
 WIN           = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
 clock         = pygame.time.Clock()
 log("Finished initializing pygame variables", "update", line())
+
+log("Loading image related directories and dictionaries", "info", line())
+#### Directory & Dictionary
+default_thumbnail     = pygame.image.load("images/default_thumb.jpg").convert()
+song_select_fade      = pygame.image.load("images/song_select_fade.png").convert_alpha()
+song_selected_fade    = pygame.image.load("images/song_selected_fade.png").convert_alpha()
+songs                 = []
+log("Finished loading image related directories and dictionaries", "update", line())
 
 
 #### Song selection & Playing songs
