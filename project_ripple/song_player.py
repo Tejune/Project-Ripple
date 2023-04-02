@@ -5,6 +5,7 @@
 
 
 import pygame
+import math
 from .constants import *
 from . import logs
 
@@ -83,17 +84,17 @@ score_per_judgement = {
 }
 
 grade_per_accuracy = {
-    (0, "F"),
+    (0, "FAIL"),
     (50, "D"),
     (75, "C"),
     (85, "B"),
     (90, "A"),
     (95, "S"),
-    (100,  "P")
+    (100, "P")
 }
 
 grade_colors = {
-    "F": (255, 0, 0),
+    "FAIL": (255, 0, 0),
     "D": (255, 184, 51),
     "C": YELLOW,
     "B": (97, 255, 102),
@@ -136,6 +137,10 @@ def play_song(song, WIN, clock):
     Accuracy                      = 0
     Notes_Played                  = 0
 
+    # Audio variables
+    Song_Length                   = 0
+    song_length_formatted         = "0:00"
+
     # Modifier variables
     God_Mode                      = False
  
@@ -168,7 +173,7 @@ def play_song(song, WIN, clock):
     pygame.mixer.music.load(song["Audio"])
 
     # Setup note data using .QUA file
-    notes = song["Notes"]
+    notes = song["Notes"].copy()
 
     def update_score (judgement):
         global Score
@@ -196,7 +201,7 @@ def play_song(song, WIN, clock):
         #print(f"Accuracy is {Accuracy}")
         for accuracy_required, grade in grade_per_accuracy:
             #print(f"Is it greater than: {accuracy_required} ({grade})")
-            if accuracy_required <= Accuracy * 100 and highest_required_yet < accuracy_required:
+            if accuracy_required <= Accuracy * 100 and highest_required_yet <= accuracy_required:
                 highest_required_yet = accuracy_required
                 Grade = grade
                 #print("YES!")
@@ -267,6 +272,22 @@ def play_song(song, WIN, clock):
         #Set constant framerate
         delta_time = clock.tick(Framerate)
         frames_since_last_hit += 1
+
+        # Since loading the song takes a while and freezes the game, let's at least show the playing UI before doing that
+        # TODO: Make this happen async or add song length to cache.json
+        if Song_Length == 1:
+            Song_Length = pygame.mixer.Sound(song["Audio"]).get_length() * 1000 # Converting from seconds to milliseconds
+
+            minutes_total = str( math.floor(((Song_Length) / 1000) / 60) )
+            seconds_total = str( round(((Song_Length) / 1000) % 60 ))
+
+            if int(seconds_total) < 10:
+                seconds_total = "0" + seconds_total
+            
+            song_length_formatted = f"{minutes_total}:{seconds_total}"
+
+        elif Song_Length == 0:
+            Song_Length = 1
 
         # Check for events
         for event in pygame.event.get():
@@ -361,6 +382,34 @@ def play_song(song, WIN, clock):
         WIN.blit(arrow_surface_4, bg_pos)
         WIN.blit(arrow_bg, bg_pos)
         
+        # Draw judgement amount background
+        judgement_surface = pygame.Surface((100, 400), pygame.SRCALPHA)
+        judgement_surface.set_alpha(140)
+        pygame.draw.rect(judgement_surface, BLACK, pygame.Rect(0, 0, 80, 280), 0, 10)
+        WIN.blit(judgement_surface, (330, 190))
+
+        # Calculate and draw song progress
+        song_time_surface = pygame.Surface((WIDTH, 6), pygame.SRCALPHA)
+        song_time_surface.set_alpha(140)
+        pygame.draw.rect(song_time_surface, BLACK, pygame.Rect(0, 0, WIDTH, 6))
+        WIN.blit(song_time_surface, (0, HEIGHT - 6))
+
+        pygame.draw.rect(WIN, YELLOW, pygame.Rect(0, HEIGHT - 6, (song_time / Song_Length ) * WIDTH, 6))
+
+        # While we're at it, let's also draw the song progress labels
+        minutes_left = str( math.floor(((Song_Length - song_time) / 1000) / 60) )
+        seconds_left = str( round(((Song_Length - song_time) / 1000) % 60) )
+
+        if int(seconds_left) < 10:
+            seconds_left = "0" + seconds_left
+
+        time_left_text   = FONT_SMALL.render(f"-{minutes_left}:{seconds_left}", True, WHITE)
+        song_length_text = FONT_SMALL.render(f"{song_length_formatted}", True, WHITE)
+
+        WIN.blit(time_left_text, (10, HEIGHT - 36))
+        WIN.blit(song_length_text, (WIDTH - 10 - song_length_text.get_width(), HEIGHT - 36))
+
+
         # Draw judgement amounts
         already_drawn = 0
         for judgement in judgement_count:
@@ -374,8 +423,15 @@ def play_song(song, WIN, clock):
 
         # Draw God Mode label if enabled
         if God_Mode:
-            god_label = FONT.render("GOD MODE",False,  YELLOW)
-            WIN.blit(god_label, (420 + 30 -  god_label.get_width(), 146))
+            
+            god_label = FONT.render("God Mode", True,  YELLOW)
+            
+            godmode_surface = pygame.Surface((god_label.get_width() + 20, god_label.get_height() + 20), pygame.SRCALPHA)
+            godmode_surface.set_alpha(140)
+            pygame.draw.rect(godmode_surface, BLACK, pygame.Rect(0, 0, god_label.get_width() + 20, god_label.get_height() + 20), 0, 10)
+            
+            WIN.blit(godmode_surface, (400 + 30 -  god_label.get_width() - 10, 130))
+            WIN.blit(god_label, (400 + 30 -  god_label.get_width(), 140))
 
         # Find and add notes within time window
         current_time = song_time + delta_time
@@ -466,32 +522,34 @@ def play_song(song, WIN, clock):
         WIN.blit(_note_bg,(WIDTH/2 - _bg.get_width() / 2, 0))
 
         if FPS_COUNTER_ENABLED:
-            fps_text = FONT_SMALL.render(f'FPS: {str(round(clock.get_fps()))}', False, WHITE)
-            WIN.blit(fps_text, (10, HEIGHT - 24))
+            fps_text = FONT_SMALL.render(f'FPS: {str(round(clock.get_fps()))}', True, WHITE)
+            WIN.blit(fps_text, (10, 24))
         
         # Draw score and accuracy
-        score_label = FONT_TITLE.render(f"{Display_Score}", False, YELLOW)
-        accuracy_label = FONT.render(f"{round(Accuracy * 100, 2)}%", False, YELLOW)
+        score_label = FONT_SECONDARY_TITLE.render(f"{Display_Score}", True, YELLOW)
+        accuracy_label = FONT_SECONDARY.render(f"{round(Accuracy * 100, 2)}%", True, WHITE)
 
+        # Append "FC" to grade if you haven't missed anything so far.
         text_to_render = f"{Grade}"
         if judgement_count["MISS"] == 0:
             text_to_render = f"{Grade} (FC)"
         
-        grade_label = FONT.render(text_to_render, False, grade_colors[Grade])
+        # Draw grade
+        grade_label = FONT_SECONDARY.render(text_to_render, True, grade_colors[Grade])
         
-
-        WIN.blit(score_label, (WIDTH / 2 -  score_label.get_width() / 2, 46))
-        WIN.blit(accuracy_label, (WIDTH / 2 -  accuracy_label.get_width() / 2 - 50, 106))
-        WIN.blit(grade_label, (WIDTH / 2 -  grade_label.get_width() / 2 + 50, 106))
+        # Blit scores to screen
+        WIN.blit(score_label,    (WIDTH / 2 -  score_label.get_width() / 2, 45))
+        WIN.blit(accuracy_label, (WIDTH / 2 -  accuracy_label.get_width() / 2 - 180, 65))
+        WIN.blit(grade_label,    (WIDTH / 2 -  grade_label.get_width() / 2 + 180, 65))
 
         # Draw Combo
         if combo > 0:
-            comb = FONT_COMBO.render(str(combo), False, YELLOW)
+            comb = FONT_COMBO.render(str(combo), True, YELLOW)
             y = 286 #max(233, min(233 + frames_since_last_hit, 236))
             WIN.blit(comb, (WIDTH/2 - comb.get_width() / 2, y))
 
         # Draw Latest Judgement
-        judgement_label = FONT.render(latest_judgement + "  (" + str(latest_judgement_offset) + " ms)", False, judgement_colors[latest_judgement])
+        judgement_label = FONT_SECONDARY.render(latest_judgement + "  (" + str(latest_judgement_offset) + " ms)", True, judgement_colors[latest_judgement])
         judgement_label.set_alpha(255 - frames_since_last_judgement)
         WIN.blit(judgement_label, (WIDTH/2 - judgement_label.get_width() / 2, 330))
 

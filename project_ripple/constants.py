@@ -30,6 +30,9 @@ FONT_HEADER   = pygame.font.Font("fonts/BigDeal.ttf", 35)
 FONT_TITLE    = pygame.font.Font("fonts/BigDeal.ttf", 55)
 FONT_COMBO    = pygame.font.Font("fonts/AllerDisplay.ttf", 35)
 
+FONT_SECONDARY_TITLE   = pygame.font.Font("fonts/Aller_Bd.ttf", 50)
+FONT_SECONDARY         = pygame.font.Font("fonts/Aller_Bd.ttf", 20)
+
 # Window constants & clock
 WIDTH         = infoObject.current_w #500 * 2.25
 HEIGHT        = infoObject.current_h #675
