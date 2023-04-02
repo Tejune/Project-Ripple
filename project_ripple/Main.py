@@ -488,7 +488,7 @@ while is_on_select_screen:
         WIN.blit(error_surface,(0, HEIGHT - 90))
 
         # Error label
-        error_text = FONT.render(f'Exception raised: {error_message}', False, RED)
+        error_text = FONT.render(f'Exception raised: {error_message}', True, RED)
         WIN.blit(error_text, (WIDTH / 2 - error_text.get_width() / 2, HEIGHT - 80))
 
     #----- Drawing the song preview window -----#
