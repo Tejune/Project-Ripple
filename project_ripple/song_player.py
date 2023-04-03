@@ -486,7 +486,8 @@ def play_song(song, WIN, clock):
 
             if position_y > arrow_y_postion:
                 combo = 0
-                playing_notes.remove(note)
+                try: playing_notes.remove(note)
+                except: pass
                 latest_judgement = "MISS"
                 judgement_count["MISS"] += 1
                 frames_since_last_judgement = 0
