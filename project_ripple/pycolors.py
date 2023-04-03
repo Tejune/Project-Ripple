@@ -35,5 +35,7 @@ cyan = colors(112, 200, 200)
 white = colors(255, 255, 255)
 #black
 black = colors(0, 0, 0)
+#orange
+orange = colors(255, 165, 0)
 #clear
 clear = clear_color()

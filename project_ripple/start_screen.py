@@ -24,9 +24,9 @@ def show_loading_screen (WIN, FONT, FONT_TITLE, currentFile, total_files):
     shown += 1
 
     WIN.fill(BLACK)
-    text_surface = FONT_TITLE.render('PROJECT RIPPLE', False, (20, 20, 20))
+    text_surface = FONT_TITLE.render('PROJECT RIPPLE', True, (20, 20, 20))
     WIN.blit(text_surface, (WIDTH/2 - text_surface.get_width()/2, HEIGHT/2 - 55/2 - 10))#- text_surface.get_height()/1.15))
-    subtitle = FONT_PIXEL.render(f'Compiling song library ({currentFile})', False, WHITE)
+    subtitle = FONT_PIXEL.render(f'Compiling song library ({currentFile})', True, WHITE)
     WIN.blit(subtitle, (WIDTH/2 - subtitle.get_width()/2, HEIGHT/2 + 55/2 + 10 ))
     pygame.draw.rect(WIN, (30,30,30), pygame.Rect(WIDTH * 0.25, HEIGHT/2 + 55/2 + 42 , (WIDTH/2), 10))
     pygame.draw.rect(WIN, WHITE, pygame.Rect(WIDTH * 0.25, HEIGHT/2 + 55/2 + 42 , (WIDTH/2) * min((shown / total_files), 1), 10))
@@ -98,9 +98,9 @@ def show_title_screen (WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, sele
         # Draw title screen
         title_color = lerp(20, 255, min(real_loops / 10, 1))
         subtitle_color = lerp(0, 255, min(real_loops / 10, 1))
-        text_surface = FONT_TITLE.render('PROJECT RIPPLE', False, (title_color, title_color, 0))
+        text_surface = FONT_TITLE.render('PROJECT RIPPLE', True, (title_color, title_color, 0))
         WIN.blit(text_surface, (WIDTH/2 - text_surface.get_width()/2, HEIGHT/2 - 55/2 - 10))
-        subtitle = FONT_PIXEL.render('Ready to rock! Press space to continue.', False, (subtitle_color,subtitle_color,subtitle_color))
+        subtitle = FONT_PIXEL.render('Ready to rock! Press space to continue.', True, (subtitle_color,subtitle_color,subtitle_color))
         WIN.blit(subtitle, (WIDTH/2 - subtitle.get_width()/2, HEIGHT/2 + 55/2 + 10 ))
 
 

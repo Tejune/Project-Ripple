@@ -62,13 +62,14 @@ log("Finished loading song selection and prerequisites for playing songs", "upda
 class Button:
     """Create a button, then blit the surface in the while loop"""
  
-    def __init__(self, song, text,  pos, font, bg="black", feedback=""):
+    def __init__(self, song, text,  pos, font, bg="black", feedback="", list_position = 0):
         self.x, self.y = pos
         self.font = FONT
         self.input = text
         self.song = song
         self.selected_song_offset = 0
         self.offset = 0
+        self.list_position = list_position
 
         # Ripple related (visible when selected)
         self.ripple_time = 0
@@ -156,19 +157,25 @@ class Button:
         self.surface = pygame.Surface(self.size, pygame.SRCALPHA)
         self.surface.convert_alpha()
 
+        # Create mask used by image to create corners
+        pygame.draw.rect(self.surface, (255, 255, 255), (0, 0, *self.size), border_radius=5)
+
         # Draw image to surface
-        self.surface.blit(self.song["LoadedImageBlurredPreview"], (0, -(HEIGHT * 0.18)))
+        self.surface.blit(self.song["LoadedImageBlurredPreview"], (0, -(HEIGHT * 0.18)), None, pygame.BLEND_RGBA_MIN)
 
         # Add transparent background under song list
         _bg = pygame.Surface((self.bound_x, self.bound_y + 18), pygame.SRCALPHA)
         _bg.set_alpha(200)
+
+        # Create another mask used by the background surface to create corners
+        pygame.draw.rect(_bg, (255, 255, 255), (0, 0, *_bg.get_size()), border_radius=5)
 
         if self.song == selected_song:
             self.bg_fade = self.song_selected_fade
         else:
             self.bg_fade = self.song_select_fade
 
-        _bg.blit(self.bg_fade, (0, 0))
+        _bg.blit(self.bg_fade, (0, 0), None, pygame.BLEND_RGBA_MIN)
         self.surface.blit(_bg,(0, 0))
 
         # Draw difficulty rating and BPM
@@ -220,13 +227,21 @@ class Button:
         # Draw the text surface to the screen
         WIN.blit(self.surface, (self.x + scrolling_effect_offset + (song_select_offset), self.y + scroll_offset))
  
-    def click(self, event, currently_selected_song):
+    def click(self, event, currently_selected_song, forcedSelection = False):
+
+        global last_song
+        global frames_since_last_song
+        global button_list_position
+
         try: x, y = pygame.mouse.get_pos()
         except: exit() # Allow f4 exit
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if pygame.mouse.get_pressed()[0]:
-                self.rect = pygame.Rect(self.x, self.y + scroll_offset, self.size[0], self.size[1])
-                if self.rect.collidepoint(x, y):
+        if forcedSelection or event.type == pygame.MOUSEBUTTONDOWN:
+            if forcedSelection or pygame.mouse.get_pressed()[0]:
+
+                if not forcedSelection:
+                    self.rect = pygame.Rect(self.x, self.y + scroll_offset, self.size[0], self.size[1])
+
+                if forcedSelection or self.rect.collidepoint(x, y):
                     if currently_selected_song == self.song:
                         pygame.mixer.Channel(2).stop()
 
@@ -245,19 +260,20 @@ class Button:
 
                         pygame.mixer.Channel(2).play(pygame.mixer.Sound("sound/Title.wav"))
                     else:
-                        global last_song
-                        global frames_since_last_song
 
                         last_song = selected_song
                         frames_since_last_song = 0
                         currently_selected_song = self.song
+                        button_list_position = self.list_position
                         self.selected_song_offset = 60
-                        #Change song
-                        pygame.mixer.music.stop()
-                        pygame.mixer.music.load(self.song["Audio"])
-                        pygame.mixer.music.play(start = (int(self.song["SongPreviewTime"]) / 1000))
-                        pygame.mixer.music.set_volume(0.4)
-                        pygame.mixer.Channel(2).stop()
+
+                        # Change song (but only if it's actually a new song and not the same one)
+                        if self.song["Title"] != last_song["Title"]:
+                            pygame.mixer.music.stop()
+                            pygame.mixer.music.load(self.song["Audio"])
+                            pygame.mixer.music.play(start = (int(self.song["SongPreviewTime"]) / 1000))
+                            pygame.mixer.music.set_volume(0.4)
+                            pygame.mixer.Channel(2).stop()
 
                         return currently_selected_song
 
@@ -285,6 +301,8 @@ selected_song = songs[random_song]
 current_song = random_song
 last_song = selected_song
 
+log(f"Total songs: {total_songs}\nSelected song: {random_song}", "warning", line())
+
 # Show title screen
 show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, selected_song)
 log("Finished compiling songs.", "update", line())
@@ -300,6 +318,7 @@ buttons         = []
 button_offset   = 120
 button_x        = WIDTH * 0.6 - 50
 button_y        = 144
+button_list_position = 0
 
 last_song_y     = 0
 
@@ -312,12 +331,14 @@ scroll = 0
 log("Creating buttons...", "update", line())
 
 # Create buttons
+buttons_created = -1
 for song in songs:
 
     song_y = button_y + len(buttons) * button_offset
     last_song_y = -song_y + HEIGHT - button_offset - 20
 
-    if len(buttons) == random_song:
+    if selected_song == song:
+        button_list_position = buttons_created + 2
         selected_song = song
         pygame.mixer.music.stop()
         pygame.mixer.music.load(song["Audio"])
@@ -326,13 +347,15 @@ for song in songs:
         scroll_offset = -song_y + HEIGHT / 2 - 60
 
     # Create button class
+    buttons_created += 1
     buttons.append(Button(
         song,
         song["Title"],
         (button_x, song_y),
         font=30,
         bg=BLACK,
-        feedback="You clicked me"))
+        feedback="You clicked me",
+        list_position = buttons_created))
     
     # Create additional buttons for other versions (TODO: Replace with a proper difficulty system)
     if song.get("OtherDifficulties") != None:
@@ -345,7 +368,7 @@ for song in songs:
             song_y = button_y + len(buttons) * button_offset
             last_song_y = -song_y + HEIGHT - button_offset - 20
 
-            if len(buttons) == random_song:
+            if selected_song == song:
                 selected_song = new_song
                 pygame.mixer.music.stop()
                 pygame.mixer.music.load(new_song["Audio"])
@@ -354,15 +377,18 @@ for song in songs:
                 scroll_offset = -song_y + HEIGHT / 2 - 60
 
             # Create button class
+            buttons_created  += 1
             buttons.append(Button(
                 new_song,
                 new_song["Title"],
                 (button_x, song_y),
                 font=30,
                 bg=BLACK,
-                feedback="You clicked me"))
+                feedback="You clicked me",
+                list_position = buttons_created))
 
 
+log(f"Amount of buttons created: {buttons_created}, Amount of songs: {songs.__len__()}", "debug", line())
 
 log("Finished initializing song select screen.", "update", line())
 
@@ -389,7 +415,7 @@ while is_on_select_screen:
                 real_loops = 0
             
         if event.type == pygame.MOUSEWHEEL:
-            print(scroll)
+            
             if event.y > 0:
                 scroll = min(scroll + event.y * 30, 120)
             if event.y < 0:
@@ -397,9 +423,30 @@ while is_on_select_screen:
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                scroll = min(scroll + 30, 120)
+                scroll = min(scroll + 34.3, 500)
+
+                selected_button = buttons[max(button_list_position - 1, 0)]
+                log(f"Selection position: {max(button_list_position - 1, 0)}", "warning", line())
+
+                new_selection = selected_button.click(None, selected_song, True)
+                selected_song = new_selection
+
             if event.key == pygame.K_DOWN:
-                scroll = max(scroll - 30, -120)
+                scroll = max(scroll - 34.3, -500)
+
+                selected_button = buttons[min(button_list_position + 1, buttons.__len__() - 1)]
+                log(f"Selection position: {min(button_list_position + 1, buttons.__len__() - 1)}", "warning", line())
+                
+                new_selection = selected_button.click(None, selected_song, True)
+                selected_song = new_selection
+            
+            if event.key == pygame.K_RETURN:
+                selected_button = buttons[button_list_position]
+                log(f"Using enter to enter a song! Hah, get it?", "debug", line())
+                
+                selected_button.click(None, selected_song, True)
+
+               
 
 
 
@@ -449,7 +496,7 @@ while is_on_select_screen:
     pygame.draw.rect(_bg, BLACK, pygame.Rect(0, 0, WIDTH, HEIGHT))
     WIN.blit(_bg,(0, 0))
 
-    # Add transparent background under song list
+    # Add transparent background color under song list
     _bg = pygame.Surface((WIDTH, HEIGHT))
     _bg.set_alpha(100)
     pygame.draw.rect(_bg, BLACK, pygame.Rect(WIDTH - WIDTH * 0.4, 0, WIDTH * 0.4, HEIGHT))
@@ -501,14 +548,14 @@ while is_on_select_screen:
     preview_corner_radius = 3
 
     # Draw background fill
-    #pygame.draw.rect(WIN, BLACK, (preview_pos_x, preview_pos_y, preview_width, preview_height), 0, 5)
+    pygame.draw.rect(WIN, BLACK, (preview_pos_x, preview_pos_y, preview_width, preview_height), 0, 5)
 
     # Draw preview image if a song has been selected
     if selected_song:
-        preview_image_surface = pygame.Surface((preview_width, preview_height))
+        preview_image_surface = pygame.Surface((preview_width, preview_height), pygame.SRCALPHA)
         preview_image_surface.set_alpha(min(frames_since_last_song * 150, 255))
 
-        prev_preview_image_surface = pygame.Surface((preview_width, preview_height))
+        prev_preview_image_surface = pygame.Surface((preview_width, preview_height), pygame.SRCALPHA)
         prev_preview_image_surface.set_alpha(max(255 - frames_since_last_song  * 150, 0))
 
         if selected_song["LoadedImagePreview"] == "None":
@@ -520,13 +567,20 @@ while is_on_select_screen:
 
         preview_image = selected_song["LoadedImagePreview"]
         prev_preview_image = last_song["LoadedImagePreview"]
+
+        # Used as a mask to create rounded corners for the displayed image
+        pygame.draw.rect(preview_image_surface, (255, 255, 255), (0, 0, *(preview_width, preview_height)), border_radius=5)
+        pygame.draw.rect(prev_preview_image_surface, (255, 255, 255), (0, 0, *(preview_width, preview_height)), border_radius=5)
+
         
-        preview_image_surface.blit(preview_image, (0, -(HEIGHT * 0.05)))
-        prev_preview_image_surface.blit(prev_preview_image, (0, -(HEIGHT * 0.05)))
+        preview_image_surface.blit(preview_image, (0, -(HEIGHT * 0.05)), None, pygame.BLEND_RGBA_MIN)
+        prev_preview_image_surface.blit(prev_preview_image, (0, -(HEIGHT * 0.05)), None, pygame.BLEND_RGBA_MIN)
 
         WIN.blit(preview_image_surface, (preview_pos_x, preview_pos_y))
         WIN.blit(prev_preview_image_surface, (preview_pos_x, preview_pos_y))
 
+    # Draw preview window outline
+    pygame.draw.rect(WIN, WHITE, (preview_pos_x, preview_pos_y, preview_width, preview_height), preview_corner_radius, 5)
 
 
     #----- Drawing the flash effect when entering from main menu -----#

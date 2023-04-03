@@ -17,6 +17,10 @@ def log(message, type, line):
             type = "  error"
             formatting = pycolors.red + pycolors.bold
             message_color = pycolors.colort((145, 112, 112))
+        case "debug":
+            type = "  debug"
+            formatting = pycolors.orange + pycolors.bold
+            message_color = pycolors.colort((255, 165, 0))
         case "update":
             type = " update"
             formatting = pycolors.colort((121, 49, 180)) + pycolors.bold
