@@ -147,6 +147,7 @@ def play_song(song, WIN, clock):
     # Visual variables
     frames_since_last_hit         = 50
     frames_since_last_judgement   = 255
+    played_fc_sound               = False
 
     # Runtime variables
     is_playing                    = True
@@ -273,6 +274,7 @@ def play_song(song, WIN, clock):
         delta_time = clock.tick(Framerate)
         frames_since_last_hit += 1
         time_passed =  song_time + 4000
+        time_since_finish = song_time - Song_Length - 1500
 
         # Since loading the song takes a while and freezes the game, let's at least show the playing UI before doing that
         # TODO: Make this happen async or add song length to cache.json
@@ -554,10 +556,19 @@ def play_song(song, WIN, clock):
         WIN.blit(grade_label,    (WIDTH / 2 -  grade_label.get_width() / 2 + 180, 65))
 
         # Draw Combo
-        if combo > 0:
+        if combo > 0 and time_since_finish < -1500:
+
             comb = FONT_COMBO.render(str(combo), True, YELLOW)
-            y = 286 #max(233, min(233 + frames_since_last_hit, 236))
-            WIN.blit(comb, (WIDTH/2 - comb.get_width() / 2, y))
+            WIN.blit(comb, (WIDTH/2 - comb.get_width() / 2, 286))
+
+        elif combo > 0 and time_since_finish >= -1500:
+
+            combo_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+            combo_surface.set_alpha((1000 - time_since_finish - 1500))
+
+            comb = FONT_COMBO.render(str(combo), True, YELLOW)
+            combo_surface.blit(comb, (WIDTH/2 - comb.get_width() / 2, 286))
+            WIN.blit(combo_surface, (0, 0))
 
         # Draw Latest Judgement
         judgement_label = FONT_SECONDARY.render(latest_judgement + "  (" + str(latest_judgement_offset) + " ms)", True, judgement_colors[latest_judgement])
@@ -604,6 +615,43 @@ def play_song(song, WIN, clock):
             # BLit surface to the screen
             WIN.blit(progress_bg_surface, (0, HEIGHT * 0.2))
             WIN.blit(progress_surface, (0, HEIGHT * 0.2))
+
+        
+        # If the song has finished and you scored a full combo, display it!
+        if (time_since_finish >= 10 and judgement_count["MISS"] == 0):
+            
+            if not played_fc_sound:
+                played_fc_sound = True
+
+                # Play FULL COMBO sound!
+                pygame.mixer.Channel(0).play(pygame.mixer.Sound("sound/full_combo.mp3"))
+                pygame.mixer.Channel(0).set_volume(4)
+
+            # Draw a background in the middle of the screen
+            progress_surface = pygame.Surface((WIDTH, 100), pygame.SRCALPHA)
+            progress_bg_surface = pygame.Surface((WIDTH, 100), pygame.SRCALPHA)
+
+            # This part controls the tweening in, show, and tween out periods
+            if time_since_finish <= 255:
+                progress_surface.set_alpha(time_since_finish)
+                progress_bg_surface.set_alpha(time_since_finish - 140)
+            elif time_since_finish >= 4000 - 255:
+                progress_surface.set_alpha((4000 - time_since_finish))
+                progress_bg_surface.set_alpha((4000 - time_since_finish - 140))
+            else:
+                progress_surface.set_alpha(255)
+                progress_bg_surface.set_alpha(140)
+ 
+            # Draw background
+            pygame.draw.rect(progress_bg_surface, BLACK, pygame.Rect(0, 0, WIDTH, 100))
+
+            # Draw FULL COMBO text
+            title_label = FONT_POPUP.render("FULL COMBO!", True, YELLOW)
+            progress_surface.blit(title_label, (WIDTH / 2 -  title_label.get_width() / 2, 30))
+
+            # BLit surface to the screen
+            WIN.blit(progress_bg_surface, (0, HEIGHT * 0.3))
+            WIN.blit(progress_surface, (0, HEIGHT * 0.3))
 
 
         # Update screen
