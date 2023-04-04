@@ -272,6 +272,7 @@ def play_song(song, WIN, clock):
         #Set constant framerate
         delta_time = clock.tick(Framerate)
         frames_since_last_hit += 1
+        time_passed =  song_time + 4000
 
         # Since loading the song takes a while and freezes the game, let's at least show the playing UI before doing that
         # TODO: Make this happen async or add song length to cache.json
@@ -388,27 +389,36 @@ def play_song(song, WIN, clock):
         pygame.draw.rect(judgement_surface, BLACK, pygame.Rect(0, 0, 80, 280), 0, 10)
         WIN.blit(judgement_surface, (330, 190))
 
-        # Calculate and draw song progress
-        song_time_surface = pygame.Surface((WIDTH, 6), pygame.SRCALPHA)
-        song_time_surface.set_alpha(140)
-        pygame.draw.rect(song_time_surface, BLACK, pygame.Rect(0, 0, WIDTH, 6))
-        WIN.blit(song_time_surface, (0, HEIGHT - 6))
+        # Calculate and draw song progress (Hide when song is finished)
+        if song_time <= Song_Length:
+            song_time_surface = pygame.Surface((WIDTH, 6), pygame.SRCALPHA)
+            song_time_surface.set_alpha(140)
+            pygame.draw.rect(song_time_surface, BLACK, pygame.Rect(0, 0, WIDTH, 6))
+            WIN.blit(song_time_surface, (0, HEIGHT - 6))
 
-        pygame.draw.rect(WIN, YELLOW, pygame.Rect(0, HEIGHT - 6, (song_time / Song_Length ) * WIDTH, 6))
+            pygame.draw.rect(WIN, YELLOW, pygame.Rect(0, HEIGHT - 6, (song_time / Song_Length ) * WIDTH, 6))
 
-        # While we're at it, let's also draw the song progress labels
-        minutes_left = str( math.floor(((Song_Length - song_time) / 1000) / 60) )
-        seconds_left = str( round(((Song_Length - song_time) / 1000) % 60) )
+            # While we're at it, let's also draw the song progress labels
+            minutes_left = str( math.floor(((Song_Length - song_time) / 1000) / 60) )
+            seconds_left = str( round(((Song_Length - song_time) / 1000) % 60) )
 
-        if int(seconds_left) < 10:
-            seconds_left = "0" + seconds_left
+            if int(seconds_left) < 10:
+                seconds_left = "0" + seconds_left
 
-        time_left_text   = FONT_SMALL.render(f"-{minutes_left}:{seconds_left}", True, WHITE)
-        song_length_text = FONT_SMALL.render(f"{song_length_formatted}", True, WHITE)
+            time_left_text   = FONT_SMALL.render(f"-{minutes_left}:{seconds_left}", True, WHITE)
+            song_length_text = FONT_SMALL.render(f"{song_length_formatted}", True, WHITE)
 
-        WIN.blit(time_left_text, (10, HEIGHT - 36))
-        WIN.blit(song_length_text, (WIDTH - 10 - song_length_text.get_width(), HEIGHT - 36))
+            WIN.blit(time_left_text, (10, HEIGHT - 36))
+            WIN.blit(song_length_text, (WIDTH - 10 - song_length_text.get_width(), HEIGHT - 36))
+        else:
 
+            # If the song has finished, gradually hide the song progress bar
+            # Note: Timers are hidden the moment the song finishes
+
+            progress_surface = pygame.Surface((WIDTH, 6), pygame.SRCALPHA)
+            progress_surface.set_alpha(255 - (song_time - Song_Length))
+            pygame.draw.rect(progress_surface, YELLOW, pygame.Rect(0, 0, WIDTH, 6))
+            WIN.blit(progress_surface, (0, HEIGHT - 6))
 
         # Draw judgement amounts
         already_drawn = 0
@@ -417,7 +427,7 @@ def play_song(song, WIN, clock):
             _y = 200 + 54 * already_drawn
             pygame.draw.rect(WIN, judgement_colors[judgement], pygame.Rect(_x , _y, 60, 40), 2, 10)
             #pygame.draw.rect(WIN, BLACK, pygame.Rect(_x + 2, _y + 2, 56, 36), 0, 10)
-            count_label = FONT_SMALL.render(str(judgement_count[judgement]), False, judgement_colors[judgement])
+            count_label = FONT_SMALL.render(str(judgement_count[judgement]), True, judgement_colors[judgement])
             WIN.blit(count_label, (_x + 30 -  count_label.get_width() / 2, _y + 20 -  count_label.get_height() / 2))
             already_drawn += 1
 
@@ -555,6 +565,45 @@ def play_song(song, WIN, clock):
         WIN.blit(judgement_label, (WIDTH/2 - judgement_label.get_width() / 2, 330))
 
         frames_since_last_judgement += 10
+
+        # If the song hasn't started yet, show the song title and info
+        if (song_time <= 0):
+
+            # Draw a background in the middle of the screen
+            progress_surface = pygame.Surface((WIDTH, 160), pygame.SRCALPHA)
+            progress_bg_surface = pygame.Surface((WIDTH, 160), pygame.SRCALPHA)
+
+            # This part controls the tweening in, show, and tween out periods
+            if time_passed <= 255:
+                progress_surface.set_alpha(time_passed)
+                progress_bg_surface.set_alpha(time_passed - 140)
+            elif time_passed >= 4000 - 255:
+                progress_surface.set_alpha((4000 - time_passed))
+                progress_bg_surface.set_alpha((4000 - time_passed - 140))
+            else:
+                progress_surface.set_alpha(255)
+                progress_bg_surface.set_alpha(140)
+ 
+            # Draw background
+            pygame.draw.rect(progress_bg_surface, BLACK, pygame.Rect(0, 0, WIDTH, 160))
+
+            # Draw song title
+            title_label = FONT_POPUP.render(song["Title"], True, YELLOW)
+            progress_surface.blit(title_label, (WIDTH / 2 -  title_label.get_width() / 2, 30))
+
+            # Draw song creator
+            auth_label = FONT_PIXEL.render(f"by {song['Artist']}", True, WHITE)
+            progress_surface.blit(auth_label, (WIDTH / 2 -  auth_label.get_width() / 2, 77))
+
+            # Draw song difficulty
+            diff_label = FONT_PIXEL.render(f"Difficulty: {song['DifficultyName']}", True, WHITE)
+            progress_surface.blit(diff_label, (WIDTH / 2 -  diff_label.get_width() / 2, 120))
+
+
+
+            # BLit surface to the screen
+            WIN.blit(progress_bg_surface, (0, HEIGHT * 0.2))
+            WIN.blit(progress_surface, (0, HEIGHT * 0.2))
 
 
         # Update screen
