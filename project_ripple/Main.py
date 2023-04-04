@@ -422,7 +422,7 @@ while is_on_select_screen:
                 scroll = max(scroll + event.y * 30, -120)
 
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
+            if event.key == pygame.K_UP and button_list_position != 0:
                 scroll = min(scroll + 34.3, 500)
 
                 selected_button = buttons[max(button_list_position - 1, 0)]
@@ -431,7 +431,7 @@ while is_on_select_screen:
                 new_selection = selected_button.click(None, selected_song, True)
                 selected_song = new_selection
 
-            if event.key == pygame.K_DOWN:
+            if event.key == pygame.K_DOWN and button_list_position != buttons.__len__() - 1:
                 scroll = max(scroll - 34.3, -500)
 
                 selected_button = buttons[min(button_list_position + 1, buttons.__len__() - 1)]
