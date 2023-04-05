@@ -5,6 +5,7 @@
 import pygame
 import numpy
 from PIL import Image, ImageFilter
+import importlib
 
 def lerp(a: float, b: float, t: float) -> float:
     """Linear interpolate on the scale given by a to b, using t as the point on that scale.
@@ -23,3 +24,7 @@ def create_neon(surf, huge=False):
     image = numpy.array(image)
     bloom_surf = pygame.image.frombuffer(image, (len(image[0]), len(image)), 'RGBA')
     return bloom_surf
+
+def resource(relative_path):
+    path = importlib.resources.files("project_ripple").joinpath(relative_path)
+    return path

@@ -7,6 +7,8 @@ import json
 import os
 from PIL import Image, ImageFilter
 from .constants import SONGS_DIRECTORY, HEIGHT, WIDTH
+from .logs import log, line
+from .helper_methods import resource
 
 
 
@@ -14,10 +16,9 @@ def update_image_cache ():
 
     # Create image cache directory if not present
     try:
-        os.mkdir("images/imagecache")
+        os.mkdir(resource("images/imagecache"))
     except Exception as e:
-        print(e)
-        pass
+        log(e, "info", line())
 
 
     # Load data from song data cache file
@@ -43,7 +44,7 @@ def update_image_cache ():
 
 
     # Lists all present images in the image cache (used so we don't cache something already cached)
-    current_images = os.listdir("images/imagecache")
+    current_images = os.listdir(resource("images/imagecache"))
 
 
     # Iterate through every image path found
@@ -73,7 +74,7 @@ def update_image_cache ():
                 # Resize the image, add gaussian blur, then save it in the cache folder
                 img = img.resize((basewidth,hsize), Image.Resampling.LANCZOS)
                 img = img.filter(ImageFilter.GaussianBlur(2))
-                img.save(f"images/imagecache/" + stemp_image_path[:len(stemp_image_path) - 4] + "_background.png")
+                img.save(resource(f"images/imagecache/" + stemp_image_path[:len(stemp_image_path) - 4] + "_background.png"))
 
         # If something throws and exception, ignore it and continue       
         except Exception as e:
@@ -83,7 +84,7 @@ def update_image_cache ():
         try:
 
             # Again, only cache file if it isn't already present in the cache folder
-            if f"{image_path[:len(image_path) - 4]}_preview.png".replace("/","_") not in current_images:
+            if resource(f"{image_path[:len(image_path) - 4]}_preview.png".replace("/","_")) not in current_images:
                 
                 # Define the path
                 temp_image_path = SONGS_DIRECTORY + "/" + image_path
@@ -98,7 +99,7 @@ def update_image_cache ():
 
                 # Resize the image, then save it in the cache folder
                 img = img.resize((basewidth,hsize), Image.Resampling.LANCZOS)
-                img.save(f"images/imagecache/" + stemp_image_path[:len(stemp_image_path) - 4] + "_preview.png")
+                img.save(resource(f"images/imagecache/" + stemp_image_path[:len(stemp_image_path) - 4] + "_preview.png"))
 
         # If something throws and exception, ignore it and continue              
         except Exception as e:
