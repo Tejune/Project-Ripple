@@ -1,4 +1,4 @@
-# Project Ripple <img align="right" width="150" height="150" src="https://github.com/Tejune/Project-Ripple/blob/master/images/arrow.png?raw=true">
+# Project Ripple <img align="right" width="150" height="150" src="https://github.com/Tejune/Project-Ripple/blob/master/project_ripple/images/arrow.png?raw=true">
 
 Project Ripple is a lightweight 4-key rhythm player that runs using Quaver maps.
 
