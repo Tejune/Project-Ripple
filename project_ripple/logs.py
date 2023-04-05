@@ -1,5 +1,10 @@
 from . import pycolors
-import datetime, inspect, pathlib
+import datetime
+import pathlib
+import inspect
+
+def line():
+    return inspect.currentframe()
 
 name = pathlib.Path(__file__).parents[1].name
 def log(message, type, line):

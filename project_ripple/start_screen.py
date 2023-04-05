@@ -9,8 +9,7 @@
 import pygame
 from .helper_methods import *
 from .constants import *
-from .logs import log
-from inspect import currentframe as line
+from .logs import log, line
 
 shown = 0
 

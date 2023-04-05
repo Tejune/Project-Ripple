@@ -4,6 +4,7 @@
 
 import platform
 import pygame
+from .helper_methods import resource
 pygame.init()
 
 infoObject = pygame.display.Info()
@@ -21,19 +22,19 @@ FPS_COUNTER_ENABLED = True
 Framerate = 120
 
 # Font Constants
-FONT_DIFF     = pygame.font.Font("fonts/Pixellari.ttf", 14)
-FONT_ARTIST   = pygame.font.Font("fonts/Aller_Rg.ttf", 16)
-FONT_PIXEL    = pygame.font.Font("fonts/Pixellari.ttf", 20)
-FONT_SMALL    = pygame.font.Font("fonts/Aller_Bd.ttf", 20)
-FONT          = pygame.font.Font("fonts/Aller_Bd.ttf", 25)
-FONT_HEADER   = pygame.font.Font("fonts/BigDeal.ttf", 35)
-FONT_TITLE    = pygame.font.Font("fonts/BigDeal.ttf", 55)
-FONT_COMBO    = pygame.font.Font("fonts/AllerDisplay.ttf", 35)
+FONT_DIFF     = pygame.font.Font(resource("fonts/Pixellari.ttf"), 14)
+FONT_ARTIST   = pygame.font.Font(resource("fonts/Aller_Rg.ttf"), 16)
+FONT_PIXEL    = pygame.font.Font(resource("fonts/Pixellari.ttf"), 20)
+FONT_SMALL    = pygame.font.Font(resource("fonts/Aller_Bd.ttf"), 20)
+FONT          = pygame.font.Font(resource("fonts/Aller_Bd.ttf"), 25)
+FONT_HEADER   = pygame.font.Font(resource("fonts/BigDeal.ttf"), 35)
+FONT_TITLE    = pygame.font.Font(resource("fonts/BigDeal.ttf"), 55)
+FONT_COMBO    = pygame.font.Font(resource("fonts/AllerDisplay.ttf"), 35)
 
-FONT_SECONDARY_TITLE   = pygame.font.Font("fonts/Aller_Bd.ttf", 50)
-FONT_SECONDARY         = pygame.font.Font("fonts/Aller_Bd.ttf", 20)
+FONT_SECONDARY_TITLE   = pygame.font.Font(resource("fonts/Aller_Bd.ttf"), 50)
+FONT_SECONDARY         = pygame.font.Font(resource("fonts/Aller_Bd.ttf"), 20)
 
-FONT_POPUP   = pygame.font.Font("fonts/Aller_Bd.ttf", 35)
+FONT_POPUP   = pygame.font.Font(resource("fonts/Aller_Bd.ttf"), 35)
 
 # Window constants & clock
 WIDTH         = infoObject.current_w #500 * 2.25
