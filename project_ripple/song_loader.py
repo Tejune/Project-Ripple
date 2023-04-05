@@ -89,7 +89,7 @@ def load_songs (WIN):
 
                     try:
 
-                        song_info["Image"] = resource("images/imagecache/" + root.name + "_" + image_name + "_preview.png")
+                        song_info["Image"] = user_dir("imagecache/" + root.name + "_" + image_name + "_preview.png")
                         song_info["LoadedImage"] = pygame.image.load(song_info["Image"]).convert()
 
                     except Exception as e:
@@ -101,7 +101,7 @@ def load_songs (WIN):
                     # Get blurred version
                     try:
 
-                        song_info["ImageBlurred"] = resource("images/imagecache/" + root.name + "_" + image_name + "_background.png")
+                        song_info["ImageBlurred"] = user_dir("imagecache/" + root.name + "_" + image_name + "_background.png")
                         song_info["LoadedImageBlurred"] = pygame.image.load(song_info["ImageBlurred"]).convert()
                         song_info["LoadedImageBlurredFull"] = pygame.transform.scale(song_info["LoadedImageBlurred"], (WIDTH, HEIGHT)).convert()
 

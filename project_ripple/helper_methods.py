@@ -31,9 +31,15 @@ def resource(relative_path):
     path = importlib.resources.files("project_ripple").joinpath(relative_path)
     return path
 
-def user_dir(relative_path):
+# Can only run once. Might improve performance
+def create_user_dir():
     user_path = platformdirs.user_data_dir("Project-Ripple")
     if not os.path.exists(user_path):
         os.makedirs(user_path)
+    create_user_dir.__code__ = (lambda:None).__code__
+
+def user_dir(relative_path):
+    create_user_dir()
+    user_path = platformdirs.user_data_dir("Project-Ripple")
     path = user_path + "/" + relative_path
     return path
