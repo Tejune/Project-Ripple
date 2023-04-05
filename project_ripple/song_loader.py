@@ -31,7 +31,7 @@ def load_songs (WIN):
 
     # Convert quaver files to json, then load the json file
     convert_json(songs_directory)
-    info = open("./cache.json")
+    info = open(user_dir("cache.json"))
     info = json.load(info)
 
     # Clear image cache if applicable

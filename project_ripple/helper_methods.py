@@ -6,6 +6,8 @@ import pygame
 import numpy
 from PIL import Image, ImageFilter
 import importlib
+import platformdirs
+import os
 
 def lerp(a: float, b: float, t: float) -> float:
     """Linear interpolate on the scale given by a to b, using t as the point on that scale.
@@ -27,4 +29,11 @@ def create_neon(surf, huge=False):
 
 def resource(relative_path):
     path = importlib.resources.files("project_ripple").joinpath(relative_path)
+    return path
+
+def user_dir(relative_path):
+    user_path = platformdirs.user_data_dir("Project-Ripple")
+    if not os.path.exists(user_path):
+        os.makedirs(user_path)
+    path = user_path + "/" + relative_path
     return path

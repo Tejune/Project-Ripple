@@ -8,7 +8,7 @@ import os
 from PIL import Image, ImageFilter
 from .constants import SONGS_DIRECTORY, HEIGHT, WIDTH
 from .logs import log, line
-from .helper_methods import resource
+from .helper_methods import resource, user_dir
 
 
 
@@ -22,7 +22,7 @@ def update_image_cache ():
 
 
     # Load data from song data cache file
-    with open("cache.json","r") as f:
+    with open(user_dir("cache.json"),"r") as f:
         data_cache = json.load(f)
 
 

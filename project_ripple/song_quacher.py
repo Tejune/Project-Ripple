@@ -5,11 +5,12 @@
 
 import os
 import json
+from .helper_methods import user_dir
 
 def convert_json(songs_path):
 
     directories = os.listdir(songs_path)
-    with open("cache.json", "r") as f:
+    with open(user_dir("cache.json"), "r") as f:
         cache = json.load(f)
         cached_items = list(cache.keys())
 
@@ -191,5 +192,5 @@ def convert_json(songs_path):
                         lane_index += 1
                         continue
 
-    with open("cache.json", "w") as f:
+    with open(user_dir("cache.json"), "w") as f:
         json.dump(cache, f, indent=2)

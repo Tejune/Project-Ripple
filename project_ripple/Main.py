@@ -287,7 +287,7 @@ show_loading_screen(WIN, FONT, FONT_TITLE, "Converting new image files...", 10)
 
 # Load songs
 try: songs = load_songs(WIN)
-except FileNotFoundError: open("cache.json","w").write("{}"); songs = load_songs(WIN)
+except FileNotFoundError: open(user_dir("cache.json"),"w").write("{}"); songs = load_songs(WIN)
 
 # Start title screen bgm
 pygame.mixer.Channel(2).play(pygame.mixer.Sound(resource("sound/Title.wav")))
