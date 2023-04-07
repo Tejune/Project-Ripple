@@ -8,6 +8,7 @@ import pygame
 import math
 from .constants import *
 from .helper_methods import resource
+from . import tweens
 from . import logs
 
 pygame.mixer.pre_init(44100, 16, 2, 4096)
@@ -150,6 +151,19 @@ def play_song(song, WIN, clock):
     frames_since_last_judgement   = 255
     played_fc_sound               = False
 
+    # Tween variables
+    progress_bar_fadeout_tween    = tweens.createTween(600, 255, 0, tweens.exponential_InOut)
+
+    song_info_fadein_tween        = tweens.createTween(1000, 0, 255, tweens.exponential_InOut)
+    song_info_fadeout_tween       = tweens.createTween(1000, 255, 0, tweens.exponential_InOut)
+    song_info_bg_fadein_tween     = tweens.createTween(500, 0, 140, tweens.exponential_InOut)
+    song_info_bg_fadeout_tween    = tweens.createTween(500, 140, 0, tweens.exponential_InOut)
+
+    full_combo_fadein_tween       = tweens.createTween(500, 0, 255, tweens.exponential_InOut)
+    full_combo_fadeout_tween      = tweens.createTween(500, 255, 0, tweens.exponential_InOut)
+
+
+
     # Runtime variables
     is_playing                    = True
     song_playing                  = False
@@ -276,6 +290,9 @@ def play_song(song, WIN, clock):
         frames_since_last_hit += 1
         time_passed =  song_time + 4000
         time_since_finish = song_time - Song_Length - 1500
+
+        # Step all active tweens
+        tweens.stepAllTweens(delta_time)
 
         # Since loading the song takes a while and freezes the game, let's at least show the playing UI before doing that
         # TODO: Make this happen async or add song length to cache.json
@@ -417,9 +434,12 @@ def play_song(song, WIN, clock):
 
             # If the song has finished, gradually hide the song progress bar
             # Note: Timers are hidden the moment the song finishes
+            if not progress_bar_fadeout_tween.isPlaying:
+                progress_bar_fadeout_tween.play()
 
             progress_surface = pygame.Surface((WIDTH, 6), pygame.SRCALPHA)
-            progress_surface.set_alpha(255 - (song_time - Song_Length))
+            progress_surface.set_alpha(progress_bar_fadeout_tween.currentValue)
+
             pygame.draw.rect(progress_surface, YELLOW, pygame.Rect(0, 0, WIDTH, 6))
             WIN.blit(progress_surface, (0, HEIGHT - 6))
 
@@ -579,7 +599,15 @@ def play_song(song, WIN, clock):
         frames_since_last_judgement += 10
 
         # If the song hasn't started yet, show the song title and info
-        if (song_time <= 0):
+        if (song_time <= 1000):
+
+            # Start animations when applicable
+            if time_passed <= 255 and not song_info_fadein_tween.isPlaying:
+                song_info_fadein_tween.play()
+                song_info_bg_fadein_tween.play()
+            if time_passed >= 4000 - 255 and not song_info_fadeout_tween.isPlaying:
+                song_info_fadeout_tween.play()
+                song_info_bg_fadeout_tween.play()
 
             # Draw a background in the middle of the screen
             progress_surface = pygame.Surface((WIDTH, 160), pygame.SRCALPHA)
@@ -587,11 +615,11 @@ def play_song(song, WIN, clock):
 
             # This part controls the tweening in, show, and tween out periods
             if time_passed <= 255:
-                progress_surface.set_alpha(time_passed)
-                progress_bg_surface.set_alpha(time_passed - 140)
+                progress_surface.set_alpha(song_info_fadein_tween.currentValue)
+                progress_bg_surface.set_alpha(song_info_bg_fadein_tween.currentValue)
             elif time_passed >= 4000 - 255:
-                progress_surface.set_alpha((4000 - time_passed))
-                progress_bg_surface.set_alpha((4000 - time_passed - 140))
+                progress_surface.set_alpha(song_info_fadeout_tween.currentValue)
+                progress_bg_surface.set_alpha(song_info_bg_fadeout_tween.currentValue)
             else:
                 progress_surface.set_alpha(255)
                 progress_bg_surface.set_alpha(140)
@@ -632,16 +660,19 @@ def play_song(song, WIN, clock):
             progress_surface = pygame.Surface((WIDTH, 100), pygame.SRCALPHA)
             progress_bg_surface = pygame.Surface((WIDTH, 100), pygame.SRCALPHA)
 
+            # Start animations when appropriate
+            if time_since_finish <= 255 and not full_combo_fadein_tween.isPlaying:
+                full_combo_fadein_tween.play()
+            elif time_since_finish >= 4000 - 255 and not full_combo_fadeout_tween.isPlaying:
+                full_combo_fadeout_tween.play()
+
             # This part controls the tweening in, show, and tween out periods
-            if time_since_finish <= 255:
-                progress_surface.set_alpha(time_since_finish)
-                progress_bg_surface.set_alpha(time_since_finish - 140)
-            elif time_since_finish >= 4000 - 255:
-                progress_surface.set_alpha((4000 - time_since_finish))
-                progress_bg_surface.set_alpha((4000 - time_since_finish - 140))
-            else:
-                progress_surface.set_alpha(255)
-                progress_bg_surface.set_alpha(140)
+            if time_since_finish <= 2000:
+                progress_surface.set_alpha(full_combo_fadein_tween.currentValue)
+                progress_bg_surface.set_alpha(full_combo_fadein_tween.currentValue - 140)
+            else: #time_since_finish >= 4000 - 255:
+                progress_surface.set_alpha(full_combo_fadeout_tween.currentValue)
+                progress_bg_surface.set_alpha(full_combo_fadeout_tween.currentValue - 140)
  
             # Draw background
             pygame.draw.rect(progress_bg_surface, BLACK, pygame.Rect(0, 0, WIDTH, 100))

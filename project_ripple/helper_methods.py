@@ -1,13 +1,19 @@
 #------------------------------------------------------------------------------------------
 #   Ripple / helper_methods
+#   Various methods to assist other parts of the program.
 #------------------------------------------------------------------------------------------
 
 import pygame
 import numpy
-from PIL import Image, ImageFilter
 import importlib
 import platformdirs
 import os
+from PIL import Image, ImageFilter
+
+
+#---------------------------------------------------------------------------------------------------------
+# Interpolation methods
+#---------------------------------------------------------------------------------------------------------
 
 def lerp(a: float, b: float, t: float) -> float:
     """Linear interpolate on the scale given by a to b, using t as the point on that scale.
@@ -26,6 +32,12 @@ def create_neon(surf, huge=False):
     image = numpy.array(image)
     bloom_surf = pygame.image.frombuffer(image, (len(image[0]), len(image)), 'RGBA')
     return bloom_surf
+
+
+#---------------------------------------------------------------------------------------------------------
+# Resource methods
+#---------------------------------------------------------------------------------------------------------
+
 
 def resource(relative_path):
     path = importlib.resources.files("project_ripple").joinpath(relative_path)
