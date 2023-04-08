@@ -188,6 +188,16 @@ def play_song(song, WIN, clock):
     pygame.mixer.Channel(0).set_volume(4)
     pygame.mixer.music.load(song["Audio"])
 
+    # Get song length, also format it for display in the progress bar
+    Song_Length = pygame.mixer.Sound(song["Audio"]).get_length() * 1000 # Converting from seconds to milliseconds
+    minutes_total = str( math.floor(((Song_Length) / 1000) / 60) )
+    seconds_total = str(round(((Song_Length) / 1000) % 60 ))
+
+    if int(seconds_total) < 10:
+        seconds_total = "0" + seconds_total
+    
+    song_length_formatted = f"{minutes_total}:{seconds_total}"
+
     # Setup note data using .QUA file
     notes = song["Notes"].copy()
 
@@ -293,22 +303,6 @@ def play_song(song, WIN, clock):
 
         # Step all active tweens
         tweens.stepAllTweens(delta_time)
-
-        # Since loading the song takes a while and freezes the game, let's at least show the playing UI before doing that
-        # TODO: Make this happen async or add song length to cache.json
-        if Song_Length == 1:
-            Song_Length = pygame.mixer.Sound(song["Audio"]).get_length() * 1000 # Converting from seconds to milliseconds
-
-            minutes_total = str( math.floor(((Song_Length) / 1000) / 60) )
-            seconds_total = str( round(((Song_Length) / 1000) % 60 ))
-
-            if int(seconds_total) < 10:
-                seconds_total = "0" + seconds_total
-            
-            song_length_formatted = f"{minutes_total}:{seconds_total}"
-
-        elif Song_Length == 0:
-            Song_Length = 1
 
         # Check for events
         for event in pygame.event.get():

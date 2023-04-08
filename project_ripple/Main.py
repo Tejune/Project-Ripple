@@ -17,7 +17,7 @@ log("Initializing pygame", "info", line())
 #### Initialize pygame module
 pygame.mixer.pre_init(44100, 16, 2, 4096)
 pygame.init()
-pygame.mixer.init()
+pygame.mixer.init(44100, -16, 2, 2048) # (frequency, size, channels, buffer))
 log("Finished initializing pygame", "update", line())
 
 #### Pygame variables & Constants

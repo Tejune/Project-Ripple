@@ -7,6 +7,7 @@
 ##### Imports and Variables
 
 import pygame
+from . import tweens
 from .helper_methods import *
 from .constants import *
 from .logs import log, line
@@ -27,8 +28,8 @@ def show_loading_screen (WIN, FONT, FONT_TITLE, currentFile, total_files):
     WIN.blit(text_surface, (WIDTH/2 - text_surface.get_width()/2, HEIGHT/2 - 55/2 - 10))#- text_surface.get_height()/1.15))
     subtitle = FONT_PIXEL.render(f'Compiling song library ({currentFile})', True, WHITE)
     WIN.blit(subtitle, (WIDTH/2 - subtitle.get_width()/2, HEIGHT/2 + 55/2 + 10 ))
-    pygame.draw.rect(WIN, (30,30,30), pygame.Rect(WIDTH * 0.25, HEIGHT/2 + 55/2 + 42 , (WIDTH/2), 10))
-    pygame.draw.rect(WIN, WHITE, pygame.Rect(WIDTH * 0.25, HEIGHT/2 + 55/2 + 42 , (WIDTH/2) * min((shown / total_files), 1), 10))
+    #pygame.draw.rect(WIN, (30,30,30), pygame.Rect(WIDTH * 0.25, HEIGHT/2 + 55/2 + 42 , (WIDTH/2), 10))
+    #pygame.draw.rect(WIN, WHITE, pygame.Rect(WIDTH * 0.25, HEIGHT/2 + 55/2 + 42 , (WIDTH/2) * min((shown / total_files), 1), 10))
     pygame.display.update()
 
 
@@ -42,12 +43,24 @@ def show_title_screen (WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, sele
     real_loops = 0
     ripples = []
 
+    black_screen_tween = tweens.createTween(1000, 255, 180, tweens.exponential_InOut)
+    title_tween        = tweens.createTween(1000, 20, 255, tweens.exponential_InOut)
+    subtitle_tween     = tweens.createTween(1000, 0, 255, tweens.exponential_InOut)
+
+    black_screen_tween.play()
+    title_tween.play()
+    subtitle_tween.play()
+
     while is_on_menu_screen:
 
         #Set constant framerate
         clock.tick(Framerate)
         loop += 1
         real_loops += 1
+
+        # Were gonna have to fake the deltaTime here since the loading screen causes this value
+        # to be huge first time it is defined
+        tweens.stepAllTweens(1000 / 60)
 
         # Check for events
         for event in pygame.event.get():
@@ -72,7 +85,7 @@ def show_title_screen (WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, sele
         # Draw background image
         WIN.blit(selected_song["LoadedImageBlurredFull"], (0, 0))
         bg_surface = pygame.Surface((WIDTH, HEIGHT))
-        bg_surface.set_alpha(max(255 - real_loops * 5, 180))
+        bg_surface.set_alpha(black_screen_tween.currentValue)
         WIN.blit(bg_surface, (0,0))
 
         # Title screen ripple effect
@@ -95,8 +108,8 @@ def show_title_screen (WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, sele
                 ripples.remove(lifetime + 1.5)
 
         # Draw title screen
-        title_color = lerp(20, 255, min(real_loops / 10, 1))
-        subtitle_color = lerp(0, 255, min(real_loops / 10, 1))
+        title_color = title_tween.currentValue
+        subtitle_color = subtitle_tween.currentValue
         text_surface = FONT_TITLE.render('PROJECT RIPPLE', True, (title_color, title_color, 0))
         WIN.blit(text_surface, (WIDTH/2 - text_surface.get_width()/2, HEIGHT/2 - 55/2 - 10))
         subtitle = FONT_PIXEL.render('Ready to rock! Press space to continue.', True, (subtitle_color,subtitle_color,subtitle_color))
