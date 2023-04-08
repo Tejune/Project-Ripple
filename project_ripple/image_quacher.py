@@ -9,10 +9,10 @@ from PIL import Image, ImageFilter
 from .constants import SONGS_DIRECTORY, HEIGHT, WIDTH
 from .logs import log, line
 from .helper_methods import user_dir
+from .start_screen import show_loading_screen
 
 
-
-def update_image_cache ():
+def update_image_cache (WIN, FONT, FONT_TITLE):
 
     # Create image cache directory if not present
     os.makedirs(user_dir("imagecache"), exist_ok=True)
@@ -48,7 +48,6 @@ def update_image_cache ():
 
         # Image path as a string
         image_path = str(image_path)
-        
 
         # Converting the first image (blurred version)
         try:
@@ -56,6 +55,7 @@ def update_image_cache ():
 
             # Only cache file if it isn't already present in the cache folder
             if f"{image_path[:len(image_path) - 4]}_background.png".replace("/","_") not in current_images:
+
                 # Define the path
                 temp_image_path = SONGS_DIRECTORY + "/" + image_path
 
@@ -80,8 +80,11 @@ def update_image_cache ():
         try:
 
             # Again, only cache file if it isn't already present in the cache folder
-            if user_dir(f"{image_path[:len(image_path) - 4]}_preview.png".replace("/","_")) not in current_images:
+            if f"{image_path[:len(image_path) - 4]}_preview.png".replace("/","_") not in current_images:
                 
+                res = user_dir(f"{image_path[:len(image_path) - 4]}_preview.png".replace("/","_"))
+                res2 = f"{image_path[:len(image_path) - 4]}_preview.png".replace("/","_")
+
                 # Define the path
                 temp_image_path = SONGS_DIRECTORY + "/" + image_path
 

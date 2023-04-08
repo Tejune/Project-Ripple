@@ -29,8 +29,13 @@ def load_songs (WIN):
     total = len(os.listdir(songs_directory))
     log(f"Loading {total} songs from the songs directory.", "info", line())
 
+    show_loading_screen(WIN, FONT, FONT_TITLE, f"Loading {total} songs from the songs directory.", 10)
+
     # Convert quaver files to json, then load the json file
     convert_json(songs_directory)
+
+    show_loading_screen(WIN, FONT, FONT_TITLE, f"Opening json file...", 10)
+
     info = open(user_dir("cache.json"))
     info = json.load(info)
 
@@ -38,8 +43,13 @@ def load_songs (WIN):
     #if CLEAR_IMAGE_CACHE_ON_STARTUP:
     #    os.remove("./images/imagecache/")
 
+    show_loading_screen(WIN, FONT, FONT_TITLE, f"Updating image cache...", 10)
+
+
     # Run image_quacher to convert new images
-    update_image_cache()
+    update_image_cache(WIN, FONT, FONT_TITLE)
+
+    show_loading_screen(WIN, FONT, FONT_TITLE, f"Loading songs...", 10)
 
     # Iterate through each folder in the song directory
     for root in os.scandir(songs_directory):
