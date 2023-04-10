@@ -261,13 +261,13 @@ class Button:
                     else:
 
                         last_song = selected_song
-                        frames_since_last_song = 0
                         currently_selected_song = self.song
                         button_list_position = self.list_position
                         self.selected_song_offset = 60
 
                         # Change song (but only if it's actually a new song and not the same one)
                         if self.song["Title"] != last_song["Title"]:
+                            frames_since_last_song = 0
                             pygame.mixer.music.stop()
                             pygame.mixer.music.load(self.song["Audio"])
                             pygame.mixer.music.play(start = (int(self.song["SongPreviewTime"]) / 1000))
