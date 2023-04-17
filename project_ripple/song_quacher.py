@@ -186,6 +186,13 @@ def convert_json(songs_path):
                         cache[item]["Notes"][time_index].append(int(line.split(" ")[2]))
                         time_index += 1
                         continue
+
+                    if line.startswith("  EndTime: ") and time_index > 0:
+                        print(f"Title: {cache[item]['Title']}")
+                        print(len(cache[item]["Notes"]))
+                        print(f"Index: {time_index}")
+                        cache[item]["Notes"][time_index - 1].append(int(line.split(" ")[3]))
+                        continue
                     
                     if line.startswith("  Lane: "):
                         cache[item]["Notes"][lane_index].append(int(line.rsplit(": ")[1]))
