@@ -7,6 +7,7 @@ import pygame
 from .helper_methods import resource
 pygame.init()
 
+pygame.display.init()
 infoObject = pygame.display.Info()
 
 # Songs directory
