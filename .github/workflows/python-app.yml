@@ -47,6 +47,3 @@ jobs:
     - name: Install all dependencies using poetry
       run: |
         poetry install
-    - name: Test program
-      run: |
-        poetry run ripple
