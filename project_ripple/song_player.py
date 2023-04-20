@@ -641,8 +641,7 @@ def play_song(song, WIN, clock):
 
         
         # If the song has finished and you scored a full combo, display it!
-        if (time_since_finish >= 10 and judgement_count["MISS"] == 0):
-            
+        if (time_since_finish >= 10):
             if not played_fc_sound:
                 played_fc_sound = True
 
@@ -672,7 +671,12 @@ def play_song(song, WIN, clock):
             pygame.draw.rect(progress_bg_surface, BLACK, pygame.Rect(0, 0, WIDTH, 100))
 
             # Draw FULL COMBO text
-            title_label = FONT_POPUP.render("FULL COMBO!", True, YELLOW)
+            title_label = None
+            if judgement_count["MISS"] == 0:
+                title_label = FONT_POPUP.render("FULL COMBO!", True, YELLOW)
+            else:
+                title_label = FONT_POPUP.render("Song clear!", True, YELLOW)
+
             progress_surface.blit(title_label, (WIDTH / 2 -  title_label.get_width() / 2, 30))
 
             # BLit surface to the screen
