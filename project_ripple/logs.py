@@ -33,4 +33,4 @@ def log(message, type, line):
     
     date = datetime.datetime.now().replace(microsecond=0)
     filename = pathlib.Path(inspect.getframeinfo(line).filename).name
-    print(f"{pycolors.bold}{pycolors.purple}{name} {pycolors.clear}{formatting}{type}{pycolors.cyan} →  {message_color}{message} @ {pycolors.colort((100,100,100))}{date} line {line.f_lineno}, {filename} {pycolors.clear}")
+    print(f"{pycolors.bold}{pycolors.purple}{name} {pycolors.clear}{formatting}{type}{pycolors.cyan} ->  {message_color}{message} @ {pycolors.colort((100,100,100))}{date} line {line.f_lineno}, {filename} {pycolors.clear}")
