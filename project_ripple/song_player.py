@@ -670,6 +670,8 @@ def play_song(song, WIN, clock):
             # Draw background
             pygame.draw.rect(progress_bg_surface, BLACK, pygame.Rect(0, 0, WIDTH, 100))
 
+            #TODO: Show end screen
+
             # Draw FULL COMBO text
             title_label = None
             if judgement_count["MISS"] == 0:
