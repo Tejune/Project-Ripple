@@ -5,7 +5,7 @@
 
 import pygame
 import numpy
-import importlib
+import importlib.resources
 import platformdirs
 import os
 from PIL import Image, ImageFilter
