@@ -4,7 +4,8 @@
 
 import platform
 import pygame
-from .helper_methods import resource
+import json
+from .helper_methods import resource, user_dir
 pygame.init()
 
 pygame.display.init()
@@ -15,6 +16,14 @@ if platform.system() == "Linux":
     SONGS_DIRECTORY = "/mnt/c/Program Files (x86)/Steam/steamapps/common/Quaver/Songs"
 else:
     SONGS_DIRECTORY = "C:/Program Files (x86)/Steam/steamapps/common/Quaver/Songs"
+try:
+    with open(user_dir("settings.json"), "r") as f:
+        settings = json.load(f)
+        if settings["SONGS_DIRECTORY"] is not None:
+            SONGS_DIRECTORY = settings["SONGS_DIRECTORY"]
+except FileNotFoundError:
+    open(user_dir("settings.json"),"w").write("{}")
+
 CLEAR_IMAGE_CACHE_ON_STARTUP = False
 LOAD_ALL_DIFFICULTIES = True
 FPS_COUNTER_ENABLED = True
