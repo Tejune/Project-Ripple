@@ -17,36 +17,43 @@ pygame.init()
 
 #----- Define variables and constants ----------------------------------------------------#
 
-
-# Create reusable image objects
-arrow                      = pygame.image.load(resource("images/arrow.png")).convert_alpha()
-arrow                      = pygame.transform.scale(arrow, (120, 120))
-arrow_outline_original     = pygame.image.load(resource("images/arrow_outline.png")).convert_alpha()
-arrow_outline_original     = pygame.transform.scale(arrow_outline_original, (120, 120))
-sparks                     = pygame.image.load(resource("images/sparks.png")).convert_alpha()
-sparks                     = pygame.transform.scale(sparks, (WIDTH, HEIGHT))
-
-
-# Create all arrow variations
-arrow_outline = [
-    arrow_outline_original,
-    pygame.transform.rotate(arrow_outline_original, 90),
-    pygame.transform.rotate(arrow_outline_original, 180),
-    pygame.transform.rotate(arrow_outline_original, 270)
-]
-
-# Create arrow highlight image
-arrow_outline_highlight_original     = pygame.image.load(resource("images/arrow_outline_highlight.png")).convert_alpha()
-arrow_outline_highlight_original     = pygame.transform.scale(arrow_outline_highlight_original, (120, 120))
+arrow = None
+arrow_outline_original = None
+sparks = None
+arrow_outline = None
+arrow_outline_highlight = None
+arrow_outline_highlight_original = None
+def initial_load():
+    global arrow, arrow_outline_original, sparks, arrow_outline, arrow_outline_highlight_original, arrow_outline_highlight
+    # Create reusable image objects
+    arrow                      = pygame.image.load(resource("images/arrow.png")).convert_alpha()
+    arrow                      = pygame.transform.scale(arrow, (120, 120))
+    arrow_outline_original     = pygame.image.load(resource("images/arrow_outline.png")).convert_alpha()
+    arrow_outline_original     = pygame.transform.scale(arrow_outline_original, (120, 120))
+    sparks                     = pygame.image.load(resource("images/sparks.png")).convert_alpha()
+    sparks                     = pygame.transform.scale(sparks, (WIDTH, HEIGHT))
 
 
-# Create all arrow highlight variations
-arrow_outline_highlight = [
-    arrow_outline_highlight_original,
-    pygame.transform.rotate(arrow_outline_highlight_original, 90),
-    pygame.transform.rotate(arrow_outline_highlight_original, 180),
-    pygame.transform.rotate(arrow_outline_highlight_original, 270)
-]
+    # Create all arrow variations
+    arrow_outline = [
+        arrow_outline_original,
+        pygame.transform.rotate(arrow_outline_original, 90),
+        pygame.transform.rotate(arrow_outline_original, 180),
+        pygame.transform.rotate(arrow_outline_original, 270)
+    ]
+
+    # Create arrow highlight image
+    arrow_outline_highlight_original     = pygame.image.load(resource("images/arrow_outline_highlight.png")).convert_alpha()
+    arrow_outline_highlight_original     = pygame.transform.scale(arrow_outline_highlight_original, (120, 120))
+
+
+    # Create all arrow highlight variations
+    arrow_outline_highlight = [
+        arrow_outline_highlight_original,
+        pygame.transform.rotate(arrow_outline_highlight_original, 90),
+        pygame.transform.rotate(arrow_outline_highlight_original, 180),
+        pygame.transform.rotate(arrow_outline_highlight_original, 270)
+    ]
 
 
 # Arrow transparency offset array
@@ -110,11 +117,13 @@ grade_colors = {
 
 
 #----- Playing the song ------------------------------------------------------------#
-
+loaded_before = False
 def play_song(song, WIN, clock):
-
+    global loaded_before
     ##### VARIABLES ##########################################################################################
-
+    if not loaded_before:
+        initial_load()
+        loaded_before = False
     # Define globals
     global frames_since_last_judgement
     global judgement_colors
