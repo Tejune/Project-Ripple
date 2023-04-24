@@ -1,17 +1,19 @@
-#------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------
 #   Ripple / tweens
 #   Handles the creation and management of tweening and easing effetcs
-#------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------
 
-import pygame
-import numpy
 import math
+
+import numpy
+import pygame
 
 createdTweens = []
 
-#---------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------
 # Interpolation methods
-#---------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------
+
 
 def linear(a: float, b: float, t: float) -> float:
     """Linear interpolate on the scale given by a to b, using t as the point on that scale.
@@ -22,10 +24,11 @@ def linear(a: float, b: float, t: float) -> float:
     """
     return (1 - t) * a + t * b
 
+
 def exponential_InOut(a: float, b: float, t: float) -> float:
     """Exponential interpolation. Fading both in and out."""
 
-    # The variable new_t represents the absolute progress of the animation in 
+    # The variable new_t represents the absolute progress of the animation in
     # the bounds of 0 (beginning of the animation) and 1 (end of animation).
 
     new_t = 0
@@ -40,24 +43,28 @@ def exponential_InOut(a: float, b: float, t: float) -> float:
 
     return linear(a, b, new_t)
 
-#---------------------------------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------------------------------------
 # Tween class
-#---------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------
+
 
 class Tween:
     """Object used for handling interpolations."""
 
-    def __init__ (self, duration: float, startValue: float, endValue: float, easingStyle: any):
+    def __init__(
+        self, duration: float, startValue: float, endValue: float, easingStyle: any
+    ):
         self.t = 0
         self.isPlaying = False
         self.duration = duration
         self.startValue = startValue
         self.endValue = endValue
         self.easingStyle = easingStyle
-        self.currentValue = self.easingStyle(self.startValue, self.endValue, self.t)
+        self.currentValue = self.easingStyle(
+            self.startValue, self.endValue, self.t)
 
-    def step (self, deltaTime: float or int):
-
+    def step(self, deltaTime: float or int):
         # Only step if the tween is playing
         if not self.isPlaying:
             return
@@ -67,24 +74,26 @@ class Tween:
         self.t = min(self.t + stepValue, 1)
 
         # Update easing value using updated t value
-        self.currentValue = self.easingStyle(self.startValue, self.endValue, self.t)
-        
+        self.currentValue = self.easingStyle(
+            self.startValue, self.endValue, self.t)
 
-    def play (self):
+    def play(self):
         self.isPlaying = True
-    
-    def pause (self):
+
+    def pause(self):
         self.isPlaying = False
-    
-    def stop (self):
+
+    def stop(self):
         self.isPlaying = False
         self.t = 0
 
-#---------------------------------------------------------------------------------------------------------
-# General methods
-#---------------------------------------------------------------------------------------------------------
 
-def createTween (duration: float, startValue: float, endValue: float, easingStyle: any):
+# ---------------------------------------------------------------------------------------------------------
+# General methods
+# ---------------------------------------------------------------------------------------------------------
+
+
+def createTween(duration: float, startValue: float, endValue: float, easingStyle: any):
     """Create a new tween. Time is in milliseconds.
 
     --------
@@ -98,7 +107,8 @@ def createTween (duration: float, startValue: float, endValue: float, easingStyl
 
     return newTween
 
-def stepAllTweens (deltaTime: float or int):
+
+def stepAllTweens(deltaTime: float or int):
     """Steps all tweens using the provided delta time."""
 
     for tween in createdTweens:
