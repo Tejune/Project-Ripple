@@ -10,7 +10,7 @@ Created just for fun, don't expect many updates or anything of the sort.
 - [Python 3.11](https://www.python.org/downloads/release/python-3112/)
 
 ## Installing other dependencies and running
-Run `run.pyw,` if this does not work you can manually install the project:
+Run `run.pyw`, if this does not work you can manually install the project:
 ```
 poetry install
 poetry run ripple
@@ -25,6 +25,6 @@ pipx install .\dist\project_ripple-0.1.0-py3-none-any.whl
 To then run, simply call `ripple` or `ripple.exe` in any terminal or launcher.
 
 ## Have fun!
-... or not, I don't care.
+This project was created mostly for learning and fun. If you have any feedback, please let us know!
 
-Tejune/Project-Ripple is licensed under the GNU General Public License v3.0.
+*Tejune/Project-Ripple is licensed under the GNU General Public License v3.0.*
