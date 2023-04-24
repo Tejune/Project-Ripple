@@ -1,19 +1,20 @@
-#------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------
 #   Ripple / helper_methods
 #   Various methods to assist other parts of the program.
-#------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------
 
-import pygame
-import numpy
 import importlib.resources
-import platformdirs
 import os
+
+import numpy
+import platformdirs
+import pygame
 from PIL import Image, ImageFilter
 
-
-#---------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------
 # Interpolation methods
-#---------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------
+
 
 def lerp(a: float, b: float, t: float) -> float:
     """Linear interpolate on the scale given by a to b, using t as the point on that scale.
@@ -24,31 +25,35 @@ def lerp(a: float, b: float, t: float) -> float:
     """
     return (1 - t) * a + t * b
 
+
 def create_neon(surf, huge=False):
-    pil_string_image = pygame.image.tostring(surf,"RGBA",False)
-    
+    pil_string_image = pygame.image.tostring(surf, "RGBA", False)
+
     image = Image.frombytes("RGBA", surf.get_size(), pil_string_image)
     image = image.filter(ImageFilter.BoxBlur(5))
     image = numpy.array(image)
-    bloom_surf = pygame.image.frombuffer(image, (len(image[0]), len(image)), 'RGBA')
+    bloom_surf = pygame.image.frombuffer(
+        image, (len(image[0]), len(image)), "RGBA")
     return bloom_surf
 
 
-#---------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------
 # Resource methods
-#---------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------
 
 
 def resource(relative_path):
     path = importlib.resources.files("project_ripple").joinpath(relative_path)
     return path
 
+
 # Can only run once. Might improve performance
 def create_user_dir():
     user_path = platformdirs.user_data_dir("Project-Ripple")
     if not os.path.exists(user_path):
         os.makedirs(user_path)
-    create_user_dir.__code__ = (lambda:None).__code__
+    create_user_dir.__code__ = (lambda: None).__code__
+
 
 def user_dir(relative_path):
     create_user_dir()
