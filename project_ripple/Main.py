@@ -49,8 +49,7 @@ log("Finished initializing pygame variables", "update", line())
 
 log("Loading image related directories and dictionaries", "info", line())
 # Directory & Dictionary
-default_thumbnail = pygame.image.load(
-    resource("images/default_thumb.jpg")).convert()
+default_thumbnail = pygame.image.load(resource("images/default_thumb.jpg")).convert()
 song_select_fade = pygame.image.load(
     resource("images/song_select_fade.png")
 ).convert_alpha()
@@ -72,8 +71,7 @@ song_select_offset = 0
 time_since_error_raised = 6000
 error_message = ""
 
-play_button = pygame.image.load(
-    resource("images/play_button.png")).convert_alpha()
+play_button = pygame.image.load(resource("images/play_button.png")).convert_alpha()
 play_button = pygame.transform.scale(play_button, (48, 48))
 
 
@@ -125,8 +123,7 @@ class Button:
             ]  # pygame.transform.scale(self.song["LoadedImageBlurred"], (self.bound_x, HEIGHT * 0.5))
 
         # Create subtext
-        self.subtext = FONT_ARTIST.render(
-            "by " + self.song["Artist"], 1, WHITE)
+        self.subtext = FONT_ARTIST.render("by " + self.song["Artist"], 1, WHITE)
 
         # Create fade surface
         self.song_select_fade = pygame.transform.scale(
@@ -148,8 +145,7 @@ class Button:
         self.bpm_bound_x, self.bpm_bound_y = FONT_DIFF.size(
             str(self.song["BPM"]).upper() + " BPM"
         )
-        self.bpm = FONT_DIFF.render(
-            str(self.song["BPM"]).upper() + " BPM", 1, WHITE)
+        self.bpm = FONT_DIFF.render(str(self.song["BPM"]).upper() + " BPM", 1, WHITE)
 
         if feedback == "":
             self.feedback = "text"
@@ -165,8 +161,7 @@ class Button:
 
         # Create text objects
         self.text_standard = self.font.render(self.input, 1, WHITE)
-        self.text_highlighted = self.font.render(
-            self.input, 1, (200, 200, 255))
+        self.text_highlighted = self.font.render(self.input, 1, (200, 200, 255))
         self.text = self.text_standard
 
         self.bound_x, self.bound_y = FONT.size(text)
@@ -188,8 +183,7 @@ class Button:
 
         # Adjust selected song offset
         if selected_song == self.song:
-            self.selected_song_offset = max(
-                (self.selected_song_offset / 1.4) - 60, -60)
+            self.selected_song_offset = max((self.selected_song_offset / 1.4) - 60, -60)
         else:
             self.selected_song_offset = min(self.selected_song_offset / 2, 0)
 
@@ -220,13 +214,11 @@ class Button:
         )
 
         # Add transparent background under song list
-        _bg = pygame.Surface(
-            (self.bound_x, self.bound_y + 18), pygame.SRCALPHA)
+        _bg = pygame.Surface((self.bound_x, self.bound_y + 18), pygame.SRCALPHA)
         _bg.set_alpha(200)
 
         # Create another mask used by the background surface to create corners
-        pygame.draw.rect(_bg, (255, 255, 255),
-                         (0, 0, *_bg.get_size()), border_radius=5)
+        pygame.draw.rect(_bg, (255, 255, 255), (0, 0, *_bg.get_size()), border_radius=5)
 
         if self.song == selected_song:
             self.bg_fade = self.song_selected_fade
@@ -237,19 +229,16 @@ class Button:
         self.surface.blit(_bg, (0, 0))
 
         # Draw difficulty rating and BPM
-        _extras = pygame.Surface(
-            (self.bound_x, self.bound_y + 18), pygame.SRCALPHA)
+        _extras = pygame.Surface((self.bound_x, self.bound_y + 18), pygame.SRCALPHA)
         _extras.set_alpha(200)
 
         pygame.draw.rect(
-            _extras, BLACK, pygame.Rect(
-                13, 75, 26 + self.diff_bound_x, 18), 0, 9
+            _extras, BLACK, pygame.Rect(13, 75, 26 + self.diff_bound_x, 18), 0, 9
         )
         pygame.draw.rect(
             _extras,
             BLACK,
-            pygame.Rect(19 + 26 + self.diff_bound_x,
-                        75, 26 + self.bpm_bound_x, 18),
+            pygame.Rect(19 + 26 + self.diff_bound_x, 75, 26 + self.bpm_bound_x, 18),
             0,
             9,
         )
@@ -296,8 +285,7 @@ class Button:
                     9 * lifetime,
                     9 * lifetime,
                 )
-                pygame.draw.ellipse(
-                    ripple_surface, (200, 200, 255), ripple_rect, 3)
+                pygame.draw.ellipse(ripple_surface, (200, 200, 255), ripple_rect, 3)
                 self.surface.blit(ripple_surface, (0, 0))
 
             if lifetime >= 60:
@@ -328,14 +316,13 @@ class Button:
 
         try:
             x, y = pygame.mouse.get_pos()
-        except:
+        except Exception:
             exit()  # Allow f4 exit
         if forcedSelection or event.type == pygame.MOUSEBUTTONDOWN:
             if forcedSelection or pygame.mouse.get_pressed()[0]:
                 if not forcedSelection:
                     self.rect = pygame.Rect(
-                        self.x, self.y +
-                        scroll_offset, self.size[0], self.size[1]
+                        self.x, self.y + scroll_offset, self.size[0], self.size[1]
                     )
 
                 if forcedSelection or self.rect.collidepoint(x, y):
@@ -351,8 +338,7 @@ class Button:
                                 "error",
                                 line(),
                             )
-                            log(f"{str(traceback.format_exc())}",
-                                "error", line())
+                            log(f"{str(traceback.format_exc())}", "error", line())
 
                             global error_message
                             global time_since_error_raised
@@ -375,8 +361,7 @@ class Button:
                             pygame.mixer.music.stop()
                             pygame.mixer.music.load(self.song["Audio"])
                             pygame.mixer.music.play(
-                                start=(
-                                    int(self.song["SongPreviewTime"]) / 1000)
+                                start=(int(self.song["SongPreviewTime"]) / 1000)
                             )
                             pygame.mixer.music.set_volume(0.4)
                             pygame.mixer.Channel(2).stop()
@@ -408,12 +393,10 @@ selected_song = songs[random_song]
 current_song = random_song
 last_song = selected_song
 
-log(f"Total songs: {total_songs}\nSelected song: {random_song}",
-    "warning", line())
+log(f"Total songs: {total_songs}\nSelected song: {random_song}", "warning", line())
 
 # Show title screen
-show_title_screen(WIN, FONT, FONT_TITLE, clock,
-                  Framerate, FONT_PIXEL, selected_song)
+show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, selected_song)
 log("Finished compiling songs.", "update", line())
 
 # --------- Song select screen ----------------------------------------------------------------------------#
@@ -469,7 +452,7 @@ for song in songs:
     )
 
     # Create additional buttons for other versions (TODO: Replace with a proper difficulty system)
-    if song.get("OtherDifficulties") != None:
+    if song.get("OtherDifficulties") is not None:
         for difficulty, notes in song["OtherDifficulties"]:
             new_song = song.copy()
             new_song["Notes"] = notes
@@ -482,8 +465,7 @@ for song in songs:
                 selected_song = new_song
                 pygame.mixer.music.stop()
                 pygame.mixer.music.load(new_song["Audio"])
-                pygame.mixer.music.play(
-                    start=(int(new_song["SongPreviewTime"]) / 1000))
+                pygame.mixer.music.play(start=(int(new_song["SongPreviewTime"]) / 1000))
                 pygame.mixer.music.set_volume(0.4)
                 scroll_offset = -song_y + HEIGHT / 2 - 60
 
@@ -551,8 +533,7 @@ while is_on_select_screen:
                     line(),
                 )
 
-                new_selection = selected_button.click(
-                    None, selected_song, True)
+                new_selection = selected_button.click(None, selected_song, True)
                 selected_song = new_selection
 
             if (
@@ -570,13 +551,12 @@ while is_on_select_screen:
                     line(),
                 )
 
-                new_selection = selected_button.click(
-                    None, selected_song, True)
+                new_selection = selected_button.click(None, selected_song, True)
                 selected_song = new_selection
 
             if event.key == pygame.K_RETURN:
                 selected_button = buttons[button_list_position]
-                log(f"Using enter to enter a song! Hah, get it?", "debug", line())
+                log("Using enter to enter a song! Hah, get it?", "debug", line())
 
                 selected_button.click(None, selected_song, True)
 
@@ -604,8 +584,7 @@ while is_on_select_screen:
     if selected_song:
         # Draw the previous song's background
         prev_blur_bg_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-        prev_blur_bg_surface.set_alpha(
-            max(255 - frames_since_last_song * 150, 0))
+        prev_blur_bg_surface.set_alpha(max(255 - frames_since_last_song * 150, 0))
         prev_blur_bg_surface.blit(last_song["LoadedImageBlurredFull"], (0, 0))
 
         # Draw the current songs background
@@ -661,13 +640,11 @@ while is_on_select_screen:
         # Drawing the background
         error_surface = pygame.Surface((WIDTH, 50))
         error_surface.set_alpha(175)
-        pygame.draw.rect(error_surface, (5, 5, 5),
-                         pygame.Rect(0, 0, WIDTH, 50))
+        pygame.draw.rect(error_surface, (5, 5, 5), pygame.Rect(0, 0, WIDTH, 50))
         WIN.blit(error_surface, (0, HEIGHT - 90))
 
         # Error label
-        error_text = FONT.render(
-            f"Exception raised: {error_message}", True, RED)
+        error_text = FONT.render(f"Exception raised: {error_message}", True, RED)
         WIN.blit(error_text, (WIDTH / 2 - error_text.get_width() / 2, HEIGHT - 80))
 
     # ----- Drawing the song preview window -----#
@@ -681,8 +658,7 @@ while is_on_select_screen:
 
     # Draw background fill
     pygame.draw.rect(
-        WIN, BLACK, (preview_pos_x, preview_pos_y,
-                     preview_width, preview_height), 0, 5
+        WIN, BLACK, (preview_pos_x, preview_pos_y, preview_width, preview_height), 0, 5
     )
 
     # Draw preview image if a song has been selected
@@ -695,8 +671,7 @@ while is_on_select_screen:
         prev_preview_image_surface = pygame.Surface(
             (preview_width, preview_height), pygame.SRCALPHA
         )
-        prev_preview_image_surface.set_alpha(
-            max(255 - frames_since_last_song * 150, 0))
+        prev_preview_image_surface.set_alpha(max(255 - frames_since_last_song * 150, 0))
 
         if selected_song["LoadedImagePreview"] == "None":
             selected_song["LoadedImagePreview"] = selected_song[
@@ -729,8 +704,7 @@ while is_on_select_screen:
             preview_image, (0, -(HEIGHT * 0.05)), None, pygame.BLEND_RGBA_MIN
         )
         prev_preview_image_surface.blit(
-            prev_preview_image, (0, -(HEIGHT * 0.05)
-                                 ), None, pygame.BLEND_RGBA_MIN
+            prev_preview_image, (0, -(HEIGHT * 0.05)), None, pygame.BLEND_RGBA_MIN
         )
 
         WIN.blit(preview_image_surface, (preview_pos_x, preview_pos_y))
@@ -757,8 +731,7 @@ while is_on_select_screen:
 
     # Play the enter sound effect when coming from the main menu
     if loops == 1:
-        pygame.mixer.Channel(0).play(
-            pygame.mixer.Sound(resource("sound/enter.wav")))
+        pygame.mixer.Channel(0).play(pygame.mixer.Sound(resource("sound/enter.wav")))
         pygame.mixer.Channel(0).set_volume(4)
         pygame.mixer.Channel(2).stop()
 

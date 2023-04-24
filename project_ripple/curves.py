@@ -63,8 +63,7 @@ while True:
             pygame.quit()
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             for P in Points:
-                circle = pygame.rect.Rect(
-                    P.x - P_D / 2, P.y - P_D / 2, P_D, P_D)
+                circle = pygame.rect.Rect(P.x - P_D / 2, P.y - P_D / 2, P_D, P_D)
                 if circle.collidepoint(event.pos) and not Point_being_dragged:
                     P.being_dragged = True
                     Point_being_dragged = True
@@ -76,7 +75,7 @@ while True:
 
         elif event.type == pygame.MOUSEMOTION:
             for P in Points:
-                if P.being_dragged == True:
+                if P.being_dragged is True:
                     mouse_x, mouse_y = event.pos
                     P.x = max(min(mouse_x, WIDTH - 50), 50)
                     P.y = max(min(mouse_y, HEIGHT - 50), 50)
@@ -94,8 +93,7 @@ while True:
             else 0
         )
         rgb1.g = (
-            int(-0.00939 * P1.x**2 + 6.57 * P1.x - 1021) *
-            (abs(50 - P1.y) / 250) - 2
+            int(-0.00939 * P1.x**2 + 6.57 * P1.x - 1021) * (abs(50 - P1.y) / 250) - 2
             if (-0.00939 * P1.x**2 + 6.57 * P1.x - 1021) * (abs(50 - P1.y) / 250) - 2
             > 2
             else 0
@@ -115,8 +113,7 @@ while True:
             else 0
         )
         rgb2.g = (
-            int(-0.00939 * P4.x**2 + 6.57 * P4.x - 1021) *
-            (abs(50 - P4.y) / 250) - 2
+            int(-0.00939 * P4.x**2 + 6.57 * P4.x - 1021) * (abs(50 - P4.y) / 250) - 2
             if (-0.00939 * P4.x**2 + 6.57 * P4.x - 1021) * (abs(50 - P4.y) / 250) - 2
             > 2
             else 0

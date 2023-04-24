@@ -5,9 +5,6 @@
 
 import math
 
-import numpy
-import pygame
-
 createdTweens = []
 
 # ---------------------------------------------------------------------------------------------------------
@@ -61,8 +58,7 @@ class Tween:
         self.startValue = startValue
         self.endValue = endValue
         self.easingStyle = easingStyle
-        self.currentValue = self.easingStyle(
-            self.startValue, self.endValue, self.t)
+        self.currentValue = self.easingStyle(self.startValue, self.endValue, self.t)
 
     def step(self, deltaTime: float or int):
         # Only step if the tween is playing
@@ -74,8 +70,7 @@ class Tween:
         self.t = min(self.t + stepValue, 1)
 
         # Update easing value using updated t value
-        self.currentValue = self.easingStyle(
-            self.startValue, self.endValue, self.t)
+        self.currentValue = self.easingStyle(self.startValue, self.endValue, self.t)
 
     def play(self):
         self.isPlaying = True

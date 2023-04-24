@@ -34,9 +34,8 @@ def convert_json(songs_path):
                     line = line.strip("\n")
                     if line.startswith("Audio"):
                         try:
-                            cache[item]["AudioFile"] = " ".join(
-                                line.split(" ")[1:])
-                        except:
+                            cache[item]["AudioFile"] = " ".join(line.split(" ")[1:])
+                        except Exception:
                             cache[item]["AudioFile"] = "None"
                         continue
 
@@ -45,76 +44,70 @@ def convert_json(songs_path):
                             cache[item]["SongPreviewTime"] = " ".join(
                                 line.split(" ")[1:]
                             )
-                        except:
+                        except Exception:
                             cache[item]["SongPreviewTime"] = "0"
                     elif line.startswith("Backgro"):
                         try:
                             cache[item]["BackgroundFile"] = " ".join(
                                 line.split(" ")[1:]
                             )
-                        except:
+                        except Exception:
                             cache[item]["BackgroundFile"] = "None"
                         continue
 
                     elif line.startswith("MapId"):
                         try:
-                            cache[item]["MapId"] = " ".join(
-                                line.split(" ")[1:])
-                        except:
+                            cache[item]["MapId"] = " ".join(line.split(" ")[1:])
+                        except Exception:
                             cache[item]["MapId"] = "None"
                         continue
 
                     elif line.startswith("MapSetId: "):
                         try:
-                            cache[item]["MapSetId"] = " ".join(
-                                line.split(" ")[1:])
-                        except:
+                            cache[item]["MapSetId"] = " ".join(line.split(" ")[1:])
+                        except Exception:
                             cache[item]["MapSetId"] = "None"
                         continue
 
                     elif line.startswith("Mode"):
                         try:
                             cache[item]["Mode"] = " ".join(line.split(" ")[1:])
-                        except:
+                        except Exception:
                             cache[item]["Mode"] = "None"
                         continue
 
                     elif line.startswith("Title"):
                         try:
-                            cache[item]["Title"] = " ".join(
-                                line.split(" ")[1:])
-                        except:
+                            cache[item]["Title"] = " ".join(line.split(" ")[1:])
+                        except Exception:
                             cache[item]["Title"] = "None"
                         continue
 
                     elif line.startswith("Artist"):
                         try:
-                            cache[item]["Artist"] = " ".join(
-                                line.split(" ")[1:])
-                        except:
+                            cache[item]["Artist"] = " ".join(line.split(" ")[1:])
+                        except Exception:
                             cache[item]["Artist"] = "None"
                         continue
 
                     elif line.startswith("Source"):
                         try:
-                            cache[item]["Source"] = " ".join(
-                                line.split(" ")[1:])
-                        except:
+                            cache[item]["Source"] = " ".join(line.split(" ")[1:])
+                        except Exception:
                             cache[item]["Source"] = "None"
                         continue
 
                     elif line.startswith("Tags"):
                         try:
                             cache[item]["Tags"] = " ".join(line.split(" ")[1:])
-                        except:
+                        except Exception:
                             cache[item]["Tags"] = "None"
                         continue
 
                     elif line.startswith("Creator"):
                         try:
-                            cache[item]["Creator"] = " ".join(
-                                line.split(" ")[1:])
-                        except:
+                            cache[item]["Creator"] = " ".join(line.split(" ")[1:])
+                        except Exception:
                             cache[item]["Creator"] = "None"
                         continue
 
@@ -123,23 +116,21 @@ def convert_json(songs_path):
                             cache[item]["DifficultyName"] = " ".join(
                                 line.split(" ")[1:]
                             )
-                        except:
+                        except Exception:
                             cache[item]["DifficultyName"] = "None"
                         continue
 
                     elif line.startswith("Description"):
                         try:
-                            cache[item]["Description"] = " ".join(
-                                line.split(" ")[1:])
-                        except:
+                            cache[item]["Description"] = " ".join(line.split(" ")[1:])
+                        except Exception:
                             cache[item]["Description"] = "None"
                         continue
 
                     elif line.startswith("EditorLayers"):
                         try:
-                            cache[item]["EditorLayers"] = " ".join(
-                                line.split(" ")[1:])
-                        except:
+                            cache[item]["EditorLayers"] = " ".join(line.split(" ")[1:])
+                        except Exception:
                             cache[item]["EditorLayers"] = "None"
                         continue
 
@@ -148,23 +139,21 @@ def convert_json(songs_path):
                             cache[item]["CustomAudioSamples"] = " ".join(
                                 line.split(" ")[1:]
                             )
-                        except:
+                        except Exception:
                             cache[item]["CustomAudioSamples"] = "None"
                         continue
 
                     elif line.startswith("SoundEffects"):
                         try:
-                            cache[item]["SoundEffects"] = " ".join(
-                                line.split(" ")[1:])
-                        except:
+                            cache[item]["SoundEffects"] = " ".join(line.split(" ")[1:])
+                        except Exception:
                             cache[item]["SoundEffects"] = "None"
                         continue
 
                     elif line.startswith("StartTime"):
                         try:
-                            cache[item]["StartTime"] = " ".join(
-                                line.split(" ")[1:])
-                        except:
+                            cache[item]["StartTime"] = " ".join(line.split(" ")[1:])
+                        except Exception:
                             cache[item]["StartTime"] = "None"
                         continue
 
@@ -173,7 +162,7 @@ def convert_json(songs_path):
                             cache[item]["SliderVelocities"] = " ".join(
                                 line.split(" ")[1:]
                             )
-                        except:
+                        except Exception:
                             cache[item]["SliderVelocities"] = "None"
                         continue
 
@@ -197,8 +186,7 @@ def convert_json(songs_path):
 
                     if line.startswith("- StartTime: "):
                         cache[item]["Notes"].append([])
-                        cache[item]["Notes"][time_index].append(
-                            int(line.split(" ")[2]))
+                        cache[item]["Notes"][time_index].append(int(line.split(" ")[2]))
                         time_index += 1
                         continue
 

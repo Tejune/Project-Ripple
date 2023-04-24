@@ -11,8 +11,15 @@ import os
 
 import pygame
 
-from .constants import *
-from .helper_methods import *
+from .constants import (
+    FONT,
+    FONT_TITLE,
+    HEIGHT,
+    LOAD_ALL_DIFFICULTIES,
+    SONGS_DIRECTORY,
+    WIDTH,
+)
+from .helper_methods import create_neon, resource, user_dir
 from .image_quacher import update_image_cache
 from .logs import line, log
 from .song_quacher import convert_json
@@ -39,7 +46,7 @@ def load_songs(WIN):
     # Convert quaver files to json, then load the json file
     convert_json(songs_directory)
 
-    show_loading_screen(WIN, FONT, FONT_TITLE, f"Opening json file...", 10)
+    show_loading_screen(WIN, FONT, FONT_TITLE, "Opening json file...", 10)
 
     info = open(user_dir("cache.json"))
     info = json.load(info)
@@ -48,12 +55,12 @@ def load_songs(WIN):
     # if CLEAR_IMAGE_CACHE_ON_STARTUP:
     #    os.remove("./images/imagecache/")
 
-    show_loading_screen(WIN, FONT, FONT_TITLE, f"Updating image cache...", 10)
+    show_loading_screen(WIN, FONT, FONT_TITLE, "Updating image cache...", 10)
 
     # Run image_quacher to convert new images
     update_image_cache(WIN, FONT, FONT_TITLE)
 
-    show_loading_screen(WIN, FONT, FONT_TITLE, f"Loading songs...", 10)
+    show_loading_screen(WIN, FONT, FONT_TITLE, "Loading songs...", 10)
 
     # Iterate through each folder in the song directory
     for root in os.scandir(songs_directory):
@@ -67,12 +74,10 @@ def load_songs(WIN):
                 found_qua_file = True
                 song_info = info[root.name + "/" + file.name]
                 found_qua_file_path = file.name
-                song_info["Data"] = songs_directory + \
-                    "/" + root.name + "/" + file.name
+                song_info["Data"] = songs_directory + "/" + root.name + "/" + file.name
 
                 # Also, update the loading screen
-                show_loading_screen(WIN, FONT, FONT_TITLE,
-                                    song_info["Title"], total)
+                show_loading_screen(WIN, FONT, FONT_TITLE, song_info["Title"], total)
 
         # Create some additional keys for objects
         song_info["Image"] = "None"
@@ -111,10 +116,9 @@ def load_songs(WIN):
                             song_info["Image"]
                         ).convert()
 
-                    except Exception as e:
+                    except Exception:
                         song_info["Image"] = file
-                        song_info["LoadedImage"] = pygame.image.load(
-                            file).convert()
+                        song_info["LoadedImage"] = pygame.image.load(file).convert()
 
                     # Get blurred version
                     try:
@@ -132,14 +136,12 @@ def load_songs(WIN):
                             song_info["LoadedImageBlurred"], (WIDTH, HEIGHT)
                         ).convert()
 
-                    except Exception as e:
+                    except Exception:
                         # Create blurred version (surface)
-                        blur_surface = pygame.Surface(
-                            (WIDTH, HEIGHT), pygame.SRCALPHA)
+                        blur_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
                         blur_surface.set_alpha(40)
                         imp = song_info["LoadedImage"]
-                        imp = pygame.transform.scale(
-                            imp, (WIDTH, HEIGHT)).convert()
+                        imp = pygame.transform.scale(imp, (WIDTH, HEIGHT)).convert()
                         blur_surface.blit(imp, (0, 0))
                         blur_surface = create_neon(blur_surface)
                         blur_surface = pygame.transform.scale(
@@ -174,7 +176,7 @@ def load_songs(WIN):
             for file in os.scandir(root):
                 if file.name.endswith(".qua") and found_qua_file_path != file.name:
                     # This means there are several difficulties for this song.
-                    if song_info.get("OtherDifficulties") == None:
+                    if song_info.get("OtherDifficulties") is None:
                         song_info["OtherDifficulties"] = []
 
                     # Gets difficulty data and appends it to the OtherDifficulties key.
