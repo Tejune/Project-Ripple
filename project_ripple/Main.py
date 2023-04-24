@@ -25,7 +25,7 @@ from .constants import (
     Framerate,
 )
 from .helper_methods import resource, user_dir
-from .logs import line, log
+from .logs import line, log, message
 
 # Imports
 from .song_loader import load_songs
@@ -67,9 +67,6 @@ selected_song = None
 last_song = None
 frames_since_last_song = 500  # Any value high enough will do
 song_select_offset = 0
-
-time_since_error_raised = 6000
-error_message = ""
 
 play_button = pygame.image.load(resource("images/play_button.png")).convert_alpha()
 play_button = pygame.transform.scale(play_button, (48, 48))
@@ -332,6 +329,9 @@ class Button:
                         # Play song using the song player. Catch errors and alert the player.
                         try:
                             play_song(self.song, WIN, clock)
+                            pygame.mixer.Channel(2).play(
+                                pygame.mixer.Sound(resource("sound/Title.wav"))
+                            )
                         except Exception as error:
                             log(
                                 f"Error while playing song: {str(error)}",
@@ -339,16 +339,8 @@ class Button:
                                 line(),
                             )
                             log(f"{str(traceback.format_exc())}", "error", line())
+                            message("Song was interrupted due to an unexpected error. Sorry!")
 
-                            global error_message
-                            global time_since_error_raised
-
-                            error_message = error
-                            time_since_error_raised = 0
-
-                        pygame.mixer.Channel(2).play(
-                            pygame.mixer.Sound(resource("sound/Title.wav"))
-                        )
                     else:
                         last_song = selected_song
                         currently_selected_song = self.song
@@ -626,26 +618,15 @@ while is_on_select_screen:
     WIN.blit(_title, (0, 0))
 
     # Draw title
-    subtitle = FONT_HEADER.render("SONG SELECT", False, WHITE)
+    subtitle = FONT_HEADER.render("SONG SELECT", True, WHITE)
     WIN.blit(subtitle, (25, 30))
 
     if FPS_COUNTER_ENABLED:
         fps_text = FONT_SMALL.render(
-            f"FPS: {str(round(clock.get_fps()))}", False, WHITE
+            f"FPS: {str(round(clock.get_fps()))}", True, WHITE
         )
         WIN.blit(fps_text, (10, HEIGHT - 24))
 
-    # If an error occured recently, display it in the bottom of the screen
-    if time_since_error_raised < 5000:
-        # Drawing the background
-        error_surface = pygame.Surface((WIDTH, 50))
-        error_surface.set_alpha(175)
-        pygame.draw.rect(error_surface, (5, 5, 5), pygame.Rect(0, 0, WIDTH, 50))
-        WIN.blit(error_surface, (0, HEIGHT - 90))
-
-        # Error label
-        error_text = FONT.render(f"Exception raised: {error_message}", True, RED)
-        WIN.blit(error_text, (WIDTH / 2 - error_text.get_width() / 2, HEIGHT - 80))
 
     # ----- Drawing the song preview window -----#
 
@@ -727,7 +708,6 @@ while is_on_select_screen:
     # wh.fill(WHITE)
     # WIN.blit(wh, (0, 0))
     loops += 1
-    time_since_error_raised += delta_time
 
     # Play the enter sound effect when coming from the main menu
     if loops == 1:

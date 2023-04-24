@@ -2,8 +2,11 @@ import datetime
 import inspect
 import pathlib
 
+from tkinter import messagebox, Tk
 from . import pycolors
 
+root = Tk()
+root.wm_withdraw()
 
 def line():
     return inspect.currentframe()
@@ -39,3 +42,12 @@ def log(message, type, line):
     date = datetime.datetime.now().replace(microsecond=0)
     filename = pathlib.Path(inspect.getframeinfo(line).filename).name
     print(f"{pycolors.bold}{pycolors.purple}{name} {pycolors.clear}{formatting}{type}{pycolors.cyan} ->  {message_color}{message} @ {pycolors.colort((100,100,100))}{date} line {line.f_lineno}, {filename} {pycolors.clear}")
+
+def message (msg: str, title: str = "Project Ripple") -> None:
+    """Shows a message box on screen using tkinter. Title is optional and defaults to "Project Ripple".
+    """
+
+    # Shows a messagebox on screen using the python builtin module tkinter
+    messagebox.showinfo(title, msg)
+
+    return
