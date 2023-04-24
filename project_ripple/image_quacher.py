@@ -33,8 +33,7 @@ def update_image_cache(WIN, FONT, FONT_TITLE):
     # Find the path of all images to convert using information from the song data cache file
     image_paths = []
     for key in quave_files:
-        image_paths.append(
-            key.split("/")[0] + "/" + data_cache[key]["BackgroundFile"])
+        image_paths.append(key.split("/")[0] + "/" + data_cache[key]["BackgroundFile"])
 
     # Lists all present images in the image cache (used so we don't cache something already cached)
     current_images = os.listdir(user_dir("imagecache"))
@@ -74,7 +73,7 @@ def update_image_cache(WIN, FONT, FONT_TITLE):
                 )
 
         # If something throws and exception, ignore it and continue
-        except Exception as e:
+        except Exception:
             pass
 
         # Converting the second image (scaled down preview version)
@@ -84,12 +83,12 @@ def update_image_cache(WIN, FONT, FONT_TITLE):
                 f"{image_path[:len(image_path) - 4]}_preview.png".replace("/", "_")
                 not in current_images
             ):
-                res = user_dir(
-                    f"{image_path[:len(image_path) - 4]}_preview.png".replace("/", "_")
-                )
-                res2 = f"{image_path[:len(image_path) - 4]}_preview.png".replace(
-                    "/", "_"
-                )
+                # res = user_dir(
+                #     f"{image_path[:len(image_path) - 4]}_preview.png".replace("/", "_")
+                # )
+                # res2 = f"{image_path[:len(image_path) - 4]}_preview.png".replace(
+                #     "/", "_"
+                # )
 
                 # Define the path
                 temp_image_path = SONGS_DIRECTORY + "/" + image_path
@@ -106,7 +105,7 @@ def update_image_cache(WIN, FONT, FONT_TITLE):
                 img = img.resize((basewidth, hsize), Image.Resampling.LANCZOS)
                 img.save(
                     user_dir(
-                        f"imagecache/"
+                        "imagecache/"
                         + stemp_image_path[: len(stemp_image_path) - 4]
                         + "_preview.png"
                     )

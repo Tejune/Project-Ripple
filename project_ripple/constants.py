@@ -26,7 +26,7 @@ try:
             SONGS_DIRECTORY = settings["SONGS_DIRECTORY"]
 except FileNotFoundError:
     open(user_dir("settings.json"), "w").write(
-        "{SONGS_DIRECTORY:" + SONGS_DIRECTORY + "}"
+        '{"SONGS_DIRECTORY":"' + SONGS_DIRECTORY + '"}'
     )
 
 CLEAR_IMAGE_CACHE_ON_STARTUP = False

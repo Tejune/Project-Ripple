@@ -55,8 +55,7 @@ def initial_load():
     arrow_outline_original = pygame.image.load(
         resource("images/arrow_outline.png")
     ).convert_alpha()
-    arrow_outline_original = pygame.transform.scale(
-        arrow_outline_original, (120, 120))
+    arrow_outline_original = pygame.transform.scale(arrow_outline_original, (120, 120))
     sparks = pygame.image.load(resource("images/sparks.png")).convert_alpha()
     sparks = pygame.transform.scale(sparks, (WIDTH, HEIGHT))
 
@@ -105,8 +104,7 @@ judgement_colors = {
     "MARVELOUS": (255, 255, 255),
 }
 
-judgement_count = {"MISS": 0, "GOOD": 0,
-                   "GREAT": 0, "PERFECT": 0, "MARVELOUS": 0}
+judgement_count = {"MISS": 0, "GOOD": 0, "GREAT": 0, "PERFECT": 0, "MARVELOUS": 0}
 
 score_per_judgement = {
     "MISS": 0,
@@ -190,10 +188,8 @@ def play_song(song, WIN, clock):
         600, 255, 0, tweens.exponential_InOut
     )
 
-    song_info_fadein_tween = tweens.createTween(
-        1000, 0, 255, tweens.exponential_InOut)
-    song_info_fadeout_tween = tweens.createTween(
-        1000, 255, 0, tweens.exponential_InOut)
+    song_info_fadein_tween = tweens.createTween(1000, 0, 255, tweens.exponential_InOut)
+    song_info_fadeout_tween = tweens.createTween(1000, 255, 0, tweens.exponential_InOut)
     song_info_bg_fadein_tween = tweens.createTween(
         500, 0, 140, tweens.exponential_InOut
     )
@@ -201,10 +197,8 @@ def play_song(song, WIN, clock):
         500, 140, 0, tweens.exponential_InOut
     )
 
-    full_combo_fadein_tween = tweens.createTween(
-        500, 0, 255, tweens.exponential_InOut)
-    full_combo_fadeout_tween = tweens.createTween(
-        500, 255, 0, tweens.exponential_InOut)
+    full_combo_fadein_tween = tweens.createTween(500, 0, 255, tweens.exponential_InOut)
+    full_combo_fadeout_tween = tweens.createTween(500, 255, 0, tweens.exponential_InOut)
 
     # Runtime variables
     is_playing = True
@@ -225,8 +219,7 @@ def play_song(song, WIN, clock):
     pygame.display.update()
 
     # Play select sound, then load song
-    pygame.mixer.Channel(0).play(
-        pygame.mixer.Sound(resource("sound/select.wav")))
+    pygame.mixer.Channel(0).play(pygame.mixer.Sound(resource("sound/select.wav")))
     pygame.mixer.Channel(0).set_volume(4)
     pygame.mixer.music.load(song["Audio"])
 
@@ -310,7 +303,7 @@ def play_song(song, WIN, clock):
                 if abs(offset) <= BOO:
                     if closest_note and offset < (closest_note[0] - song_time):
                         closest_note = note
-                    elif closest_note == False:
+                    elif closest_note is False:
                         closest_note = note
 
         # Decide judgement for note if found
@@ -421,17 +414,13 @@ def play_song(song, WIN, clock):
         # Add arrow surfaces
         arrow_bg = pygame.Surface((530, arrow_y_postion), pygame.SRCALPHA)
         arrow_bg.set_alpha(90)
-        arrow_surface_1 = pygame.Surface(
-            (530, arrow_y_postion), pygame.SRCALPHA)
+        arrow_surface_1 = pygame.Surface((530, arrow_y_postion), pygame.SRCALPHA)
         arrow_surface_1.set_alpha(frames_since_last_lane_pressed[0])
-        arrow_surface_2 = pygame.Surface(
-            (530, arrow_y_postion), pygame.SRCALPHA)
+        arrow_surface_2 = pygame.Surface((530, arrow_y_postion), pygame.SRCALPHA)
         arrow_surface_2.set_alpha(frames_since_last_lane_pressed[1])
-        arrow_surface_3 = pygame.Surface(
-            (530, arrow_y_postion), pygame.SRCALPHA)
+        arrow_surface_3 = pygame.Surface((530, arrow_y_postion), pygame.SRCALPHA)
         arrow_surface_3.set_alpha(frames_since_last_lane_pressed[2])
-        arrow_surface_4 = pygame.Surface(
-            (530, arrow_y_postion), pygame.SRCALPHA)
+        arrow_surface_4 = pygame.Surface((530, arrow_y_postion), pygame.SRCALPHA)
         arrow_surface_4.set_alpha(frames_since_last_lane_pressed[3])
 
         # Draw arrows
@@ -440,10 +429,8 @@ def play_song(song, WIN, clock):
         arrow_bg.blit(arrow_outline[2], (12 + 128 + 128, y_sweet_spot))
         arrow_bg.blit(arrow_outline[3], (12 + 128 + 128 + 128, y_sweet_spot))
         arrow_surface_1.blit(arrow_outline_highlight[0], (12, y_sweet_spot))
-        arrow_surface_2.blit(
-            arrow_outline_highlight[1], (12 + 128, y_sweet_spot))
-        arrow_surface_3.blit(
-            arrow_outline_highlight[2], (12 + 128 + 128, y_sweet_spot))
+        arrow_surface_2.blit(arrow_outline_highlight[1], (12 + 128, y_sweet_spot))
+        arrow_surface_3.blit(arrow_outline_highlight[2], (12 + 128 + 128, y_sweet_spot))
         arrow_surface_4.blit(
             arrow_outline_highlight[3], (12 + 128 + 128 + 128, y_sweet_spot)
         )
@@ -460,28 +447,24 @@ def play_song(song, WIN, clock):
         # Draw judgement amount background
         judgement_surface = pygame.Surface((100, 400), pygame.SRCALPHA)
         judgement_surface.set_alpha(140)
-        pygame.draw.rect(judgement_surface, BLACK,
-                         pygame.Rect(0, 0, 80, 280), 0, 10)
+        pygame.draw.rect(judgement_surface, BLACK, pygame.Rect(0, 0, 80, 280), 0, 10)
         WIN.blit(judgement_surface, (330, 190))
 
         # Calculate and draw song progress (Hide when song is finished)
         if song_time <= Song_Length:
             song_time_surface = pygame.Surface((WIDTH, 6), pygame.SRCALPHA)
             song_time_surface.set_alpha(140)
-            pygame.draw.rect(song_time_surface, BLACK,
-                             pygame.Rect(0, 0, WIDTH, 6))
+            pygame.draw.rect(song_time_surface, BLACK, pygame.Rect(0, 0, WIDTH, 6))
             WIN.blit(song_time_surface, (0, HEIGHT - 6))
 
             pygame.draw.rect(
                 WIN,
                 YELLOW,
-                pygame.Rect(0, HEIGHT - 6,
-                            (song_time / Song_Length) * WIDTH, 6),
+                pygame.Rect(0, HEIGHT - 6, (song_time / Song_Length) * WIDTH, 6),
             )
 
             # While we're at it, let's also draw the song progress labels
-            minutes_left = str(math.floor(
-                ((Song_Length - song_time) / 1000) / 60))
+            minutes_left = str(math.floor(((Song_Length - song_time) / 1000) / 60))
             seconds_left = str(round(((Song_Length - song_time) / 1000) % 60))
 
             if int(seconds_left) < 10:
@@ -508,8 +491,7 @@ def play_song(song, WIN, clock):
             progress_surface = pygame.Surface((WIDTH, 6), pygame.SRCALPHA)
             progress_surface.set_alpha(progress_bar_fadeout_tween.currentValue)
 
-            pygame.draw.rect(progress_surface, YELLOW,
-                             pygame.Rect(0, 0, WIDTH, 6))
+            pygame.draw.rect(progress_surface, YELLOW, pygame.Rect(0, 0, WIDTH, 6))
             WIN.blit(progress_surface, (0, HEIGHT - 6))
 
         # Draw judgement amounts
@@ -518,13 +500,11 @@ def play_song(song, WIN, clock):
             _x = 340
             _y = 200 + 54 * already_drawn
             pygame.draw.rect(
-                WIN, judgement_colors[judgement], pygame.Rect(
-                    _x, _y, 60, 40), 2, 10
+                WIN, judgement_colors[judgement], pygame.Rect(_x, _y, 60, 40), 2, 10
             )
             # pygame.draw.rect(WIN, BLACK, pygame.Rect(_x + 2, _y + 2, 56, 36), 0, 10)
             count_label = FONT_SMALL.render(
-                str(judgement_count[judgement]
-                    ), True, judgement_colors[judgement]
+                str(judgement_count[judgement]), True, judgement_colors[judgement]
             )
             WIN.blit(
                 count_label,
@@ -554,8 +534,7 @@ def play_song(song, WIN, clock):
                 10,
             )
 
-            WIN.blit(godmode_surface, (400 + 30 -
-                     god_label.get_width() - 10, 130))
+            WIN.blit(godmode_surface, (400 + 30 - god_label.get_width() - 10, 130))
             WIN.blit(god_label, (400 + 30 - god_label.get_width(), 140))
 
         # Find and add notes within time window
@@ -590,8 +569,7 @@ def play_song(song, WIN, clock):
             note_surface = pygame.Surface((120, 120), pygame.SRCALPHA)
             note_surface.convert_alpha()
             note_surface.blit(arrow, (0, 0))
-            note_surface = pygame.transform.rotate(
-                note_surface, (note[1] - 1) * 90)
+            note_surface = pygame.transform.rotate(note_surface, (note[1] - 1) * 90)
             _note_bg.blit(note_surface, (position_x, position_y))
             # pygame.draw.rect(_note_bg, YELLOW, pygame.Rect(position_x, position_y, 100, 40))
             # pygame.draw.rect(_note_bg, (150,150, 0), pygame.Rect(position_x + 1, position_y + 1, 98, 38))
@@ -609,14 +587,14 @@ def play_song(song, WIN, clock):
 
                 try:
                     frames_since_last_lane_pressed[note[1] - 1] = 150
-                except:
+                except Exception:
                     pass
 
             if position_y > arrow_y_postion:
                 combo = 0
                 try:
                     playing_notes.remove(note)
-                except:
+                except Exception:
                     pass
                 latest_judgement = "MISS"
                 judgement_count["MISS"] += 1
@@ -642,8 +620,7 @@ def play_song(song, WIN, clock):
 
             # Add lines to surface
             pygame.draw.rect(
-                tempo_surface, WHITE, pygame.Rect(
-                    position_x, position_y, 530, 3)
+                tempo_surface, WHITE, pygame.Rect(position_x, position_y, 530, 3)
             )
 
             if position_y >= arrow_y_postion:
@@ -660,8 +637,7 @@ def play_song(song, WIN, clock):
             WIN.blit(fps_text, (10, 24))
 
         # Draw score and accuracy
-        score_label = FONT_SECONDARY_TITLE.render(
-            f"{Display_Score}", True, YELLOW)
+        score_label = FONT_SECONDARY_TITLE.render(f"{Display_Score}", True, YELLOW)
         accuracy_label = FONT_SECONDARY.render(
             f"{round(Accuracy * 100, 2)}%", True, WHITE
         )
@@ -672,13 +648,11 @@ def play_song(song, WIN, clock):
             text_to_render = f"{Grade} (FC)"
 
         # Draw grade
-        grade_label = FONT_SECONDARY.render(
-            text_to_render, True, grade_colors[Grade])
+        grade_label = FONT_SECONDARY.render(text_to_render, True, grade_colors[Grade])
 
         # Blit scores to screen
         WIN.blit(score_label, (WIDTH / 2 - score_label.get_width() / 2, 45))
-        WIN.blit(accuracy_label, (WIDTH / 2 -
-                 accuracy_label.get_width() / 2 - 180, 65))
+        WIN.blit(accuracy_label, (WIDTH / 2 - accuracy_label.get_width() / 2 - 180, 65))
         WIN.blit(grade_label, (WIDTH / 2 - grade_label.get_width() / 2 + 180, 65))
 
         # Draw Combo
@@ -701,8 +675,7 @@ def play_song(song, WIN, clock):
             judgement_colors[latest_judgement],
         )
         judgement_label.set_alpha(255 - frames_since_last_judgement)
-        WIN.blit(judgement_label, (WIDTH / 2 -
-                 judgement_label.get_width() / 2, 330))
+        WIN.blit(judgement_label, (WIDTH / 2 - judgement_label.get_width() / 2, 330))
 
         frames_since_last_judgement += 10
 
@@ -723,20 +696,16 @@ def play_song(song, WIN, clock):
             # This part controls the tweening in, show, and tween out periods
             if time_passed <= 255:
                 progress_surface.set_alpha(song_info_fadein_tween.currentValue)
-                progress_bg_surface.set_alpha(
-                    song_info_bg_fadein_tween.currentValue)
+                progress_bg_surface.set_alpha(song_info_bg_fadein_tween.currentValue)
             elif time_passed >= 4000 - 255:
-                progress_surface.set_alpha(
-                    song_info_fadeout_tween.currentValue)
-                progress_bg_surface.set_alpha(
-                    song_info_bg_fadeout_tween.currentValue)
+                progress_surface.set_alpha(song_info_fadeout_tween.currentValue)
+                progress_bg_surface.set_alpha(song_info_bg_fadeout_tween.currentValue)
             else:
                 progress_surface.set_alpha(255)
                 progress_bg_surface.set_alpha(140)
 
             # Draw background
-            pygame.draw.rect(progress_bg_surface, BLACK,
-                             pygame.Rect(0, 0, WIDTH, 160))
+            pygame.draw.rect(progress_bg_surface, BLACK, pygame.Rect(0, 0, WIDTH, 160))
 
             # Draw song title
             title_label = FONT_POPUP.render(song["Title"], True, YELLOW)
@@ -788,21 +757,18 @@ def play_song(song, WIN, clock):
 
             # This part controls the tweening in, show, and tween out periods
             if time_since_finish <= 2000:
-                progress_surface.set_alpha(
-                    full_combo_fadein_tween.currentValue)
+                progress_surface.set_alpha(full_combo_fadein_tween.currentValue)
                 progress_bg_surface.set_alpha(
                     full_combo_fadein_tween.currentValue - 140
                 )
             else:  # time_since_finish >= 4000 - 255:
-                progress_surface.set_alpha(
-                    full_combo_fadeout_tween.currentValue)
+                progress_surface.set_alpha(full_combo_fadeout_tween.currentValue)
                 progress_bg_surface.set_alpha(
                     full_combo_fadeout_tween.currentValue - 140
                 )
 
             # Draw background
-            pygame.draw.rect(progress_bg_surface, BLACK,
-                             pygame.Rect(0, 0, WIDTH, 100))
+            pygame.draw.rect(progress_bg_surface, BLACK, pygame.Rect(0, 0, WIDTH, 100))
 
             # TODO: Show end screen
 
