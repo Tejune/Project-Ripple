@@ -205,6 +205,7 @@ def play_song(song, WIN, clock):
     song_playing = False
     song_time = -5000  # Time delay in milliseconds until song starts after loading
     playing_notes = []
+    long_note_lines = []
     combo = 0
     arrow_y_postion = 890
     y_sweet_spot = arrow_y_postion - 274
@@ -537,15 +538,29 @@ def play_song(song, WIN, clock):
             WIN.blit(godmode_surface, (400 + 30 - god_label.get_width() - 10, 130))
             WIN.blit(god_label, (400 + 30 - god_label.get_width(), 140))
 
-        # Find and add notes within time window
+        # Find and add notes and markers within time window
         current_time = song_time + delta_time
         song_time = current_time
+
         for note in notes:
             if (
                 note[0] - current_time <= NOTE_WINDOW and note[1] <= 4
             ):  # TODO: Add suport for more than 4 lanes
-                playing_notes.append(note)
+                
+                # If long note, add ending note
+                if len(note) >= 3:
+                    playing_notes.append([note[0], note[1], "StartNote", note[2]])
+                    playing_notes.append([note[2], note[1], "EndNote"])
+                else:
+                    playing_notes.append([note[0], note[1], "NormalNote"])
+
                 notes.remove(note)
+
+            if (
+                note[0] - current_time <= NOTE_WINDOW * 2 and note[1] <= 4 and len(note) >= 3
+            ):
+                long_note_lines.append([note[0], note[2], note[1]])
+
             if note[0] - current_time > NOTE_WINDOW:
                 break
 
@@ -554,9 +569,33 @@ def play_song(song, WIN, clock):
             song_playing = True
             pygame.mixer.music.play()
 
-        # Draw and calculate notes
+        # Draw and calculate notes as well as markers
+        _line_bg = pygame.Surface((530, HEIGHT), pygame.SRCALPHA)
         _note_bg = pygame.Surface((530, HEIGHT), pygame.SRCALPHA)
         _note_bg = _note_bg.convert_alpha()
+
+        for line in long_note_lines:
+
+            # Drawing the line in between long notes
+            p_x = 120 * (line[2] - 1) + ((line[2] - 1) * 8) + 12
+
+            start_time = (line[1] - current_time) / NOTE_WINDOW
+            start_y =  min(-120 + (y_sweet_spot + 120) * (1 - start_time), y_sweet_spot + 60)
+
+            end_time = (line[0] - current_time) / NOTE_WINDOW
+            end_y = -120 + (y_sweet_spot + 120) * (1 - end_time)
+
+            final_y_pos = end_y - (end_y - start_y) + 60
+            final_y_size = end_y - start_y
+
+            if final_y_pos + final_y_size >= y_sweet_spot + 60:
+                final_y_size -= final_y_pos + final_y_size - y_sweet_spot - 60
+
+            if final_y_pos >= y_sweet_spot + 60:
+                long_note_lines.remove(line)
+
+            pygame.draw.rect(_line_bg, (255, 0, 255), (p_x, final_y_pos, 120, final_y_size))
+
         for note in playing_notes:
             position_x = 120 * (note[1] - 1) + ((note[1] - 1) * 8) + 12
 
@@ -603,6 +642,7 @@ def play_song(song, WIN, clock):
 
                 update_score("MISS")
 
+
         # Create tempo lines
         tempo_time += delta_time
         if tempo_time >= tempo_spawn_frequency * 2:
@@ -628,6 +668,7 @@ def play_song(song, WIN, clock):
 
         _note_bg.blit(tempo_surface, (0, 0))
 
+        WIN.blit(_line_bg, (WIDTH / 2 - _bg.get_width() / 2, 0))
         WIN.blit(_note_bg, (WIDTH / 2 - _bg.get_width() / 2, 0))
 
         if FPS_COUNTER_ENABLED:
