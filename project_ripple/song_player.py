@@ -573,7 +573,7 @@ def play_song(song, WIN, clock):
                 # If long note, add ending note
                 if len(note) >= 3:
                     playing_notes.append([note[0], note[1], "StartNote", note[2]])
-                    playing_notes.append([note[2], note[1], "EndNote"])
+                    #playing_notes.append([note[2], note[1], "EndNote"])
                 else:
                     playing_notes.append([note[0], note[1], "NormalNote"])
 
@@ -617,6 +617,17 @@ def play_song(song, WIN, clock):
             if final_y_pos >= y_sweet_spot + 60:
                 long_note_lines.remove(line)
 
+            # Drawing the long note ending part
+            lne_surfacr = pygame.Surface((120, 120), pygame.SRCALPHA)
+            lne_surfacr.convert_alpha()
+
+            pygame.draw.rect(lne_surfacr, BLACK, (p_x + 12, final_y_pos, 120 - 24, final_y_size)) # Border
+            pygame.draw.rect(lne_surfacr, lane_colors[line[2]], (p_x + 16, final_y_pos, 120 - 32, final_y_size)) # Fill
+
+            note_surface = pygame.transform.rotate(note_surface, (note[1] - 1) * 90)
+            _line_bg.blit(lne_surfacr, (0, 0))
+
+            # Drawing the long note line
             pygame.draw.rect(_line_bg, BLACK, (p_x + 12, final_y_pos, 120 - 24, final_y_size)) # Border
             pygame.draw.rect(_line_bg, lane_colors[line[2]], (p_x + 16, final_y_pos, 120 - 32, final_y_size)) # Fill
 
