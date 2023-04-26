@@ -39,7 +39,7 @@ pygame.init()
 
 # ----- Define variables and constants ----------------------------------------------------#
 
-arrow = None
+arrows = None
 arrow_outline_original = None
 sparks = None
 arrow_outline = None
@@ -48,10 +48,26 @@ arrow_outline_highlight_original = None
 
 
 def initial_load():
-    global arrow, arrow_outline_original, sparks, arrow_outline, arrow_outline_highlight_original, arrow_outline_highlight
+    global arrows, arrow_outline_original, sparks, arrow_outline, arrow_outline_highlight_original, arrow_outline_highlight
     # Create reusable image objects
-    arrow = pygame.image.load(resource("images/arrow.png")).convert_alpha()
-    arrow = pygame.transform.scale(arrow, (120, 120))
+
+    # 1: Creating the arrow image objects
+    arrows = [None, None, None, None]
+
+    arrows[0] = pygame.image.load(resource("images/arrow_left.png")).convert_alpha() # Lane 1
+    arrows[0] = pygame.transform.scale(arrows[0], (120, 120))
+
+    arrows[1] = pygame.image.load(resource("images/arrow_up.png")).convert_alpha() # Lane 2
+    arrows[1] = pygame.transform.scale(arrows[1], (120, 120))
+
+    arrows[2] = pygame.image.load(resource("images/arrow_down.png")).convert_alpha() # Lane 3
+    arrows[2] = pygame.transform.scale(arrows[2], (120, 120))
+
+    arrows[3] = pygame.image.load(resource("images/arrow_right.png")).convert_alpha() # Lane 4
+    arrows[3] = pygame.transform.scale(arrows[3], (120, 120))
+
+
+
     arrow_outline_original = pygame.image.load(
         resource("images/arrow_outline.png")
     ).convert_alpha()
@@ -102,6 +118,13 @@ judgement_colors = {
     "GREAT": (97, 255, 102),
     "PERFECT": (112, 253, 255),
     "MARVELOUS": (255, 255, 255),
+}
+
+lane_colors = {
+    1: (111, 34, 114),
+    2: (83, 137, 62),
+    3: (186, 141, 55),
+    4: (153, 86, 84),
 }
 
 judgement_count = {"MISS": 0, "GOOD": 0, "GREAT": 0, "PERFECT": 0, "MARVELOUS": 0}
@@ -594,7 +617,8 @@ def play_song(song, WIN, clock):
             if final_y_pos >= y_sweet_spot + 60:
                 long_note_lines.remove(line)
 
-            pygame.draw.rect(_line_bg, (255, 0, 255), (p_x, final_y_pos, 120, final_y_size))
+            pygame.draw.rect(_line_bg, BLACK, (p_x + 12, final_y_pos, 120 - 24, final_y_size)) # Border
+            pygame.draw.rect(_line_bg, lane_colors[line[2]], (p_x + 16, final_y_pos, 120 - 32, final_y_size)) # Fill
 
         for note in playing_notes:
             position_x = 120 * (note[1] - 1) + ((note[1] - 1) * 8) + 12
@@ -607,8 +631,8 @@ def play_song(song, WIN, clock):
             # Add notes to surface
             note_surface = pygame.Surface((120, 120), pygame.SRCALPHA)
             note_surface.convert_alpha()
-            note_surface.blit(arrow, (0, 0))
-            note_surface = pygame.transform.rotate(note_surface, (note[1] - 1) * 90)
+            note_surface.blit(arrows[note[1] - 1], (0, 0))
+            #note_surface = pygame.transform.rotate(note_surface, (note[1] - 1) * 90)
             _note_bg.blit(note_surface, (position_x, position_y))
             # pygame.draw.rect(_note_bg, YELLOW, pygame.Rect(position_x, position_y, 100, 40))
             # pygame.draw.rect(_note_bg, (150,150, 0), pygame.Rect(position_x + 1, position_y + 1, 98, 38))
