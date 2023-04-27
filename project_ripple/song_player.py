@@ -229,6 +229,7 @@ def play_song(song, WIN, clock):
     song_time = -5000  # Time delay in milliseconds until song starts after loading
     playing_notes = []
     long_note_lines = []
+    is_line_held = [False, False, False, False]
     combo = 0
     arrow_y_postion = 890
     y_sweet_spot = arrow_y_postion - 274
@@ -304,7 +305,7 @@ def play_song(song, WIN, clock):
                 # print("No...")
 
     # Note hit detection
-    def hit_detect(lane):
+    def hit_detect(lane, flag=None):
         # Define global
         global latest_judgement
         global latest_judgement_offset
@@ -313,6 +314,47 @@ def play_song(song, WIN, clock):
         global Notes_Played
         global Score
         global Accuracy
+
+        # Long note hit code, fired when lifting the key to a lane
+        if flag == "LONG_NOTES":
+
+            # Return if there isn't a long note being held in the current lane
+            if is_line_held[lane-1] == False:
+                return False, "N/A"
+            
+            song_offset = is_line_held[lane-1] - song_time
+
+            judgement = "MISS"
+            if abs(song_offset) <= 75:
+                #Hit!
+
+                # All long note hits count as marvelous
+                judgement = "MARVELOUS"
+                
+                #Removing the long note
+                for line in long_note_lines:
+                    print(line[1])
+                    print(is_line_held[lane-1])
+                    if line[1] == is_line_held[lane-1]:
+                        long_note_lines.remove(line)
+                
+                is_line_held[lane-1] = False
+
+            else:
+                #Miss!
+                is_line_held[lane-1] = False
+                judgement = "MISS"
+            
+            latest_judgement = judgement
+            judgement_count[judgement] += 1
+            latest_judgement_offset = song_offset
+            update_score(judgement)
+            frames_since_last_judgement = 0
+            return True, judgement
+            
+
+
+
 
         # Variable definition
         closest_note = False
@@ -349,6 +391,11 @@ def play_song(song, WIN, clock):
 
         # If a note was found, delete it and return the result
         if closest_note:
+
+            # If the note is the beginning of a long note, begin the holding requirement
+            if closest_note[2] == "StartNote":
+                is_line_held[lane - 1] = closest_note[3]
+            
             playing_notes.remove(closest_note)
             judgement_count[judgement] += 1
 
@@ -409,6 +456,30 @@ def play_song(song, WIN, clock):
                         frames_since_last_hit = 0
                     elif hit and judgement == "MISS":
                         combo = 0
+
+            if event.type == pygame.KEYUP:
+                lane = -1
+
+                if event.key == pygame.K_z:
+                    lane = 1
+                if event.key == pygame.K_x:
+                    lane = 2
+                if event.key == pygame.K_COMMA:
+                    lane = 3
+                if event.key == pygame.K_PERIOD:
+                    lane = 4
+
+                if lane != -1:
+                    hit, judgement = hit_detect(lane, "LONG_NOTES")
+
+                    if hit and judgement != "MISS":
+                        combo += 1
+                        frames_since_last_hit = 0
+                        pygame.mixer.Channel(3).play(sfx_hit)
+                        pygame.mixer.Channel(3).set_volume(0.065)
+                    elif hit and judgement == "MISS":
+                        combo = 0
+
 
         # Fill screen with black
         WIN.fill(BLACK)
@@ -583,6 +654,8 @@ def play_song(song, WIN, clock):
                 note[0] - current_time <= NOTE_WINDOW * 2 and note[1] <= 4 and len(note) >= 3
             ):
                 long_note_lines.append([note[0], note[2], note[1]])
+                playing_notes.append([note[0], note[1], "StartNote", note[2]])
+                notes.remove(note)
 
             if note[0] - current_time > NOTE_WINDOW:
                 break
@@ -593,7 +666,7 @@ def play_song(song, WIN, clock):
             pygame.mixer.music.play()
 
         # Draw and calculate notes as well as markers
-        _line_bg = pygame.Surface((530, HEIGHT), pygame.SRCALPHA)
+        _line_bg = pygame.Surface((530, HEIGHT - (HEIGHT - y_sweet_spot - 60)), pygame.SRCALPHA)
         _note_bg = pygame.Surface((530, HEIGHT), pygame.SRCALPHA)
         _note_bg = _note_bg.convert_alpha()
 
@@ -617,19 +690,36 @@ def play_song(song, WIN, clock):
             if final_y_pos >= y_sweet_spot + 60:
                 long_note_lines.remove(line)
 
+            # Getting long note colors
+            color = lane_colors[line[2]]
+            r, g, b = lane_colors[line[2]]
+            h = 50 # Highlight amount
+            hx = 100
+            hightlight_color = (min(r + h, 255), min(g + h, 255), min(b + h, 255))
+            ex_hightlight_color = (min(r + hx, 255), min(g + hx, 255), min(b + hx, 255))
+
+
+            if line[1] == is_line_held[line[2] -1]:
+                color = hightlight_color
+                hightlight_color = ex_hightlight_color
+
             # Drawing the long note ending part
-            lne_surfacr = pygame.Surface((120, 120), pygame.SRCALPHA)
-            lne_surfacr.convert_alpha()
+            lne_surfacr = pygame.Surface((70, 70), pygame.SRCALPHA)
+            pygame.draw.rect(lne_surfacr, BLACK, (0, 0, 70, 70)) # Border
+            pygame.draw.rect(lne_surfacr, color, (4, 4, 62, 62)) # Fill
 
-            pygame.draw.rect(lne_surfacr, BLACK, (p_x + 12, final_y_pos, 120 - 24, final_y_size)) # Border
-            pygame.draw.rect(lne_surfacr, lane_colors[line[2]], (p_x + 16, final_y_pos, 120 - 32, final_y_size)) # Fill
-
-            note_surface = pygame.transform.rotate(note_surface, (note[1] - 1) * 90)
-            _line_bg.blit(lne_surfacr, (0, 0))
+            lne_surfacr = pygame.transform.rotate(lne_surfacr, 45)
+            _line_bg.blit(lne_surfacr, (p_x + 12, final_y_pos - 52))
 
             # Drawing the long note line
             pygame.draw.rect(_line_bg, BLACK, (p_x + 12, final_y_pos, 120 - 24, final_y_size)) # Border
-            pygame.draw.rect(_line_bg, lane_colors[line[2]], (p_x + 16, final_y_pos, 120 - 32, final_y_size)) # Fill
+            pygame.draw.rect(_line_bg, color, (p_x + 16, final_y_pos, 120 - 32, final_y_size)) # Fill
+
+            # Drawing the long note ending highlight
+            hightlight_surface = pygame.Surface((70, 70), pygame.SRCALPHA)
+            pygame.draw.rect(hightlight_surface, hightlight_color, (4, 4, 62, 62)) # Hightlight
+            hightlight_surface = pygame.transform.rotate(hightlight_surface, 45)
+            _line_bg.blit(hightlight_surface, (p_x + 12, final_y_pos - 52))
 
         for note in playing_notes:
             position_x = 120 * (note[1] - 1) + ((note[1] - 1) * 8) + 12
