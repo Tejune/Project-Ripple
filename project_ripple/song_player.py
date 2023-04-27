@@ -333,8 +333,6 @@ def play_song(song, WIN, clock):
                 
                 #Removing the long note
                 for line in long_note_lines:
-                    print(line[1])
-                    print(is_line_held[lane-1])
                     if line[1] == is_line_held[lane-1]:
                         long_note_lines.remove(line)
                 
@@ -638,15 +636,10 @@ def play_song(song, WIN, clock):
 
         for note in notes:
             if (
-                note[0] - current_time <= NOTE_WINDOW and note[1] <= 4
+                note[0] - current_time <= NOTE_WINDOW and note[1] <= 4 and len(note) < 3
             ):  # TODO: Add suport for more than 4 lanes
                 
-                # If long note, add ending note
-                if len(note) >= 3:
-                    playing_notes.append([note[0], note[1], "StartNote", note[2]])
-                    #playing_notes.append([note[2], note[1], "EndNote"])
-                else:
-                    playing_notes.append([note[0], note[1], "NormalNote"])
+                playing_notes.append([note[0], note[1], "NormalNote"])
 
                 notes.remove(note)
 
