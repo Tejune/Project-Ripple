@@ -325,7 +325,7 @@ def play_song(song, WIN, clock):
             song_offset = is_line_held[lane-1] - song_time
 
             judgement = "MISS"
-            if abs(song_offset) <= 75:
+            if abs(song_offset) <= 150:
                 #Hit!
 
                 # All long note hits count as marvelous
