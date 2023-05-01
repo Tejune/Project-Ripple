@@ -24,6 +24,35 @@ pipx install .\dist\project_ripple-0.1.0-py3-none-any.whl
 ```
 To then run, simply call `ripple` or `ripple.exe` in any terminal or launcher.
 
+## Nix support
+<details>
+  <summary>Running</summary>
+  
+  ```bash
+  nix run "github:Tejune/Project-Ripple#project-ripple"
+  ```
+  Without previously enabling flakes and nix-command:
+  ```bash
+  nix --experimental-features 'nix-command flakes' run "github:Tejune/Project-Ripple#project-ripple"
+  ```
+</details>
+
+<details>
+  <summary>Installing and running (can be done in other ways)</summary>
+  
+  ```bash
+  nix profile install "github:Tejune/Project-Ripple#project-ripple"
+  project-ripple
+  ripple
+  ```
+  Without previously enabling flakes and nix-command:
+  ```bash
+  nix --experimental-features 'nix-command flakes' profile install "github:Tejune/Project-Ripple#project-ripple"
+  project-ripple
+  ripple
+  ```
+</details>
+
 ## Have fun!
 This project was created mostly for learning and fun. If you have any feedback, please let us know!
 
