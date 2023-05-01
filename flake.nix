@@ -20,6 +20,7 @@
           project-ripple = mkPoetryApplication {
             python = pkgs.python311;
             projectDir = self;
+            propagatedBuildInputs = [ pkgs.python311Packages.tkinter ];
             overrides = pkgs.poetry2nix.defaultPoetryOverrides.extend
               (self: super:
                 {
