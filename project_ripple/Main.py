@@ -43,7 +43,7 @@ log("Finished initializing pygame", "update", line())
 log("Initializing pygame variables", "info", line())
 pygame.display.set_caption("Project Ripple")  # Set Caption
 infoObject = pygame.display.Info()
-WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
+WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.DOUBLEBUF)
 clock = pygame.time.Clock()
 log("Finished initializing pygame variables", "update", line())
 
@@ -221,7 +221,7 @@ class Button:
             self.bg_fade = self.song_selected_fade
         else:
             self.bg_fade = self.song_select_fade
-
+        
         _bg.blit(self.bg_fade, (0, 0), None, pygame.BLEND_RGBA_MIN)
         self.surface.blit(_bg, (0, 0))
 
@@ -607,6 +607,7 @@ while is_on_select_screen:
     # Draw all buttons currently on screen
     for button in buttons:
         if button.y + scroll_offset < HEIGHT and button.y + scroll_offset > -200:
+            pass
             sel = button.show(delta_time)
             if sel:
                 selected_song = sel
