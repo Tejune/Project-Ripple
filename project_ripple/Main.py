@@ -235,7 +235,7 @@ class Button:
             self.song["LoadedImageBlurredPreview"],
             (0, -(HEIGHT * 0.18)),
             None,
-            pygame.BLEND_RGBA_MIN,
+            pygame.BLEND_RGB_MIN,
         )
 
         # Add transparent background under song list
@@ -582,18 +582,17 @@ while is_on_select_screen:
                 selected_button = buttons[
                     min(button_list_position + 1, buttons.__len__() - 1)
                 ]
-                log(
-                    f"Selection position: {min(button_list_position + 1, buttons.__len__() - 1)}",
-                    "warning",
-                    line(),
-                )
+                # log(
+                #     f"Selection position: {min(button_list_position + 1, buttons.__len__() - 1)}",
+                #     "debug",
+                #     line(),
+                # )
 
                 new_selection = selected_button.click(None, selected_song, True)
                 selected_song = new_selection
 
             if event.key == pygame.K_RETURN:
                 selected_button = buttons[button_list_position]
-                log("Using enter to enter a song! Hah, get it?", "debug", line())
 
                 selected_button.click(None, selected_song, True)
 
@@ -619,18 +618,26 @@ while is_on_select_screen:
 
     # Draw selected song thumbnail preview
     if selected_song:
-        # Draw the previous song's background
-        prev_blur_bg_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-        prev_blur_bg_surface.set_alpha(max(255 - frames_since_last_song * 150, 0))
-        prev_blur_bg_surface.blit(last_song["LoadedImageBlurredFull"], (0, 0))
 
-        # Draw the current songs background
-        _blur_bg_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-        _blur_bg_surface.set_alpha(min(frames_since_last_song * 150, 255))
-        _blur_bg_surface.blit(selected_song["LoadedImageBlurredFull"], (0, 0))
+        if (frames_since_last_song * 75) < 255:
+            # Draw the previous song's background
+            prev_blur_bg_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+            prev_blur_bg_surface.set_alpha(max(255 - frames_since_last_song * 75, 0))
+            prev_blur_bg_surface.blit(last_song["LoadedImageBlurredFull"], (0, 0))
 
-        WIN.blit(prev_blur_bg_surface, (0, 0))
-        WIN.blit(_blur_bg_surface, (0, 0))
+            # Draw the current songs background
+            _blur_bg_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+            _blur_bg_surface.set_alpha(min(frames_since_last_song * 75, 255))
+            _blur_bg_surface.blit(selected_song["LoadedImageBlurredFull"], (0, 0))
+
+            WIN.blit(prev_blur_bg_surface, (0, 0))
+            WIN.blit(_blur_bg_surface, (0, 0))
+        
+        else:
+            
+            # Draw the current songs background
+            WIN.blit(selected_song["LoadedImageBlurredFull"], (0, 0))
+
 
         # Increment loop counter
         frames_since_last_song += 1
