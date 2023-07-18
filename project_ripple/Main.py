@@ -1,7 +1,9 @@
-# ------------------------------------------------------------------------------------------
-#   Project Ripple
+# ------------------------------------------------------------------------------------------#
+#   Project Ripple -> Main File
 #   by Tejune
-# ------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------#
+
+#---- Imports ------------------------------------------------------------------------------#
 
 import random
 import traceback
@@ -27,46 +29,74 @@ from .constants import (
 from .helper_methods import resource, user_dir
 from .logs import line, log, message
 
-# Imports
 from .song_loader import load_songs
 from .song_player import play_song  # Tejune stupid? Lägg imports på toppen
 from .start_screen import show_loading_screen, show_title_screen
 
-log("Initializing pygame", "info", line())
-# Initialize pygame module
+
+#---- Pygame Initialization --------------------------------------------------------------#
+
+log(
+    "Initializing pygame...", 
+    "info", 
+    line()
+)
+
 pygame.mixer.pre_init(44100, 16, 2, 4096)
 pygame.init()
-pygame.mixer.init(44100, -16, 2, 2048)  # (frequency, size, channels, buffer))
-log("Finished initializing pygame", "update", line())
+pygame.mixer.init(44100, -16, 2, 2048)
 
-# Pygame variables & Constants
-log("Initializing pygame variables", "info", line())
 pygame.display.set_caption("Project Ripple")  # Set Caption
 infoObject = pygame.display.Info()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.DOUBLEBUF)
 clock = pygame.time.Clock()
-log("Finished initializing pygame variables", "update", line())
 
-log("Loading image related directories and dictionaries", "info", line())
-# Directory & Dictionary
+log(
+    "Finished initializing pygame", 
+    "update", 
+    line()
+)
+
+
+#---- Image and dict initialization -----------------------------------------------------#
+
+log(
+    "Loading image related directories and dictionaries", 
+    "info", 
+    line()
+)
+
 default_thumbnail = pygame.image.load(resource("images/default_thumb.jpg")).convert()
+
 song_select_fade = pygame.image.load(
     resource("images/song_select_fade.png")
 ).convert_alpha()
 song_selected_fade = pygame.image.load(
     resource("images/song_selected_fade.png")
 ).convert_alpha()
+
 songs = []
-log("Finished loading image related directories and dictionaries", "update", line())
+
+log(
+    "Finished loading image related directories and dictionaries", 
+    "update", 
+    line()
+)
 
 
-# Song selection & Playing songs
-log("Loading song selection and prerequisites for playing songs", "info", line())
-scroll_offset = 0
-selected_song = None
-last_song = None
-frames_since_last_song = 500  # Any value high enough will do
-song_select_offset = 0
+#---- Song Selection Initialization -----------------------------------------------------#
+
+log(
+    "Loading song selection and prerequisites for playing songs", 
+    "info", 
+    line()
+)
+
+scroll_offset            = 0
+selected_song            = None
+last_song                = None
+frames_since_last_song   = 500
+song_select_offset       = 0
 
 play_button = pygame.image.load(resource("images/play_button.png")).convert_alpha()
 play_button = pygame.transform.scale(play_button, (48, 48))
@@ -78,10 +108,9 @@ log(
     line(),
 )
 
-############# Functions & Classes ##############
 
+#---- Classes --------------------------------------------------------------------------#
 
-# Button class
 class Button:
     """Create a button, then blit the surface in the while loop"""
 
@@ -195,7 +224,6 @@ class Button:
         # Create button surface
         self.size = (self.bound_x, self.bound_y + 18)
         self.surface = pygame.Surface(self.size, pygame.SRCALPHA)
-        self.surface.convert_alpha()
 
         # Create mask used by image to create corners
         pygame.draw.rect(
@@ -363,56 +391,73 @@ class Button:
 
 # --------- Compile songs and show menu screen ------------------------------------------------------------#
 
-log("Compiling songs...", "info", line())
-# Show loading screen
+log(
+    "Compiling songs...", 
+    "info", 
+    line()
+)
+
 show_loading_screen(WIN, FONT, FONT_TITLE, "Converting new image files...", 10)
 
-# Load songs
 try:
     songs = load_songs(WIN)
 except FileNotFoundError:
     open(user_dir("cache.json"), "w").write("{}")
     songs = load_songs(WIN)
 
-# Start title screen bgm
+# Play title screen BGM
 pygame.mixer.Channel(2).play(pygame.mixer.Sound(resource("sound/Title.wav")))
 pygame.mixer.Channel(2).set_volume(0.4)
 
 # Select a random track
-total_songs = len(songs)
-random_song = random.randint(0, total_songs - 1)
-selected_song = songs[random_song]
-current_song = random_song
-last_song = selected_song
+total_songs      = len(songs)
+random_song      = random.randint(0, total_songs - 1)
+selected_song    = songs[random_song]
+current_song     = random_song
+last_song        = selected_song
 
-log(f"Total songs: {total_songs}\nSelected song: {random_song}", "warning", line())
+log(
+    f"Total songs: {total_songs}\nSelected song: {random_song}", 
+    "update", 
+    line()
+)
 
-# Show title screen
 show_title_screen(WIN, FONT, FONT_TITLE, clock, Framerate, FONT_PIXEL, selected_song)
-log("Finished compiling songs.", "update", line())
+
+log(
+    "Finished compiling songs.", 
+    "update", 
+    line()
+)
+
 
 # --------- Song select screen ----------------------------------------------------------------------------#
 
-# ----- Create buttons -----#
+log(
+    "Initializing song select screen...", 
+    "info", 
+    line()
+)
 
-log("Initializing song select screen...", "info", line())
+# Button variables
+buttons                 = []
+button_offset           = 120
+button_x                = WIDTH * 0.6 - 50
+button_y                = 144
+button_list_position    = 0
 
-# Define button variables
-buttons = []
-button_offset = 120
-button_x = WIDTH * 0.6 - 50
-button_y = 144
-button_list_position = 0
+# Other variables
+is_on_select_screen     = True
+loops                   = 0
+real_loops              = 0
+scroll                  = 0
+last_song_y             = 0
 
-last_song_y = 0
-
-# Define variables
-is_on_select_screen = True
-loops = 0
-real_loops = 0
-scroll = 0
-
-log("Creating buttons...", "update", line())
+log(
+    "Creating buttons...", 
+    "update", 
+    line()
+)
 
 # Create buttons
 buttons_created = -1
