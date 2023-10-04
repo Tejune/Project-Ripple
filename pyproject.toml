@@ -14,7 +14,7 @@ ripple = "project_ripple.Main:__main__"
 [tool.poetry.dependencies]
 python = "3.11.*"
 pygame = "2.2.0"
-Pillow = "^9.4.0"
+Pillow = "^10.0.1"
 numpy = "^1.24.2"
 platformdirs = "^3.2.0"
 
