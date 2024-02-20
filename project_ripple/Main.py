@@ -46,7 +46,7 @@ pygame.mixer.pre_init(44100, 16, 2, 4096)
 pygame.init()
 pygame.mixer.init(44100, -16, 2, 2048)
 
-pygame.display.set_caption("Project Ripple")  # Set Caption
+pygame.display.set_caption("Project Nipple")  # Set Caption
 infoObject = pygame.display.Info()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.DOUBLEBUF)
 clock = pygame.time.Clock()
